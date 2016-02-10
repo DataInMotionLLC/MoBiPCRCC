@@ -86,12 +86,28 @@ Parse.Cloud.define("getPCR", function (request, response) {
     {TheCallObject.Status = "INPROCESS"}
     
     u.setBuild("Start")
-    //if (typeof request.params.PCRID !== 'undefined') {
-        var _pcrID = 'tGHIYt5l1e'
-    //}
-    //else {
-    //    response.success("Missing PCRID");
-    //};
+    if (typeof request.params.PCRID !== 'undefined') {
+        if (request.params.PCRID == '') {
+            response.success("Missing PCRID");
+        }
+        else {
+            var _pcrID = request.params.PCRID
+        }
+    }
+    else {
+        response.success("Missing PCRID");
+    };
+    if (typeof request.params.status !== 'undefined') {
+        if (request.params.status == '') {
+            response.success("Missing status");
+        }
+        else {
+            var _status = request.params.status
+        }
+    }
+    else {
+        response.success("Missing status");
+    };       
     u.setBuild("FetchBusinessObject")
 
     var eList = getAll();
@@ -99,12 +115,11 @@ Parse.Cloud.define("getPCR", function (request, response) {
     {
         x.Genv34.getObj(_pcrID).then(function (rawParse) {
             if (typeof rawParse.attributes === 'undefined') {
-                //response.success("Failed Fetch: rawParse")
-                return ("Failed Fetch: rawParse")
+                response.success("Failed Fetch: rawParse")
+                
             };
             if (typeof rawParse.attributes.agencyId === 'undefined') {
-                //response.success("Missing Agency")
-                return ("Missing Agency")
+                response.success("Missing Agency")               
             };
             var _agencyID = rawParse.attributes.agencyId;    //Prime it.  No Agency ID, no go
             TheCallObject.AgencyID = _agencyID;
@@ -113,7 +128,7 @@ Parse.Cloud.define("getPCR", function (request, response) {
             var p = getAgency(_agencyID);
             p.then(function (results) {
                 if (typeof rawParse.attributes.emsDataSet === 'undefined') {
-                    return ("Fetch Failure:  emsDataSet")
+                    response.success("Fetch Failure:  emsDataSet")
                 };
                 TheCallObject.PCRObject = rawParse.attributes.emsDataSet;   //Set the Business Entity
                 var ElementList = [];                                       //Config Lis

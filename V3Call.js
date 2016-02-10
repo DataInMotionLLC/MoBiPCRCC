@@ -243,7 +243,8 @@ exports.setTheCall = function (thePCR)
             u.RaiseError("ePatientObject", 0, "setV3Call.u.getObjectFromOLTPExtract.ePatient", e);
         };       
        
-        if (typeof ePatientObject !== 'undefined' && ePatientObject.IsUndefined == false) {
+        if (typeof ePatientObject !== 'undefined' && ePatientObject.IsUndefined == false)
+        {
             var rawObject = {};
             rawObject.Name = "ePatientObject"
             rawObject.Payload = ePatientObject
@@ -251,11 +252,13 @@ exports.setTheCall = function (thePCR)
             rawObject = undefined;
             ePatientObject.HasDataSet = true;
             var _Patient = {};
-            try {
+            try
+            {
                 u.RaiseError("setePatient(ePatientObject, NEMSISElements)", 100, "V3Call", "setePatient");
                 _Patient = pat.setePatient(ePatientObject, NEMSISElements);
             }
-            catch (e) {
+            catch (e)
+            {
                 u.RaiseError("setePatient", 0, "setV3Call.u.getObjectFromOLTPExtract.ePatient", e);
                 _Patient = null;
             };
