@@ -390,12 +390,12 @@ exports.setePatient = function (pcrObj, NemsisList) {
 
         ///////////ePatient.17//////// 
         try {
-            BODOB = u.setBusinessObject(_eL, NemsisList, "ePatient.17")
+            var BODOB = u.setBusinessObject(_eL, NemsisList, "ePatient.17")
             if (BODOB.IsNull == false) {
                 var pattern = /(\d{2})(\d{2})(\d{4})/;
                 BODOB.vSet[0].val = BODOB.vSet[0].val.replace(pattern, '$3-$2-$1');
-            };
-            ePatient["ePatient.17"] = BODOB;
+                ePatient["ePatient.17"] = BODOB;
+            };            
         }
         catch (e) {
             u.RaiseError("ePatient.17", 1, "ePatient34", e);

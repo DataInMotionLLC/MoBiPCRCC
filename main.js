@@ -13,6 +13,50 @@ summary = require('cloud/Summary.js');
 var moment = require('moment');
 SendMail = require('cloud/SendeMail.js');
 var client = require('cloud/myMailModule-1.0.0.js');
+
+Parse.Cloud.afterSave("PCR", function (request) {
+    console.log("In PCR")
+    //var p = getPCR(request.object.id);
+    //console.log("End " + p)
+    //p.then(function (results) {
+    //    console.log("restults " + results)
+    //});
+});
+
+
+//Parse.Cloud.afterSave("HTMLClass", function (request) {
+//    console.log(request)
+//    console.log("In the HTMLClass " + request.object.get('PCRID'))
+//    var p = getPCR(request.object.get('PCRID'));
+//    //console.log("End " + p)
+//    //p.then(function (results) {
+//    //    console.log("restults " + results)
+//    //});
+//});
+
+
+//Parse.Cloud.afterSave("EMSDataset", function (request) {
+//    console.log("In EMSDataset")
+//        //var cm = Parse.Object.extend("PCR");
+//        //var query = new Parse.Query(cm);
+//        //query.equalTo("PCRID", request.object.pcrID);
+//        ////return query.find({
+//        //return query.first({
+//        //    success: function (results) {
+//        //        console.log("resutlts of PCRID " + results)
+//        //    },
+//        //    error: function (error) { }
+//        //});
+
+    
+//    //var p = getPCR(request.object.id);
+//    //console.log("End " + p)
+    
+//});
+
+
+
+
 Parse.Cloud.define("getHTML", function (request, response) {
     var d = {}
     //var e = getHTML("tGHIYt5l1e")
@@ -31,39 +75,48 @@ Parse.Cloud.define("getHTML", function (request, response) {
 
 
 Parse.Cloud.define("getPCR", function (request, response) {
-
+//var getPCR = function (pcrID, status) {
+    console.log("In Get PCR With everything")
     var pcrStatus = "Open"
     var TheCallObject = new Object();
+    var _status = ""
+    if ((typeof status != 'undefined') && (status != ""))
+    { TheCallObject.Status = status; }
+    else
+    {TheCallObject.Status = "INPROCESS"}
+    
     u.setBuild("Start")
-
-    if (typeof request.params.PCRID !== 'undefined') {
-        var _pcrID = request.params.PCRID
-    }
-    else {
-        response.success("Missing PCRID");
-    };
+    //if (typeof request.params.PCRID !== 'undefined') {
+        var _pcrID = 'tGHIYt5l1e'
+    //}
+    //else {
+    //    response.success("Missing PCRID");
+    //};
     u.setBuild("FetchBusinessObject")
 
     var eList = getAll();
-    eList.then(function (elements) {
+    eList.then(function (elements)
+    {
         x.Genv34.getObj(_pcrID).then(function (rawParse) {
             if (typeof rawParse.attributes === 'undefined') {
-                response.success("Failed Fetch: rawParse")
+                //response.success("Failed Fetch: rawParse")
+                return ("Failed Fetch: rawParse")
             };
             if (typeof rawParse.attributes.agencyId === 'undefined') {
-                response.success("Missing Agency")
+                //response.success("Missing Agency")
+                return ("Missing Agency")
             };
             var _agencyID = rawParse.attributes.agencyId;    //Prime it.  No Agency ID, no go
             TheCallObject.AgencyID = _agencyID;
 
-            u.setBuild("GetAgency")
+            u.setBuild("GetAgency");
             var p = getAgency(_agencyID);
             p.then(function (results) {
                 if (typeof rawParse.attributes.emsDataSet === 'undefined') {
-                    response.success("Fetch Failure:  emsDataSet")
+                    return ("Fetch Failure:  emsDataSet")
                 };
                 TheCallObject.PCRObject = rawParse.attributes.emsDataSet;   //Set the Business Entity
-                var ElementList = [];                                       //Config List
+                var ElementList = [];                                       //Config Lis
                 for (var i = 0; i < elements.length ; i++) {
                     var Element = new Object();
                     Element.Number = elements[i].attributes.ElementNumber;
@@ -93,12 +146,14 @@ Parse.Cloud.define("getPCR", function (request, response) {
                     u.RaiseError("Failed generating PCR Object", 0, "TheCall.setV3Call", e);
                 };
 
-                //Set Entity ID (Call ID)
-                ////////////////////////////////////////////////
+
                 try {
+                    console.log("SetCallProperties");
                     u.setBuild("SetCallProperties");
                     var _v3E = v3CT.setV3English(TheCallObject);             //Reporting Payload
+                    console.log("v3CT.setV3English(TheCallObject)")
                     TheCallObject.Props = _v3E;
+                    TheCallObject.PCRID = _pcrID;
                     TheCallObject.Props.PCRID = _pcrID;
                     try {
                         var _Summary = summary.setCallSummary(TheCallObject)
@@ -106,9 +161,8 @@ Parse.Cloud.define("getPCR", function (request, response) {
                     }
                     catch (e) {
                         u.RaiseError("Failed generating Summary Object", 0, "TheCall.setCallSummary", e);
-                    }
+                    };
 
-                    TheCallObject.PCRID = _pcrID;
                     var tmp = rules.setCallRules(TheCallObject.Props);
                     var htmltext = ht.setHTML(TheCallObject)                //AsIs HTML Document
                     TheCallObject.HTMLDoc = htmltext;
@@ -119,97 +173,105 @@ Parse.Cloud.define("getPCR", function (request, response) {
                 catch (e) {
                     u.RaiseError("Failed generating Reporting Object", 0, "TheCall.setV3English", e);
                 };
-                var callM = setCallMetrix(_pcrID)
-                callM.then(function (ddr) {
-                    //    //If the call is well-formed, build it.
-                    //    ////////////////////////////////////////////////
-                    //    ////////////////////////////////////////////////
-                    var o1 = new Array();
-                    o1 = u.getFatalErrors();
-                    if (o1.length === 0) {
-                        var BuildStatus = "SUCCESS"
-                    }
-                    else {
-                        var BuildStatus = "FAILED Fatal Error Count: " + o1.length;
-                    };
-                    TheCallObject.BuildStatus = BuildStatus;
-                    //    ////////////////////////////////////////////////
-                    //    ////////////////////////////////////////////////
-                    var p1 = SaveTheHTML(TheCallObject);
-                    p1.then(function () {
+                //var callM = setCallMetrix(_pcrID)
+                //callM.then(function (ddr) {
+                //    //    //If the call is well-formed, build it.
+                //    //    ////////////////////////////////////////////////
+                //    //    ////////////////////////////////////////////////
+                //    var o1 = new Array();
+                //    o1 = u.getFatalErrors();
+                //    if (o1.length === 0) {
+                //        var BuildStatus = "SUCCESS"
+                //    }
+                //    else {
+                //        var BuildStatus = "FAILED Fatal Error Count: " + o1.length;
+                //    };
+                //    TheCallObject.BuildStatus = BuildStatus;
+                //    //    ////////////////////////////////////////////////
+                //    ////////////////////////////////////////////////
+                //    //var p1 = SaveTheHTML(TheCallObject);
+                //    var p1 = saveHTMLClass(TheCallObject);
+                //    p1.then(function () {
+                //        if (status !== "COMPLETE") {
+                //            try {
+                //                var dc = pdf.NewPDF(TheCallObject);
+                //                TheCallObject.PDF = dc;
+                //            }
+                //            catch (e) {
+                //                u.RaiseError("Failed generating PDF ", 0, "TheCall.setV2Call", e);
+                //            };
 
-                        if (TheCallObject.BuildStatus !== "SUCCESS") {
-                            try {
-                                console.log("PDFing")
-                                var dc = pdf.NewPDF(TheCallObject);
-                                TheCallObject.PDF = dc;
-                                console.log("After PDFing")
-                            }
-                            catch (e) {
-                                u.RaiseError("Failed generating PDF ", 0, "TheCall.setV2Call", e);
-                            };
+                //            if (typeof TheCallObject.Props !== 'undefined') {
+                //                try {
+                //                    TheCallObject.Version2 = v2Object;
+                //                    var v2Object = v2.setV2Call(TheCallObject);
+                //                    var v2XML = ver2XML.setV2XML(v2Object);
+                //                    TheCallObject.v2XML = v2XML;
+                //                    var version2XMLByteArray = v2XML.getBytes();
+                //                    TheCallObject.XML = version2XMLByteArray;
+                //                }
+                //                catch (e) {
+                //                    u.RaiseError("Failed generating Verson 2 Object", 0, "TheCall.setV2Call", e);
+                //                }
+                //            };
+                //            var p = SaveThePDF(TheCallObject);
+                //            p.then(function () {
+                //                //If Has Crew, Save Crew
+                //                if ((typeof TheCallObject.Props["Crew"] !== 'undefined') && (TheCallObject.Props["Crew"] > 0)) {
+                //                    var cMet = crewMetrix.setCrewMetrix(TheCallObject);
+                //                    cMet.then(function (ceM) {
+                //                        if (typeof TheCallObject.XML !== 'undefined') {
+                //                            var cXML = SaveTheXML(TheCallObject);
+                //                            cXML.then(function (Txml) {
+                //                                u.setBuild("EndTime");
+                //                                var FatalE = u.getFatalErrors;
+                //                                var TimeE = u.getTimeErrors;
+                //                                var WarningsE = u.getWarnings;
+                //                                var CallLogE = u.getCallLog;
+                //                                var TheEvent = new Object();
+                //                                if (FatalE.length > 0) {
+                //                                    TheEvent.Status = "Errors"
+                //                                };
+                //                                if (TimeE.length > 0) {
+                //                                    TheEvent.TimeErrors = TimeE;
+                //                                };
+                //                                if (WarningsE.length > 0) {
+                //                                    TheEvent.Warningss = WarningsE;
+                //                                };
+                //                                if (typeof Summary !== 'undefined') {
+                //                                    TheEvent.Summary = Summary;
+                //                                };
+                //                                //                                    var y = sendIt(TheCallObject)
+                //                                //                                    y.then(function (theMail) {
 
-                                    if (typeof TheCallObject.Props !== 'undefined') {
-                                        try {
-                                            TheCallObject.Version2 = v2Object;
-                                            var v2Object = v2.setV2Call(TheCallObject);
-                                            var v2XML = ver2XML.setV2XML(v2Object);
-                                            TheCallObject.v2XML = v2XML;
-                                            var version2XMLByteArray = v2XML.getBytes();
-                                            TheCallObject.XML = version2XMLByteArray;
-                                        }
-                                        catch (e) {
-                                            u.RaiseError("Failed generating Verson 2 Object", 0, "TheCall.setV2Call", e);
-                                        }
-                                    };
-                                    var p = SaveThePDF(TheCallObject);
-                                    p.then(function () {
-                                        //If Has Crew, Save Crew
+                //                                //                                        var tom = sendToTom(TheCallObject)
+                //                                //                                        tom.then(function (theTom)
+                //                                //                                        {                                                                                                
+                //                                //                                        });
+                //                                //                                    });
 
-                                        var cMet = crewMetrix.setCrewMetrix(TheCallObject);
-                                        cMet.then(function (ceM) {
-                                            if (typeof TheCallObject.XML !== 'undefined') {
-                                                var cXML = SaveTheXML(TheCallObject);
-                                                cXML.then(function (Txml) {
-                                                    u.setBuild("EndTime");
-                                                    var FatalE = u.getFatalErrors;
-                                                    var TimeE = u.getTimeErrors;
-                                                    var WarningsE = u.getWarnings;
-                                                    var CallLogE = u.getCallLog;
-                                                    var TheEvent = new Object();
-                                                    if (FatalE.length > 0) {
-                                                        TheEvent.Status = "Errors"
-                                                    };
-                                                    if (TimeE.length > 0) {
-                                                        TheEvent.TimeErrors = TimeE;
-                                                    };
-                                                    if (WarningsE.length > 0) {
-                                                        TheEvent.Warningss = WarningsE;
-                                                    };
-                                                    if (typeof Summary !== 'undefined') {
-                                                        TheEvent.Summary = Summary;
-                                                    };
-                                                    var y = sendIt(TheCallObject)
-                                                    y.then(function (theMail) {
-                                                        
-                                                    });
-                                                    response.success(TheCallObject);
+                response.success(TheCallObject)
 
-                                                }, function (error) {
-                                                });
-                                            }
-                                        }, function (error) {
-                                        });
-                                    }, function (error) {
-                                    });
-                                }
-                                else {
-                            //        //response.success(TheCallObject);
-                        };
-                    }, function (error) {
-                    });
-                }, function (error) {
-                });
+                //                            }, function (error) {
+                //                            });
+                //                        }
+
+
+                //                    }, function (error) {
+                //                    });
+                //                }
+                //                else {
+                //                    return ("Incomplete Call.  Missing Crew");
+                //                };
+                //            }, function (error) {
+                //            });
+                //        }
+                //        else {
+                //        };
+                //    }, function (error) {
+                //    });
+                //}, function (error) {
+                //});
             }, function (error) {
             });
         }, function (error) {
@@ -230,19 +292,9 @@ var SaveTheXML = function (tc) {
     })
 };
 
-var SaveTheHTML = function (TheCall) {
-    var file = new Parse.File(TheCall.PCRID + ".HTML", TheCall.HTML);
-    return file.save().then(function () {
-        var ThePCR = Parse.Object.extend("HTMLClass");
-        var tpcr = new ThePCR();
-        tpcr.set("PCRID", TheCall.PCRID);
-        tpcr.set("Complaint", TheCall.Props["DispatchComplaint"]);
-        tpcr.set("HTML", file);
-        tpcr.save()
-    })
-};
+
 var SaveThePDF = function (TheCall) {
-    var file = new Parse.File(TheCall.PCRID + ".PDF", TheCall.HTML);
+    var file = new Parse.File(TheCall.PCRID + ".PDF", TheCall.PDF);
     return file.save().then(function () {
         var ThePCR = Parse.Object.extend("PDFClass");
         var tpcr = new ThePCR();
@@ -262,7 +314,6 @@ var getAll = function () {
     });
 };
 var getCallMtx = function (pcrId) {
-    console.log("getCallMtx  "+  pcrId)
     var cm = Parse.Object.extend("CallMetrix");
     var query = new Parse.Query(cm);
     query.equalTo("PCRID", pcrId);
@@ -272,9 +323,9 @@ var getCallMtx = function (pcrId) {
         error: function (error) { }
     });
 };
-var getCrewMtx = function (pcrId) {
-    console.log("getCrewMtx " + pcrId)
-    var cm = Parse.Object.extend("CrewMetrix");
+
+var getHTMLObject = function (pcrId) {
+    var cm = Parse.Object.extend("HTMLClass");
     var query = new Parse.Query(cm);
     query.equalTo("PCRID", pcrId);
     //return query.find({
@@ -283,6 +334,8 @@ var getCrewMtx = function (pcrId) {
         error: function (error) { }
     });
 };
+
+
 var getAgency = function () {
     var Agency = Parse.Object.extend("Agency");
     var query = new Parse.Query(Agency);
@@ -307,25 +360,20 @@ var setCallMetrix = function (pcrid) {
     query.equalTo("PCRID", pcrid);
     return query.find(
         {
-            success: function (results) {                        
-                if (results.length > 0)
-                {                            
+            success: function (results) {
+                if (results.length > 0) {
                     cmID = results[0].id
                 }
-                else
-                {
+                else {
                     cmID = "";
                 }
-                        
             },
             error: function (user, error) {
                 console.warn('Error ' + error.code + ': ' + error.message);
             }
-
-
         }).then(
     function (object) {
-        
+
         var cm = new callmetrix();
         if (cmID !== null) {
             cm.set("objectId", cmID);
@@ -344,8 +392,7 @@ var setCallMetrix = function (pcrid) {
     }
 
     ,
-    function (error)
-    {
+    function (error) {
         console.log('Error ' + error.code + ': ' + error.message);
     })
 };
@@ -359,14 +406,6 @@ var sendIt = function (tc) {
        
     client.initialize('mg.datainmotionllc.com', 'key-dd6c965d8a32b0a4db474a678e02de87');
 
-     
-    //var attch = new mailgun.Attachment({
-    //    data: imgStream,
-    //    filename:'myFileName.html',
-    //    contentType: 'image/png',
-    //    knownLength: 6486
-    //});
-
     return client.sendEmail({
         to: 'arner.derek@gmail.com',        
         cc: 'yintothayang@gmail.com',
@@ -375,7 +414,7 @@ var sendIt = function (tc) {
         generateTextFromHTML: true,        
         html: h
     }).then(function (httpResponse) {
-        console.log("Sent")
+        console.log("Update CallMetrix with Sent Date/Status")
             return httpResponse
         });
     // });
@@ -390,3 +429,69 @@ var getHTML = function (pcr) {
         error: function (error) { }
     });
 };
+
+var sendToTom = function (tc) {
+    return Parse.Cloud.httpRequest({
+        method: 'POST',
+        url: 'http://dev.datainmotionllc.com/api/v1/pcr',
+        headers: { 'Content-Type': 'text/xml' },
+        dataType: "xml",
+        body: tc.V2XML
+
+    }).then(function (httpResponse) {
+        console.log("RES: " + httpResponse.text);
+    }, function (httpResponse) {
+        console.error('Request failed with response code ');
+    })
+};
+
+
+var saveHTMLClass = function (TheCall) {
+
+    var _htmlID = null;
+    var htm = Parse.Object.extend("HTMLClass");
+    var query = new Parse.Query(htm)
+    var _pcrid = TheCall.PCRID;
+    query.equalTo("PCRID", _pcrid);
+    return query.find(
+        {
+            success: function (results) {
+                if (results.length > 0) {
+                    _htmlID = results[0].id
+                }
+                else {
+                    _htmlID = null;
+                }
+            },
+            error: function (user, error) {
+                console.warn('Error '  + error.message);
+            }
+        }).then(
+    function (object) {
+
+        var ht = new htm();
+        if (_htmlID !== null) {
+            ht.set("objectId", _htmlID);
+        };
+
+
+        var file = new Parse.File(TheCall.PCRID + ".HTML", TheCall.HTML);
+        return file.save().then(function () {                        
+            ht.set("PCRID", TheCall.PCRID);
+            ht.set("Complaint", TheCall.Props["DispatchComplaint"]);
+            ht.set("HTML", file);
+            ht.save()
+        });
+        return null
+    }
+    
+    ,
+    function (error) {
+        console.log('Error ' + error.code + ': ' + error.message);
+    })
+};
+
+
+
+
+

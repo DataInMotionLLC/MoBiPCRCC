@@ -2,8 +2,6 @@ u = require('cloud/Utilities.js');
 var moment = require('moment');
 exports.setCrewMetrix = function (TheCall) {
     var BO = {};
-    console.log("TheCall.V3")
-    console.log(TheCall.V3)
 
     if (typeof TheCall=== 'undefined') {
         u.RaiseError("Set Crew Modalites", 0, "setCrewModalities", "Set Crew Modalites");
@@ -41,11 +39,7 @@ exports.setCrewMetrix = function (TheCall) {
     };
     
     BO = TheCall.V3;
-    if (typeof BO.eProcedures == 'undefined') {
-        alert("Undefined")
-    }
-    else
-        {
+    if (typeof BO.eProcedures !== 'undefined') {
         var obj = {};
         var obj = BO.eProcedures;
         if (typeof obj.ProcedureGroup !== 'undefined') {
@@ -224,7 +218,6 @@ function getDateNumbers(d) {
     weekday[6] = "Saturday";
     // Copy date so don't modify original
     d = new Date();
-    console.log(d.getDay())
     var nn = d.getDay()
     d.setHours(0, 0, 0);
     // Set to nearest Thursday: current date + 4 - current day number

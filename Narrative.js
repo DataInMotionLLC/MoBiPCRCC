@@ -27,23 +27,26 @@ exports.setNarrative = function (Props)
     if (typeof BO === 'undefined') {
         return "Error.  Undefined TheCall Object"
     };
-    
+
     var ElementArray = [];
     var p = "";    
         
     p = p + setLine("Crew responded to ");
+
     p = p + setLine(BO["RespTypeOfServiceRequest"] + " ");
+    
     p = p + setLine("call involving ");
     p = p + setLine(BO.Gender + " ");
     p = p + setLine("age, " + BO["PatientAge"]);
     p = p + setLine(" to  " + BO["LocationType"]);
     p = p + setLine(" for " + BO["DispatchComplaint"]);
     p = endSentence(p);
-    
+
     p = p + setLine("Unit Response " + BO.ResponseUrgency);
     p = p + setLine(" with " + BO.RespResponseModeToScene);
     p = endSentence(p);
         
+
     p = p + setLine("Patient Chief Complaint is ");
     p = p + setLine(BO["ChiefComplaint"]);
     if (typeof BO.Vitals !== "undefined") {
@@ -164,6 +167,7 @@ exports.setNarrative = function (Props)
         };
                 
     };
+
     a = a + "\n";
     ElementArray.push(a);
     var Head = "";
@@ -339,7 +343,7 @@ exports.setNarrative = function (Props)
     };
     a = "\n";
     ElementArray.push(a);
-
+    
     var ps = "";
     if (BO["Procedures"].length > 0) {
         for (var i = 0; i < BO["Procedures"].length; i++) {
@@ -470,12 +474,10 @@ exports.setNarrative = function (Props)
     ElementArray.push(ss);
     ss = "";
 
-
     var s = "";
     for (var i = 0; i < ElementArray.length; i++) {
         s = s + ElementArray[i]
     }
-    
     return s
 };
 

@@ -1,6 +1,8 @@
 exports.setHTML= function (TheCall) {
 
     var Props = TheCall.Props;
+    console.log("Props")
+    console.log(Props)
     var htmlDoc = "";
     htmlDoc = htmlDoc+ "<!DOCTYPE html>";
     htmlDoc = htmlDoc+ "<html lang=\"en\" xmlns=\"http://www.w3.org/1999/xhtml\">";
@@ -98,7 +100,7 @@ exports.setHTML= function (TheCall) {
     htmlDoc = htmlDoc + "</table>";
     htmlDoc = htmlDoc + "</div>";
     
-    //////////Patient
+    
     htmlDoc = htmlDoc + "<p></p>"
     htmlDoc = htmlDoc + "<div style=\"width:100%;background:#F9EECF;border:1px solid black;text-align:center\">"
     htmlDoc = htmlDoc + "<p><b>Patient</b></p>"
@@ -111,12 +113,12 @@ exports.setHTML= function (TheCall) {
     htmlDoc = htmlDoc + "</tr>"
 
     htmlDoc = htmlDoc + "<tr>";
-    htmlDoc = htmlDoc + setCell(33, 33, "Address", Props["ClosestRelativeAddress"])
+    htmlDoc = htmlDoc + setCell(33, 33, "Address", Props["PatientAddress"])
     htmlDoc = htmlDoc + setCell(33, 33, "Primary Phone", Props["ClosestRelativePhone"])
     htmlDoc = htmlDoc + "</tr>"
 
     htmlDoc = htmlDoc + "<tr>";
-    htmlDoc = htmlDoc + setCell(33, 33, "", "      " + Props["ClosestRelativeCSZ"])
+    htmlDoc = htmlDoc + setCell(33, 33, "", "      " + Props["PatientCSZ"])
     htmlDoc = htmlDoc + setCell(33, 33, "Secondary Phone", "")
     htmlDoc = htmlDoc + "</tr>"
 
@@ -284,8 +286,7 @@ exports.setHTML= function (TheCall) {
     htmlDoc = htmlDoc + "<tr>";
     var d = "";
     for (var i = 0; i < Props["Protocols"].length; i++) {
-        d = d + Props["Protocols"][i].Protocols + "<br>"
-        //htmlDoc = htmlDoc + "<tr>";
+        d = d + Props["Protocols"][i].Protocols + "<br>"        
     };
     htmlDoc = htmlDoc + setCell(33, 33, "Protocols", d)
     htmlDoc = htmlDoc + "</tr>"
@@ -415,7 +416,7 @@ function setCell(w1, w2, text, val, flag) {
     var retStr = "";
     retStr = retStr + "<td Width = \"" + w1 + "%\">";
     retStr = retStr + "<table border=\"0\" width=\"100%\">";
-    //retStr = retStr + "<tr align=\"center\">";
+   
     retStr = retStr + "<tr>";
     retStr = retStr + "<td Width = \"30%\">";
     retStr = retStr + "<b>" + text + " </b> "

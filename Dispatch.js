@@ -392,7 +392,7 @@ exports.seteDispatch = function (pcrObj, NemsisList) {
 
     //eDispatch.02//////////////////////////////////////////
     try {
-        eDispatch["eDispatch.02"] = u.setBusinessObject(_elementList, NemsisList, "eDispatch.02")
+        eDispatch["eDispatch.02"] = u.setBusinessObject(_elementList, NemsisList, "eDispatch.02")                
     }
 
     catch (e) {

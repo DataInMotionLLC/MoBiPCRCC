@@ -13,6 +13,7 @@ exports.setProps = function () {
     p["EMSAgencyOrganizationType"] = "";
     p["EMSAgencyOrganizationStatus"] = "";
     p["Intervals"] = [];
+    p["DispoPatientMovedFromRig"] = "";
     
     /*
     EMS AGENCY NAME
@@ -59,8 +60,11 @@ exports.setProps = function () {
     p["DispoPreActTime"] = "";
     p["DispoPreAct"] = "";
     p["DispoHospitalActivation"] = "";
+    p["DispoState"] = "";
+    p["DispoCounty"] = "";
+    p["DispoZip"] = "";
     p["DispoFinalAccuity"] = "";
-
+    p["AddDispoTransportModeFromScene"] = "";
     p["TimePSAP"] = "";
     p["TimeDispatchNotified"] = "";
     p["TimeUnitNotified"] = "";

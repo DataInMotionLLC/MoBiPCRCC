@@ -1,6 +1,5 @@
 var moment = require('moment');
-exports.setIntervals = function (Times) {
-    console.log("Intervals")
+exports.setIntervals = function (Times) {    
     var tProps = new Object()
     tProps.IntervalNotified="";
     tProps.IntervalUnitAck="";

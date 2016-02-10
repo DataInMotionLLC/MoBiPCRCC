@@ -4,11 +4,10 @@ sp= require('cloud/setProps.js');
 var intervals = require('cloud/setIntervals.js');
 var nar = require('cloud/Narrative.js');
 exports.setV3English = function (TheCall) {
-
     Props = sp.setProps();
     
     if (typeof TheCall === 'undefined') {
-        return null
+        return Props
     };
 
 
@@ -16,6 +15,7 @@ exports.setV3English = function (TheCall) {
     var Events = new Array();
     var EventLen = 0;
     var BO = {};
+
     BO = TheCall.V3;
 
     Props["CreatedDate"] = moment().utc().format("MM/DD/YYYY");
@@ -26,11 +26,10 @@ exports.setV3English = function (TheCall) {
         }
     };
 
-
-    if (typeof BO.eRecord != 'undefined') {
+    if (typeof BO.eRecord !== 'undefined') {
         var obj = {};
         var obj = BO.eRecord;
-        if (typeof obj["eRecord.01"] != 'undefined') {
+        if (typeof obj["eRecord.01"] !== 'undefined') {
             // Props["PCRID"] = setPropsect(obj["eRecord.01"]);
         }
     };
@@ -40,19 +39,19 @@ exports.setV3English = function (TheCall) {
         var obj = BO.eDispatch;
         if (typeof obj["eDispatch.01"] !== 'undefined') {            
             Props["DispatchComplaint"] = setPropsect(obj["eDispatch.01"]);
-            if (Props["DispatchComplaint"] == "Standby") {
+            if (Props["DispatchComplaint"] === "Standby") {
                 Props["CallType"] = "Standby"
             };
-            if (Props["DispatchComplaint"] == "Traffic/Transportation Incident") {
+            if (Props["DispatchComplaint"] === "Traffic/Transportation Incident") {
                 Props["CallType"] = "MVC"
             };
-            if (Props["DispatchComplaint"] == "Automated Crash Notification") {
+            if (Props["DispatchComplaint"] === "Automated Crash Notification") {
                 Props["CallType"] = "MVC"
             };
-            if (Props["DispatchComplaint"] == "Transfer/Interfacility/Palliative Care") {
+            if (Props["DispatchComplaint"] === "Transfer/Interfacility/Palliative Care") {
                 Props["CallType"] = "Transfer"
             };
-            if (Props["DispatchComplaint"] == "Airmedical Transport") {
+            if (Props["DispatchComplaint"] === "Airmedical Transport") {
                 Props["CallType"] = "AirTransport"
             };
         };
@@ -68,8 +67,7 @@ exports.setV3English = function (TheCall) {
         if (typeof obj["eDispatch.05"] !== 'undefined') {
             Props["DispatchPriority"] = setPropsect(obj["eDispatch.05"]);
         }
-    };
-
+    };    
     if (typeof BO.eDisposition !== 'undefined') {
         var obj = {};
         var obj1 = BO.eDisposition;
@@ -88,9 +86,15 @@ exports.setV3English = function (TheCall) {
                 Props["DispoToAddress"] = Props["DispoToAddress"] + setPropsect(obj["eDisposition.04"]);
             };
             if (typeof obj["eDisposition.05"] !== 'undefined') {
+                Props["DispoState"] = setPropsect(obj["eDisposition.05"]);
                 Props["DispoToAddress"] = Props["DispoToAddress"] + setPropsect(obj["eDisposition.05"]);
             };
+
+            if (typeof obj["eDisposition.06"] !== 'undefined') {
+                Props["DispoCounty"] = setPropsect(obj["eDisposition.06"]);
+            };
             if (typeof obj["eDisposition.07"] !== 'undefined') {
+                Props["DispoZip"] = setPropsect(obj["eDisposition.07"]);
                 Props["DispoToAddress"] = Props["DispoToAddress"] + setPValue(obj["eDisposition.07"]);
             };
         };
@@ -285,6 +289,9 @@ exports.setV3English = function (TheCall) {
         if (typeof obj1["eDisposition.17"] !== 'undefined') {
             Props["DispoTransportModeFromScene"] = setPropsect(obj1["eDisposition.17"]);
         };
+        if (typeof obj1["eDisposition.18"] !== 'undefined') {
+            Props["AddDispoTransportModeFromScene"] = setPropsect(obj1["eDisposition.18"]);
+        };
         if (typeof obj1["eDisposition.19"] !== 'undefined') {
             Props["DispoFinalAccuity"] = setPropsect(obj1["eDisposition.19"]);
         };
@@ -327,7 +334,7 @@ exports.setV3English = function (TheCall) {
             };
             Props["DispoHospitalActivation"] = preAct;
         }
-    };
+    };    
     Props.Intervals = [];
     if (typeof BO.eTimes !== 'undefined') {
         var Inter = intervals.setIntervals(BO.eTimes)
@@ -565,22 +572,26 @@ exports.setV3English = function (TheCall) {
                 Events.push(Event);
             }
         }
-    };
-    
+    };   
     if (typeof BO.eResponse !== 'undefined') {
         var obj = {};
         obj = BO.eResponse;
-        if (typeof obj.AgencyGroup["eResponse.01"] !== 'undefined') {
-            Props["RespAgencyNumber"] = setPropsect(obj.AgencyGroup["eResponse.01"]);
+        if (typeof obj.AgencyGroup !== 'undefined') {
+            if (typeof obj.AgencyGroup["eResponse.01"] !== 'undefined') {
+                Props["RespAgencyNumber"] = setPropsect(obj.AgencyGroup["eResponse.01"]);
+            };
+            if (typeof obj.AgencyGroup["eResponse.02"] !== 'undefined') {
+                Props["RespAgencyName"] = setPropsect(obj.AgencyGroup["eResponse.02"]);
+            }
         };
-        if (typeof obj.AgencyGroup["eResponse.02"] !== 'undefined') {
-            Props["RespAgencyName"] = setPropsect(obj.AgencyGroup["eResponse.02"]);
-        };
-
-        if (typeof obj["eResponse.03"] !== 'undefined') {
+        
+        if (typeof obj["eResponse.03"] !== 'undefined')
+        {
             Props["RespIncidentNumber"] = setPropsect(obj["eResponse.03"]);
         };
-        if (typeof obj.ServiceGroup !== 'undefined') {
+        
+        if (typeof obj.ServiceGroup !== 'undefined')
+        {
             if (typeof obj.ServiceGroup["eResponse.05"] !== 'undefined') {
                 Props["RespTypeOfServiceRequest"] = setPropsect(obj.ServiceGroup["eResponse.05"]);
             }
@@ -589,7 +600,7 @@ exports.setV3English = function (TheCall) {
                 Props["RespStandByPurpose"] = setPropsect(obj.ServiceGroup["eResponse.06"]);
             }
         };
-
+        
         if (typeof obj["eResponse.07"] !== 'undefined') {
             Props["RespPrimaryRoleOfUnit"] = setPropsect(obj["eResponse.07"]);
         };
@@ -624,35 +635,39 @@ exports.setV3English = function (TheCall) {
         if (typeof obj["eResponse.15"] !== 'undefined') {
             Props["RespUnitLevelOfCare"] = setPropsect(obj["eResponse.15"]);
         };
-
+        
         if (typeof obj["eResponse.19"] !== 'undefined') {
             Props["RespBeginMileage"] = setPropsect(obj["eResponse.19"]);
         };
-
+                
         if (typeof obj["eResponse.20"] !== 'undefined') {
-            var yy = obj["eResponse.20"].vSet[0].val - obj["eResponse.19"].vSet[0].val
-            Props["RespOnSceneMiles"] = setPropsect(obj["eResponse.20"]);
-            yy = yy.toFixed(1)
-            Props["ToSceneMileage"] = yy.toString();
-
+            if (typeof Props["RespBeginMileage"] !== 'undefined') {
+                
+                Props["RespOnSceneMiles"] = setPropsect(obj["eResponse.20"]);
+                if (Props["RespOnSceneMiles"] != "") {
+                    var yy = Props["RespOnSceneMiles"] - Props["RespBeginMileage"]
+                    yy = yy.toFixed(1)
+                    Props["ToSceneMileage"] = yy.toString();
+                }
+            };
         };
 
         if (typeof obj["eResponse.21"] !== 'undefined') {
             Props["RespDestinationMiles"] = setPropsect(obj["eResponse.21"]);
-            if (typeof obj["eResponse.19"] !== 'undefined') {
-                var y = obj["eResponse.21"].vSet[0].val - obj["eResponse.19"].vSet[0].val;
-                if (typeof obj["eResponse.20"] !== 'undefined') {
-                    var xy = obj["eResponse.21"].vSet[0].val - obj["eResponse.20"].vSet[0].val;
+            if (typeof Props["RespBeginMileage"] !== 'undefined') {
+                if (Props["RespDestinationMiles"] != "") {
+                    var y = Props["RespDestinationMiles"] - Props["RespBeginMileage"];
+                    if (typeof Props["RespBeginMileage"] !== 'undefined') {
+                        var xy = Props["RespDestinationMiles"] - Props["RespOnSceneMiles"];
+                        xy = xy.toFixed(1)
 
-                    xy = xy.toFixed(1)
-
-                    Props["RespLadenMileage"] = xy.toString();
+                        Props["RespLadenMileage"] = xy.toString();
+                    };
+                    //y = y.toFixed(1)
+                    Props["RespTotalMileage"] = y.toString();
                 };
-                y = y.toFixed(1)
-                Props["RespTotalMileage"] = y.toString();
-            };
+            }
         };
-
 
         if (typeof obj["eResponse.21"] !== 'undefined') {
 
@@ -671,10 +686,10 @@ exports.setV3English = function (TheCall) {
             Props["RespAddResponseModeToScene"] = setPropsect(obj["eResponse.24"]);
         };
 
-        if ((typeof begin !== 'undefined') && (typeof end !== 'undefined')) {
+        if ((typeof Props["BeginMileage"] !== 'undefined') && (typeof Props["EndMiles"] !== 'undefined')) {
             Props["RespTotalMiles"] = Props["EndMiles"] - Props["BeginMileage"];
         }
-    };
+    };  
     if (typeof BO.ePatient !== 'undefined') {
         var obj = {};
         obj = BO.ePatient;
@@ -685,7 +700,7 @@ exports.setV3English = function (TheCall) {
                 Props["PatientFirstName"] = setPropsect("ePatient.03", objPN["ePatient.03"]);
                 PatientName = PatientName + Props["PatientFirstName"];
             };
-
+            
             if (typeof objPN["ePatient.04"] !== 'undefined') {
                 Props["PatientMiddleName"] = setPropsect(objPN["ePatient.04"]);
                 PatientName = PatientName + Props["PatientMiddleName"];
@@ -704,14 +719,12 @@ exports.setV3English = function (TheCall) {
                 Props["PatientName"] = PatientName;
             };
         };
-
         Props["PatientCompleteAddress"] = ""
         if (typeof obj["ePatient.05"] !== 'undefined') {
 
             Props["PatientAddress"] = setPValue(obj["ePatient.05"]);
             Props["PatientCompleteAddress"] = Props["PatientAddress"];
         };
-
 
         Props["PatientCSZ"] = "";
         if (typeof obj["ePatient.06"] !== 'undefined') {
@@ -745,28 +758,24 @@ exports.setV3English = function (TheCall) {
         if (typeof obj["ePatient.12"] !== 'undefined') {
             Props["SSN"] = setPValue(obj["ePatient.12"]);
         };
-
         if (typeof obj["ePatient.13"] !== 'undefined') {
             Props["Gender"] = setPropsect(obj["ePatient.13"]);
         };
-
         if (typeof obj["ePatient.14"] !== 'undefined') {
             Props["Race"] = setPropsect(obj["ePatient.14"]);
         };
-
-        if (typeof obj["AgeGroup"]["ePatient.15"] !== 'undefined') {
-            Props["Age"] = setPropsect(obj["AgeGroup"]["ePatient.15"]);
+        if (typeof obj["AgeGroup"] !== 'undefined') {
+            if (typeof obj["AgeGroup"]["ePatient.15"] !== 'undefined') {
+                Props["Age"] = setPropsect(obj["AgeGroup"]["ePatient.15"]);
+            };
+            if (typeof obj["AgeGroup"]["ePatient.16"] !== 'undefined') {
+                Props["AgeUnits"] = setPropsect(obj["AgeGroup"]["ePatient.16"]);
+            };
+            Props["PatientAge"] = Props["Age"] + " " + Props["AgeUnits"];
         };
-
-        if (typeof obj["AgeGroup"]["ePatient.16"] !== 'undefined') {
-            Props["AgeUnits"] = setPropsect(obj["AgeGroup"]["ePatient.16"]);
-        };
-        Props["PatientAge"] = Props["Age"] + " " + Props["AgeUnits"];
-
         if (typeof obj["ePatient.17"] !== 'undefined') {
             Props["PatientDOB"] = setPropsect("ePatient.17", obj["ePatient.17"]);
         };
-
         if (typeof obj["ePatient.18"] !== 'undefined') {
             Props["PatientPhone"] = setPropsect("ePatient.18", obj["ePatient.18"]);
         }
@@ -779,7 +788,7 @@ exports.setV3English = function (TheCall) {
         if (typeof obj["ePatient.21"] !== 'undefined') {
             Props["PatientDriversLicense"] = setPropsect("ePatient.21", obj["ePatient.21"]);
         }
-    };
+    };    
     if (typeof BO.eHistory !== 'undefined') {
         var obj = {};
         var obj = BO.eHistory;
@@ -878,8 +887,7 @@ exports.setV3English = function (TheCall) {
 
             Props["LastOralIntake"] = setPropsect(obj["eHistory.19"]);
         }
-    };
-
+    };    
     if (typeof BO.ePayment !== 'undefined') {
         var obj = {};
         var obj = BO.ePayment;
@@ -1006,7 +1014,7 @@ exports.setV3English = function (TheCall) {
             }
             Props["Supplies"] = si;
         }
-    };
+    };    
     if (typeof BO.eSituation !== 'undefined') {
         var obj = {};
         var obj = BO.eSituation;
@@ -1146,6 +1154,9 @@ exports.setV3English = function (TheCall) {
             Props["OtherAgencies"] = aa;
         };
 
+        if (typeof obj["eScene.06"] !== 'undefined') {
+            Props["NumberOfPatientsAtScene"] = setPropsect(obj["eScene.06"]);
+        };
         if (typeof obj["eScene.07"] !== 'undefined') {
             Props["MassCasualtyIncident"] = setPropsect(obj["eScene.07"]);
         };
@@ -1401,6 +1412,7 @@ exports.setV3English = function (TheCall) {
             Props["OtherSignatureGroup"] = Sig;
         }
     };
+
     if (typeof BO.eInjury !== 'undefined') {
         var obj = {};
         var obj = BO.eInjury
@@ -2148,15 +2160,11 @@ exports.setV3English = function (TheCall) {
         }
     };
 
-    console.log("The New CrewGroup")
-    
     var CrewString = "";
     if (typeof BO.eCrew != 'undefined')
     {
-        console.log("BO CrewGroup Defined")
         for (var t = 0; t < BO.eCrew["CrewGroup"].length; t++) 
         {
-            console.log("BO CrewGroup inside")
             var crewObj = new Object();
             var obj = BO.eCrew["CrewGroup"][t]
             crewObj.Name = "";
@@ -2167,20 +2175,14 @@ exports.setV3English = function (TheCall) {
                 crewObj.Name = setPropsect(obj["eCrew.01"]);
                 CrewString = CrewString + " " + crewObj.Name;
                 crewObj.StateID = setPValue(obj["eCrew.01"]);
-                console.log("crewObj.Name")
-                console.log(crewObj.Name)
             };
 
             if (typeof obj["eCrew.02"] !== 'undefined') {
                 crewObj.MemberLevel = setPropsect(obj["eCrew.02"]);
-                console.log("MemberLevel")
-                console.log(crewObj.MemberLevel)
             };
 
             if (typeof obj["eCrew.03"] !== 'undefined') {
                 crewObj.Role = setPropsect(obj["eCrew.03"]);
-                console.log("Role")
-                console.log(crewObj.Role)
             };
             if (typeof cArray === 'undefined') {
                 var cArray = new Array();
@@ -2284,13 +2286,14 @@ exports.setV3English = function (TheCall) {
             }
         }
     };
-        
     
     var r = nar.setNarrative(Props)
+
     var b = r.match(/(.{1,120})/g);
-    
-    Props["Narrative"] = chunkStr(r, 150)
-    
+
+    Props["Narrative"] = b
+    //Props["Narrative"] = chunkStr(r, 150)
+
     var d = sortBy(Events, { prop: "Time" });
     d.Count = EventLen
     Props.Events = d;        
@@ -2300,7 +2303,8 @@ var setPropsect = function (pcrObject) {
     s = "";
     if (typeof pcrObject !== 'undefined') {
         var valObject = [];
-        if (pcrObject.IsNull == false) {
+        if (pcrObject.IsNull == false)
+        {
             if (typeof pcrObject.vSet !== 'undefined') {
                 if (pcrObject.vSet.length !== 0) {
                     for (var i = 0; i < pcrObject.vSet.length; i++) {
