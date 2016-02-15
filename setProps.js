@@ -1,8 +1,7 @@
 
 exports.setProps = function () {
     var p = new Object();
-    //Header
-    
+    //Header    
     p["RespAgencyNumber"] = "";
     p["RespAgencyName"] = "";
     p["EMSAgencyState"] = "";
@@ -15,6 +14,22 @@ exports.setProps = function () {
     p["Intervals"] = [];
     p["DispoPatientMovedFromRig"] = "";
     
+    p.IntervalNotified = 0;
+    p.IntervalUnitAck = 0;
+    p.IntervalUnitEnRoute = 0;
+    p.IntervalUnitAtScene = 0;;
+    p.IntervalUnitAtPatient = 0;
+    p.IntervalUnitTransferToCare = 0;
+    p.IntervalUnitLeftScene = 0;
+    p.IntervalUnitAtLanding = 0;
+    p.IntervalUnitPatientArrived = 0;
+    p.IntervalUnitTransferCare = 0;
+    p.IntervalUnitBackInService = 0;
+    p.IntervalUnitCancel = 0;
+    p.IntervalUnitHome = 0;
+    p.IntevalUnitComplete = 0;
+
+
     /*
     EMS AGENCY NAME
     EMS AGENCY STATE
@@ -122,6 +137,7 @@ exports.setProps = function () {
     p["PatientCompleteAddress"] = "";
     p["SSN"] = "";
     p["Gender"] = "";
+    p["PatientAddressLocation"] = "";
     p["Race"] = "";
     p["Age"] = "";
     p["AgeUnits"] = "";
@@ -214,6 +230,8 @@ exports.setProps = function () {
     p["Fall"] = false;
     p["NumberOfShocks"] = "";
     p["NumberOfPatientsAtScene"] = "";
+    p["MassCasualtyIncident"] = "";
+    
 
     p["Medications"] = "";
     p["Protocols"] = "";

@@ -2,26 +2,30 @@ var u = require('cloud/Utilities.js');
 var summaryArray = new Array();
 exports.setCallSummary = function (TheCall) {
     var rA = [];
+    
     //Props["CallDisposition"] = "CanceledOnSceneNoPatient";
     //Props["CallHasPatient"] = false;
     //Props["CallHasTransport"] = false;
     //Props["CallHasTreatment"] = false;
     //Props["CallStatus"] = "Cancel";
-    console.log("Summary")
-    if (typeof TheCall.Props === 'undefined') {
+    
+    if (typeof TheCall.Props == 'undefined') {
         u.RaiseError("setCallSummary", 100, "Undefined TheCall.Props Object", "setCallSummary");
         
     };
     var BO = TheCall.Props;
     if (typeof TheCall.Props.Intervals === 'undefined') {
+        
         u.RaiseError("setCallSummary", 100, "Undefined TheCall.Props Object", "setCallSummary");
         
     };
     var p = "";
-    if (TheCall["Status"] !== "") {
-        p = "Status: " + TheCall["Status"]
+
+    if (TheCall["status"] !== "") {
+        p = "Status: " + TheCall["status"]
         //setLine("Status", TheCall["Status"]);
     }
+
     if (BO["PCRID"] !== "") {
         p = p + "\t" + "Call ID: " + TheCall["PCRID"]
     }
@@ -95,7 +99,7 @@ exports.setCallSummary = function (TheCall) {
         }
     };
 
-    if (typeof TheCall.V3.eDispatch === 'undefined') {
+    if (typeof TheCall.Props.eDispatch === 'undefined') {
         setM("M", "Dispatch Information")
     }
     else {
@@ -111,7 +115,7 @@ exports.setCallSummary = function (TheCall) {
     };
     
     
-    if (typeof TheCall.V3.eDisposition === 'undefined') {
+    if (typeof TheCall.Props.eDisposition === 'undefined') {
         setM("M", "Disposition Information")
     }
     else {
@@ -158,7 +162,7 @@ exports.setCallSummary = function (TheCall) {
             }
         }
     };
-    if (typeof TheCall.V3.eResponse === 'undefined') {
+    if (typeof TheCall.Props.eResponse === 'undefined') {
         setM("M", "Response Information")
     }
     else
@@ -206,7 +210,7 @@ exports.setCallSummary = function (TheCall) {
             setM("M", "Add Response Mode Indicators")
         }        
     };
-    if (typeof TheCall.V3.eTimes === 'undefined') {
+    if (typeof TheCall.Props.eTimes === 'undefined') {
         setM("M", "Time Information")
     }
     else
@@ -234,8 +238,7 @@ exports.setCallSummary = function (TheCall) {
     };
     /////
     ///Patient Rules
-
-    if (typeof TheCall.V3.ePatient === 'undefined') {
+    if (typeof TheCall.Props.ePatient === 'undefined') {
         setM("U", "Patient Data Not Recorded");
     }
     else {
@@ -270,19 +273,12 @@ exports.setCallSummary = function (TheCall) {
     };
     
     if (BO["CallStatus"] != 'Cancel') {
-        if (typeof TheCall.V3.eScene === 'undefined') {
+        if (typeof TheCall.Props.eScene === 'undefined') {
             setM("M", "Scene Data");
         }
-        else {
-            if (BO["FirstUnitOnScene"] == "") {
-                if ((typeof Props["OtherAgencies"] !== 'undefined') && (Props["OtherAgencies"].length == 0)) {
-                    setM("D", "First Unit on Scene Defaulted to YES.  No other units on Scene.");
-                }
-                else {
-                    setM("U", "First Unit on Scene.");
-                }
-            };
-
+        else
+        {
+           
             if (BO["SceneState"] == "") {
                 setM("M", "Scene State");
             };
@@ -294,7 +290,7 @@ exports.setCallSummary = function (TheCall) {
                     setM("U", "Number of Patients On Scene");
                 };
 
-                if (BO["MassCasualtyIncident"] == "") {
+                    if (BO["MassCasualtyIncident"] == "") {
                     setM("U", "Mass Casualty Incident");
                 };
 
@@ -379,7 +375,6 @@ exports.setCallSummary = function (TheCall) {
             }
         }
     };
-    console.log("HERE IT IS HAS PATIENT")
     if(BO["CallHasPatient"] == true)
     {
         if (BO["HistBarriersToCare"] == "") {
@@ -435,7 +430,6 @@ exports.setCallSummary = function (TheCall) {
         b = a.type + ":  " + a.text
         rA.push(b)
     }
-
     //return summaryArray;
     return rA;
 };

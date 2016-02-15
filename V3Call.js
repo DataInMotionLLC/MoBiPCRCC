@@ -107,7 +107,7 @@ exports.setTheCall = function (thePCR)
         try {
             u.RaiseError("u.getObjectFromOLTPExtract(parseObject, eDisposition)", 100, "V3Call", "u.getObjectFromOLTPExtract(parseObject, eDisposition)");
             var eDispositionObject = u.getObjectFromOLTPExtract(parseObject, "eDisposition");
-            console.log("eDispositionObject")
+         
             
         }
         catch (e) {
@@ -118,7 +118,7 @@ exports.setTheCall = function (thePCR)
             u.RaiseError("Null Element List", 0, "setV3Call.eDisposition34")
         }
         else {
-            console.log("_Disposition Raw Object")
+         
             var rawObject = {};
             rawObject.Payload = eDispositionObject
             rawObjects.push(rawObject)
@@ -129,10 +129,7 @@ exports.setTheCall = function (thePCR)
 
             try {
                 u.RaiseError("seteDisposition(eDispositionObject, NEMSISElements)", 100, "V3Call", "seteDisposition");
-                console.log("Before_Disposition")
                 _Disposition = dsp.seteDisposition(eDispositionObject, NEMSISElements);
-                console.log("_Disposition")
-                console.log(_Disposition)
 
             }
             catch (e) {

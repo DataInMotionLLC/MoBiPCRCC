@@ -2,43 +2,34 @@ u = require('cloud/Utilities.js');
 var moment = require('moment');
 exports.setCrewMetrix = function (TheCall) {
     var BO = {};
-
-    if (typeof TheCall=== 'undefined') {
+    if (typeof TheCall === 'undefined') {
+        console.log("Undecfined TheCall")
         u.RaiseError("Set Crew Modalites", 0, "setCrewModalities", "Set Crew Modalites");
         return null
     };
 
-    if (typeof TheCall.Props=== 'undefined') {
+    if (typeof TheCall.Props === 'undefined') {
+        console.log("Undecfined Props")
         u.RaiseError("Set Crew Modalites", 0, "setCrewModalities", "Missing Call Properties");
         return null
     };
 
-    if (typeof TheCall.Props.PCRID=== 'undefined') {
+    if (typeof TheCall.PCRID === 'undefined') {
+        console.log("Undecfined PCRID")
         u.RaiseError("Set Crew Modalites", 0, "setCrewModalities", "Missing Call PCRID");
         return null
     };
 
-
-    //if (typeof TheCall.Agency=== 'undefined') {
-    //    u.RaiseError("Set Crew Modalites", 0, "setCrewModalities", "Set Crew Modalites");
-    //    return null
+    //if (typeof TheCall.Agency !== 'undefined') {
+    //    if (typeof TheCall.Agency.AgencyName !== 'undefined') {
+    //        var AgencyName = TheCall.Agency.AgencyName;
+    //    }
     //};
-
-    //if (typeof TheCall.Agency.AgencyName=== 'undefined') {
-    //    u.RaiseError("Set Crew Modalites", 0, "setCrewModalities", "Set Crew Modalites");
-    //    return null
-    //}
-    //else {
-    if (typeof TheCall.Agency !== 'undefined') {
-        if (typeof TheCall.Agency.AgencyName !== 'undefined') {
-            var AgencyName = TheCall.Agency.AgencyName;
-        }
-    };
-    if (typeof AgencyName=== 'undefined') {
-        var AgencyName = "Test Agency";
-    };
     
-    BO = TheCall.V3;
+    
+    BO = TheCall;
+    
+    
     if (typeof BO.eProcedures !== 'undefined') {
         var obj = {};
         var obj = BO.eProcedures;
@@ -60,9 +51,9 @@ exports.setCrewMetrix = function (TheCall) {
                         var m = getDateNumbers(tP)
                         Modality["Type"] = "Procedure";                                              
                         Modality["Date"] = moment(tP).format("MM/DD/YYYY");
-                        Modality["Week"] = m.weekNo;
-                        Modality["Month"] = m.monthStart;
-                        Modality["Day"] = m.weekDay;
+                        Modality["CallWeek"] = m.weekNumber;
+                        Modality["CallMonth"] = m.monthStart;
+                        Modality["CallDayOfWeek"] = m.weekDay;
                         Modality["Year"] = m.YEAR
                         
 
@@ -114,11 +105,10 @@ exports.setCrewMetrix = function (TheCall) {
                             };
                             var m = getDateNumbers(tM)
                             Modality["Date"] = moment(tM).format("HH:mm");
-                            Modality["Type"] = "Medication";
-                            Modality["Date"] = moment(tM).format("MM/DD/YYYY");
-                            Modality["Week"] = m.weekNo;
-                            Modality["Month"] = m.monthStart;
-                            Modality["Day"] = m.weekDay;
+                            Modality["Type"] = "Medication";                            
+                            Modality["CallWeek"] = m.weekNo;
+                            Modality["CallMonth"] = m.monthStart;
+                            Modality["CallDayOfWeek"] = m.weekDay;
                             Modality["Year"] = m.YEAR
                         
                             if (typeof obj2["eMedications.03"] !== 'undefined') {
@@ -159,9 +149,8 @@ exports.setCrewMetrix = function (TheCall) {
                 }
             }
         }
-    };
+    };    
     if (typeof Modalities !== 'undefined') {
-        if (Modalities.length > 0) {
             var p = Modalities;
             var list = [];
             var Metrix = Parse.Object.extend("CrewMetrix");
@@ -172,20 +161,19 @@ exports.setCrewMetrix = function (TheCall) {
                     metrix.set("objectId", TheCall.CrewMetrixId);
                 };
                 metrix.set("OID", p[i].OID);
-                metrix.set("Agency", p[i].Agency);
-                metrix.set("Date", p[i].date);
-                metrix.set("CrewID", p[i].CrewID);
-                metrix.set("CrewName", p[i].CrewName);
-                metrix.set("Day", p[i].Day);
-                metrix.set("Month", p[i].Month);
-                metrix.set("Intervention", p[i].Action);
-                metrix.set("InterventionCode", p[i].ActionCode);
-                metrix.set("InterventionType", p[i].Type);
-                metrix.set("Week", p[i].Week);
-                metrix.set("Year", p[i].Year);
-                metrix.set("Year", p[i].Year);
-                metrix.set("CrewRole", p[i].CrewRole);
-                metrix.set("AdministrationRoute", p[i].Route);
+                metrix.set("Agency", p[i].AgencyName);
+                //metrix.set("Date", p[i].date);
+                //metrix.set("CrewID", p[i].CrewID);
+                //metrix.set("CrewName", p[i].CrewName);
+                //metrix.set("Day", m.weekDay);
+                //metrix.set("Month", m.monthStart);
+                //metrix.set("Week", m.weekNo);
+                //metrix.set("Year", m.Year);
+                //metrix.set("Intervention", p[i].Action);
+                //metrix.set("InterventionCode", p[i].ActionCode);
+                //metrix.set("InterventionType", p[i].Type);                
+                //metrix.set("CrewRole", p[i].CrewRole);
+                //metrix.set("AdministrationRoute", p[i].Route);
 
 
                 list.push(metrix)
@@ -198,11 +186,7 @@ exports.setCrewMetrix = function (TheCall) {
                 }
             });
         }
-    }
-    else
-    {
-        return null;
-    }
+
 };
 function getDateNumbers(d) {
     var monthNames = ["January", "February", "March", "April", "May", "June",

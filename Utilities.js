@@ -207,7 +207,6 @@ var getValue = function (elementList, valueElement) {
     };
 };
 exports.IsGo = function (valObject) {
-    console.log(valObject)
     if (typeof valObject === 'undefined') {
         return false;
     };
@@ -365,7 +364,8 @@ exports.getObjectFromOLTPExtract = function (businessObject, sectionName) {
 
     return _retValue;
 };
-exports.RaiseError = function (theError, theSeverity, theOrigin, error) {
+exports.RaiseError = function (theError, theSeverity, theOrigin, error) {    
+
     //theCallObject : Global Call Object
     //theError      : Error Text
     //theSeverity   : 0 = Malformed, 1 = 
@@ -373,26 +373,25 @@ exports.RaiseError = function (theError, theSeverity, theOrigin, error) {
     //error         : runtime error
     //Time
     //Seq
-    if ((typeof theOrigin !== 'undefined') && (theOrigin !== null)) {
+    //if ((typeof theOrigin !== 'undefined') && (theOrigin !== null)) {
         if (typeof Error === 'undefined') {
             var Error = new Object();
         };
         Error.Source = theOrigin;
-    };
+    //};
 
     if ((typeof theSeverity !== 'undefined') && (theSeverity !== null)) {
-        if (typeof Error === 'undefined') {
+        if (typeof Error == 'undefined') {
             var Error = new Object();
         };
         Error.Severity = theSeverity;
-        if (theSeverity == 0) {
+        if (theSeverity === 0) {
             CallErrors.Fatal = true;
         }
-
     };
 
     if ((typeof theError !== 'undefined') && (theError !== null)) {
-        if (typeof Error === 'undefined') {
+        if (typeof Error == 'undefined') {
             var Error = new Object();
         };
         Error.SMethod = theError;
@@ -400,35 +399,40 @@ exports.RaiseError = function (theError, theSeverity, theOrigin, error) {
         Error.Seq = seq++
     };
     if ((typeof error !== 'undefined') && (error !== null)) {
-        if (typeof Error === 'undefined') {
+        if (typeof Error == 'undefined') {
             var Error = new Object();
         };
         Error.Text = error.toString();
     };
-    if (typeof Error !== 'undefined') {
+    if (typeof Error === 'undefined')
+    {
+        console.log("ERROR UNDEFINED")
+        //throw new error("Raise Error Method Error")
+    }
+    else
+        {
+        
         if (theSeverity == 100) {
             CallLog.push(Error)
         }
-        else if (theSeverity == 0) {
+        else if (theSeverity === 0) {
             Fatal.push(Error);
         }
-        else if (theSeverity == -1) {
+        else if (theSeverity === -1) {
             Fatal.push(Error)
         }
-        else if (theSeverity == 1) {
+        else if (theSeverity === 1) {
             Warning.push(Error)
         }
-        else if (theSeverity == 2) {
+        else if (theSeverity === 2) {
             Time.push(Error)
         }
-        else if (theSeverity == 10) {
+        else if (theSeverity === 10) {
             Rules.push(Error)
         }         
         
     }
-    else {
-        throw new error("Raise Error Method Error")
-    };
+    
 };
 exports.getCallErrors = function () {
     return CallErrors;
@@ -614,4 +618,42 @@ var SetItUp = function (inputVal) {
 
     valObj.vSet = BO;
     return valObj;
+};
+exports.getDateNumbers = function (d) {
+    var monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+    var weekday = new Array(7);
+    weekday[0] = "Sunday";
+    weekday[1] = "Monday";
+    weekday[2] = "Tuesday";
+    weekday[3] = "Wednesday";
+    weekday[4] = "Thursday";
+    weekday[5] = "Friday";
+    weekday[6] = "Saturday";
+    // Copy date so don't modify original
+    d = new Date();
+    var nn = d.getDay()
+    d.setHours(0, 0, 0);
+    // Set to nearest Thursday: current date + 4 - current day number
+    // Make Sunday's day number 7
+    d.setDate(d.getDate() + 4 - (d.getDay() || 7));
+    // Get first day of year
+    var yearStart = new Date(d.getFullYear(), 0, 1);
+
+    var m = d.getMonth();
+    var md = d.getDay();
+    var weekDay = weekday[nn];
+    var monthNumber = m + 1;
+    var monthStart = monthNames[m];
+    // Calculate full weeks to nearest Thursday
+    var weekNo = Math.ceil((((d - yearStart) / 86400000) + 1) / 7);
+    // Return array of year and week number
+    var YEAR = d.getFullYear()
+    YEAR = moment(d).format("YY")
+    var ret = {};
+    ret.YEAR = YEAR;
+    ret.weekNumber = weekNumber;
+    ret.monthStart = monthStart;
+    ret.monthNumber = monthNumber;
+    ret.weekDay = md;
+    return ret;
 };

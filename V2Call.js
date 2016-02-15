@@ -8,7 +8,6 @@ s15 = require('cloud/E15.js');
 s16 = require('cloud/E1623.js');
 exports.setV2Call = function (TheCall)
 {
-    console.log("setv2Call")
 
     try {
         var pe01 = sa.setE01(TheCall);

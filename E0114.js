@@ -7,19 +7,40 @@ exports.setE01 = function (TheCall) {
     }
     else {
         var E01 = {};
-        if (typeof TC.eRecord["eRecord.01"] !== 'undefined') {
-            E01.E01_01 = TC.eRecord["eRecord.01"].vSet[0].val;
+        if (typeof TC.eRecord["eRecord.01"] != 'undefined')
+        {
+            if (typeof TC.eRecord["eRecord.01"].vSet != 'undefined') {
+                E01.E01_01 = TC.eRecord["eRecord.01"].vSet[0].val;
+            }
+            else {
+                E01.E01_01 = "MAN";
+            }
         };
-        if (typeof TC.eRecord["eRecord.02"] !== 'undefined') {
-            E01.E01_02 = TC.eRecord["eRecord.02"].vSet[0].val;
+        if (typeof TC.eRecord["eRecord.02"] != 'undefined') {
+            if (typeof TC.eRecord["eRecord.02"].vSet != 'undefined') {
+                E01.E01_02 = TC.eRecord["eRecord.02"].vSet[0].val;
+            }
+            else {
+                E01.E01_01 = "MAN";
+            }
         };
-        if (typeof TC.eRecord["eRecord.03"] !== 'undefined') {
-            E01.E01_03 = TC.eRecord["eRecord.03"].vSet[0].val;
+        if (typeof TC.eRecord["eRecord.03"] != 'undefined') {
+            if (typeof TC.eRecord["eRecord.03"].vSet != 'undefined') {
+                E01.E01_03 = TC.eRecord["eRecord.03"].vSet[0].val;
+            }
+            else {
+                E01.E01_03 = "MAN";
+            }            
         };
-        if (typeof TC.eRecord["eRecord.04"] !== 'undefined') {
-            E01.E01_04 = TC.eRecord["eRecord.04"].vSet[0].val;
+        if (typeof TC.eRecord["eRecord.04"] != 'undefined') {
+            if (typeof TC.eRecord["eRecord.04"].vSet != 'undefined') {
+                E01.E01_04 = TC.eRecord["eRecord.04"].vSet[0].val;
+            }
+            else {
+                E01.E01_04 = "MAN";
+            }            
         };
-    }
+    }    
 
     return E01
 };

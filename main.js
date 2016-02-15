@@ -14,289 +14,323 @@ var moment = require('moment');
 SendMail = require('cloud/SendeMail.js');
 var client = require('cloud/myMailModule-1.0.0.js');
 
-Parse.Cloud.afterSave("PCR", function (request) {
-    console.log("In PCR")
-    //var p = getPCR(request.object.id);
-    //console.log("End " + p)
-    //p.then(function (results) {
-    //    console.log("restults " + results)
-    //});
-});
 
-
-//Parse.Cloud.afterSave("HTMLClass", function (request) {
-//    console.log(request)
-//    console.log("In the HTMLClass " + request.object.get('PCRID'))
-//    var p = getPCR(request.object.get('PCRID'));
-//    //console.log("End " + p)
-//    //p.then(function (results) {
-//    //    console.log("restults " + results)
+//Parse.Cloud.define("getHTML", function (request, response) {
+//    var d = {}
+//    //var e = getHTML("tGHIYt5l1e")
+//    //e.then(function (er) {
+//    //    response.success(er)
 //    //});
+    
+//    //var e = sendIt("tGHIYt5l1e")
+//    //e.then(function (er) {
+//    //    response.success(er)
+//    //});
+//    //response.success("er")
 //});
-
-
-//Parse.Cloud.afterSave("EMSDataset", function (request) {
-//    console.log("In EMSDataset")
-//        //var cm = Parse.Object.extend("PCR");
-//        //var query = new Parse.Query(cm);
-//        //query.equalTo("PCRID", request.object.pcrID);
-//        ////return query.find({
-//        //return query.first({
-//        //    success: function (results) {
-//        //        console.log("resutlts of PCRID " + results)
-//        //    },
-//        //    error: function (error) { }
-//        //});
-
-    
-//    //var p = getPCR(request.object.id);
-//    //console.log("End " + p)
-    
-//});
-
-
-
-
-Parse.Cloud.define("getHTML", function (request, response) {
-    var d = {}
-    //var e = getHTML("tGHIYt5l1e")
-    //e.then(function (er) {
-    //    response.success(er)
-    //});
-    
-    var e = sendIt("tGHIYt5l1e")
-    e.then(function (er) {
-        response.success(er)
-    });
-    //response.success("er")
-});
 
 
 
 
 Parse.Cloud.define("getPCR", function (request, response) {
-//var getPCR = function (pcrID, status) {
-    console.log("In Get PCR With everything")
     var pcrStatus = "Open"
-    var TheCallObject = new Object();
     var _status = ""
-    if ((typeof status != 'undefined') && (status != ""))
-    { TheCallObject.Status = status; }
-    else
-    {TheCallObject.Status = "INPROCESS"}
-    
+    //Paramters
+    var _Call = {};
     u.setBuild("Start")
-    if (typeof request.params.PCRID !== 'undefined') {
-        if (request.params.PCRID == '') {
-            response.success("Missing PCRID");
+    if (typeof request !== 'undefined') {
+        if (typeof request.params.PCRID !== 'undefined') {
+            if (request.params.PCRID == '') {
+                response.success("Missing PCRID");
+            }
+            else {
+                var _pcrID = request.params.PCRID
+                _Call.PCRID = _pcrID;
+            }
+        };
+
+        if (typeof request.params.status !== 'undefined') {
+            if (request.params.status == '') {
+                response.success("Missing status");
+            }
+            else {
+                var _status = request.params.status
+                _Call.status = _status;
+            }
         }
-        else {
-            var _pcrID = request.params.PCRID
-        }
-    }
-    else {
-        response.success("Missing PCRID");
     };
-    if (typeof request.params.status !== 'undefined') {
-        if (request.params.status == '') {
-            response.success("Missing status");
+
+    u.setBuild("FetchBusinessObject")
+    var pcr = getPCRObject(_pcrID);
+    pcr.then(function (P) {
+        if (P.length == 0) {
+            response.success("Bad PCR")
         }
         else {
-            var _status = request.params.status
-        }
-    }
-    else {
-        response.success("Missing status");
-    };       
-    u.setBuild("FetchBusinessObject")
+            var _ca = P[0];
 
-    var eList = getAll();
-    eList.then(function (elements)
-    {
-        x.Genv34.getObj(_pcrID).then(function (rawParse) {
-            if (typeof rawParse.attributes === 'undefined') {
-                response.success("Failed Fetch: rawParse")
+            _Call.Summary = [];
+            _Call.HasFatal = false
+            _Call.Errors = []
+            _Call.Warnings = []
+            _Call.PDF = {};
+            _Call.HTML = {};
+            _Call.htmlText = "";
+            _Call.XML = {};
+            _Call.P = P;
+            _Call.BillFile = {};
+            _Call.pcrObjectID = P.id;
+
+
+            if (typeof P[0].attributes != 'undefined')
+            {
+                if (typeof P[0].attributes.agencyId !== 'undefined') {
+                    _Call.agencyID = P[0].attributes.agencyId;
+                };
+                if (typeof P[0].attributes.PCRID !== 'undefined') {
+                    _Call.PCRID = P[0].attributes.PCRID;
+                };
                 
-            };
-            if (typeof rawParse.attributes.agencyId === 'undefined') {
-                response.success("Missing Agency")               
-            };
-            var _agencyID = rawParse.attributes.agencyId;    //Prime it.  No Agency ID, no go
-            TheCallObject.AgencyID = _agencyID;
-
-            u.setBuild("GetAgency");
-            var p = getAgency(_agencyID);
-            p.then(function (results) {
-                if (typeof rawParse.attributes.emsDataSet === 'undefined') {
-                    response.success("Fetch Failure:  emsDataSet")
+                if (typeof P[0].attributes.complete !== 'undefined') {
+                    _Call.CompletionStatus = P[0].attributes.complete;
                 };
-                TheCallObject.PCRObject = rawParse.attributes.emsDataSet;   //Set the Business Entity
-                var ElementList = [];                                       //Config Lis
-                for (var i = 0; i < elements.length ; i++) {
-                    var Element = new Object();
-                    Element.Number = elements[i].attributes.ElementNumber;
-                    Element.ElementName = elements[i].attributes.ElementName;
-                    Element.Usage = elements[i].attributes.Usage;
-                    if (elements[i].attributes.NVList.length > 0) {
-                        Element.NVList = elements[i].attributes.NVList
-                    };
+                if (typeof P[0].attributes.user !== 'undefined') {
+                    _Call.userID = P[0].attributes.user.id;
+                    _Call.userLastName = P[0].attributes.user.attributes.lastName;
+                    _Call.userFirstName = P[0].attributes.user.attributes.firstName;
+                    _Call.userName = P[0].attributes.user.attributes.userName;
 
-                    if (elements[i].attributes.PNList.length > 0) {
-                        Element.PNList = elements[i].attributes.PNList
-                    };
-
-                    if (elements[i].attributes.IsNillable.length > 0) {
-                        Element.IsNillable = elements[i].attributes.IsNillable
-                    };
-                    ElementList.push(Element)//Populate Configurations
                 };
-                TheCallObject.NEMSISElements = ElementList;                 //Bind Configurations to Business Entity
-                try {
-                    u.setBuild("BeginGenPCRObject");
-                    var _v3 = v.setTheCall(TheCallObject)                    //Get Attribute List
-                    TheCallObject.V3 = _v3;                                  //Assign Attributes to Business Entity                                    
-                    TheCallObject.ObjectList = _v3.RawPCRObjects;
-                }
-                catch (e) {
-                    u.RaiseError("Failed generating PCR Object", 0, "TheCall.setV3Call", e);
+                if (typeof P[0].attributes.vehicleId !== 'undefined') {
+                    _Call.vehicleId = P[0].attributes.vehicleId;
                 };
-
-
-                try {
-                    console.log("SetCallProperties");
-                    u.setBuild("SetCallProperties");
-                    var _v3E = v3CT.setV3English(TheCallObject);             //Reporting Payload
-                    console.log("v3CT.setV3English(TheCallObject)")
-                    TheCallObject.Props = _v3E;
-                    TheCallObject.PCRID = _pcrID;
-                    TheCallObject.Props.PCRID = _pcrID;
-                    try {
-                        var _Summary = summary.setCallSummary(TheCallObject)
-                        TheCallObject.Summary = _Summary;
+                if (typeof P[0].attributes.vehicle !== 'undefined') {
+                    if (typeof P[0].attributes.vehicle.attributes !== 'undefined')
+                    {
+                        if (typeof P[0].attributes.vehicle.attributes.location !== 'undefined') {
+                            _Call.Location = P[0].attributes.vehicle.attributes.location;                            
+                        }
+                        if (typeof P[0].attributes.vehicle.attributes.crew !== 'undefined') {
+                            _Call.CrewIDS = P[0].attributes.vehicle.attributes.crew;
+                        };
                     }
-                    catch (e) {
-                        u.RaiseError("Failed generating Summary Object", 0, "TheCall.setCallSummary", e);
-                    };
-
-                    var tmp = rules.setCallRules(TheCallObject.Props);
-                    var htmltext = ht.setHTML(TheCallObject)                //AsIs HTML Document
-                    TheCallObject.HTMLDoc = htmltext;
-                    var htmlBytes = htmltext.getBytes();
-                    TheCallObject.HTML = htmlBytes;
-
                 }
-                catch (e) {
-                    u.RaiseError("Failed generating Reporting Object", 0, "TheCall.setV3English", e);
+            }
+        };
+
+        var eList = getAll();
+        eList.then(function (elements) {
+            x.Genv34.getObj("WW8AAvhbs0").then(function (rawParse) {
+                if (typeof rawParse.attributes === 'undefined') {
+                    response.success("Failed Fetch: rawParse")
                 };
-                //var callM = setCallMetrix(_pcrID)
-                //callM.then(function (ddr) {
-                //    //    //If the call is well-formed, build it.
-                //    //    ////////////////////////////////////////////////
-                //    //    ////////////////////////////////////////////////
-                //    var o1 = new Array();
-                //    o1 = u.getFatalErrors();
-                //    if (o1.length === 0) {
-                //        var BuildStatus = "SUCCESS"
-                //    }
-                //    else {
-                //        var BuildStatus = "FAILED Fatal Error Count: " + o1.length;
-                //    };
-                //    TheCallObject.BuildStatus = BuildStatus;
-                //    //    ////////////////////////////////////////////////
-                //    ////////////////////////////////////////////////
-                //    //var p1 = SaveTheHTML(TheCallObject);
-                //    var p1 = saveHTMLClass(TheCallObject);
-                //    p1.then(function () {
-                //        if (status !== "COMPLETE") {
-                //            try {
-                //                var dc = pdf.NewPDF(TheCallObject);
-                //                TheCallObject.PDF = dc;
-                //            }
-                //            catch (e) {
-                //                u.RaiseError("Failed generating PDF ", 0, "TheCall.setV2Call", e);
-                //            };
 
-                //            if (typeof TheCallObject.Props !== 'undefined') {
-                //                try {
-                //                    TheCallObject.Version2 = v2Object;
-                //                    var v2Object = v2.setV2Call(TheCallObject);
-                //                    var v2XML = ver2XML.setV2XML(v2Object);
-                //                    TheCallObject.v2XML = v2XML;
-                //                    var version2XMLByteArray = v2XML.getBytes();
-                //                    TheCallObject.XML = version2XMLByteArray;
-                //                }
-                //                catch (e) {
-                //                    u.RaiseError("Failed generating Verson 2 Object", 0, "TheCall.setV2Call", e);
-                //                }
-                //            };
-                //            var p = SaveThePDF(TheCallObject);
-                //            p.then(function () {
-                //                //If Has Crew, Save Crew
-                //                if ((typeof TheCallObject.Props["Crew"] !== 'undefined') && (TheCallObject.Props["Crew"] > 0)) {
-                //                    var cMet = crewMetrix.setCrewMetrix(TheCallObject);
-                //                    cMet.then(function (ceM) {
-                //                        if (typeof TheCallObject.XML !== 'undefined') {
-                //                            var cXML = SaveTheXML(TheCallObject);
-                //                            cXML.then(function (Txml) {
-                //                                u.setBuild("EndTime");
-                //                                var FatalE = u.getFatalErrors;
-                //                                var TimeE = u.getTimeErrors;
-                //                                var WarningsE = u.getWarnings;
-                //                                var CallLogE = u.getCallLog;
-                //                                var TheEvent = new Object();
-                //                                if (FatalE.length > 0) {
-                //                                    TheEvent.Status = "Errors"
-                //                                };
-                //                                if (TimeE.length > 0) {
-                //                                    TheEvent.TimeErrors = TimeE;
-                //                                };
-                //                                if (WarningsE.length > 0) {
-                //                                    TheEvent.Warningss = WarningsE;
-                //                                };
-                //                                if (typeof Summary !== 'undefined') {
-                //                                    TheEvent.Summary = Summary;
-                //                                };
-                //                                //                                    var y = sendIt(TheCallObject)
-                //                                //                                    y.then(function (theMail) {
-
-                //                                //                                        var tom = sendToTom(TheCallObject)
-                //                                //                                        tom.then(function (theTom)
-                //                                //                                        {                                                                                                
-                //                                //                                        });
-                //                                //                                    });
-
-                response.success(TheCallObject)
-
-                //                            }, function (error) {
-                //                            });
-                //                        }
+                _Call.PCRID
+                var Summary = [];
+                var Warnings = [];
+                var Errors = [];
+                _Call.Summary = Summary;
+                _Call.HasFatal = false
+                _Call.Errors = Errors;
+                _Call.Warnings = Warnings; //   - stuff like "Response/Enroute interval:  15 minutes.  One day we'll config this stuff.
+                _Call.PDF = {}
+                _Call.HTML = {};
+                _Call.XML = {};
+                _Call.BillFile = {};
+                _Call.BillFile = {};
 
 
-                //                    }, function (error) {
-                //                    });
-                //                }
-                //                else {
-                //                    return ("Incomplete Call.  Missing Crew");
-                //                };
-                //            }, function (error) {
-                //            });
-                //        }
-                //        else {
-                //        };
-                //    }, function (error) {
-                //    });
-                //}, function (error) {
-                //});
+                u.setBuild("GetAgency");
+                var p = getAgency(_Call.agencyID);
+                p.then(function (results) {
+
+                    if (typeof rawParse.attributes.emsDataSet === 'undefined') {
+                        response.success("Fetch Failure:  emsDataSet")
+                    };
+                    _Call.PCRObject = rawParse.attributes.emsDataSet;   //Set the Business Entity
+                    var ElementList = [];                                       //Config Lis
+                    for (var i = 0; i < elements.length ; i++) {
+                        var Element = new Object();
+                        Element.Number = elements[i].attributes.ElementNumber;
+                        Element.ElementName = elements[i].attributes.ElementName;
+                        Element.Usage = elements[i].attributes.Usage;
+                        if (elements[i].attributes.NVList.length > 0) {
+                            Element.NVList = elements[i].attributes.NVList
+                        };
+
+                        if (elements[i].attributes.PNList.length > 0) {
+                            Element.PNList = elements[i].attributes.PNList
+                        };
+
+                        if (elements[i].attributes.IsNillable.length > 0) {
+                            Element.IsNillable = elements[i].attributes.IsNillable
+                        };
+                        ElementList.push(Element)//Populate Configurations
+                    };
+                    _Call.NEMSISElements = ElementList;                 //Bind Configurations to Business Entity
+                    //try {
+                        u.setBuild("BeginGenPCRObject");
+                        var _v3 = v.setTheCall(_Call)                    //Get Attribute List
+                        _Call.Version3 = _v3;                                  //Assign Attributes to Business Entity                                    
+                        _Call.ObjectList = _v3.RawPCRObjects;
+                    //}
+                    //catch (e) {
+                        //u.RaiseError("Failed generating PCR Object", 0, "TheCall.setV3Call", e);
+                    //};
+
+
+                    //try {
+                    u.setBuild("SetCallProperties");
+                    var props = v3CT.setV3English(_Call);             //Reporting Payload
+
+                    _Call.Props = props;
+
+                    _Call.PCRID = _pcrID;
+                    rules.setCallRules(_Call);
+                    var _Summary = summary.setCallSummary(_Call)
+                    _Call.Summary = _Summary;
+                    //  try {
+
+                    //}
+                    //catch (e) {
+                    //  u.RaiseError("Failed generating Summary Object", 0, "TheCall.setCallSummary", e);
+                    //};
+
+                    var htmltext = ht.setHTML(_Call)                //AsIs HTML Document
+                    _Call.htmltext = htmltext;
+                    var htmlBytes = htmltext.getBytes();
+                    _Call.HTML = htmlBytes;
+
+                    //}
+                    //catch (e) {
+                    //   u.RaiseError("Failed generating Reporting Object", 0, "TheCall.setV3English", e);
+                    //};
+
+                    var p = getAgencyRigs(_Call.agencyID)
+                    p.then(function (allRigs) {
+
+                        _Call.AllVehicles = allRigs;
+
+                        var callM = callMetrix.setCallMetrix(_Call)
+                        callM.then(function (ddr) {
+                            ////        //If the call is well-formed, build it.
+                            var o1 = new Array();
+                            o1 = u.getFatalErrors();
+                            if (o1.length === 0) {
+                                var BuildStatus = "SUCCESS"
+                            }
+                            else {
+                                var BuildStatus = "FAILED Fatal Error Count: " + o1.length;
+                            };
+                            _Call.BuildStatus = BuildStatus;
+                            ////////////////////////////////////////////////
+                            //////////////////////////////////////////////                                    
+                            var p1 = saveHTMLClass(_Call);
+                            p1.then(function () {
+                                var status = _Call.status
+                                status = "INCOMPLETE"
+                                if (status !== "COMPLETE") {
+
+
+                                    try {
+                                        var dc = pdf.NewPDF(_Call);
+                                        _Call.PDF = dc;
+                                    }
+                                    catch (e) {
+                                        u.RaiseError("Failed generating PDF ", 0, "TheCall.setV2Call", e);
+                                    };
+
+
+                                    try {
+                                        _Call.Version2 = v2Object;
+                                        var v2Object = v2.setV2Call(_Call);
+                                        var v2XML = ver2XML.setV2XML(v2Object);
+                                        _Call.v2XML = v2XML;
+                                        var version2XMLByteArray = v2XML.getBytes();
+                                        _Call.XML = version2XMLByteArray;
+                                    }
+                                    catch (e) {
+                                        u.RaiseError("Failed generating Verson 2 Object", 0, "TheCall.setV2Call", e);
+                                    }
+
+                                    var p = SaveThePDF(_Call);
+                                    p.then(function () {
+                                        
+                                        if (typeof _Call.XML !== 'undefined') {
+                                            var cXML = SaveTheXML(_Call);
+                                            cXML.then(function (Txml) {
+                                                u.setBuild("EndTime");
+                                                var FatalE = u.getFatalErrors();
+                                                var TimeE = u.getTimeErrors();
+                                                var WarningsE = u.getWarnings();
+                                                _Call.CallLog = u.getCallLog();
+                                                var TheEvent = new Object();
+                                                if (FatalE.length > 0) {
+                                                    _Call.HasFatal = true;
+                                                    _Call.Errors = FatalE;
+                                                };
+                                                if (TimeE.length > 0) {
+                                                    _Call.TimeErrors = TimeE;
+                                                };
+                                                if (WarningsE.length > 0) {
+                                                    _Call.Warnings = WarningsE;
+                                                };
+                                                var y = sendIt(_Call)
+                                                y.then(function (theMail) {
+                                                    var tom = sendToTom(_Call)
+                                                    tom.then(function (theTom) {
+                                                    });
+                                                });
+                                                //var cMet = setCrewMetrix(_Call);
+                                                //cMet.then(function (ceM) 
+                                                //{
+                                                response.success(_Call)
+
+
+                                                //}, function (error) {
+                                                //    response.success("Call Metrix")
+                                                //});
+
+
+                                                //}, function (error) {
+                                                //    response.success("2")
+                                                //});
+
+
+                                                //}, function (error) {
+                                                
+                                            });
+                                        };
+                                        //});
+                                    }, function (error) {
+                                        response.success("Save HTML")
+                                    });
+                                }
+                            });
+                        }, function (error) {
+                            response.success("saveHTMLClass")
+                        });
+
+                    }, function (error) {
+                        response.success("Agency Rigs")
+                    });
+                }, function (error) {
+                    response.success("Elements Errors")
+                });
             }, function (error) {
+                response.success("7")
             });
+
         }, function (error) {
+            response.success("8")
         });
     }, function (error)
-    { });
+    { response.success("9") });
 });
 
 
-var SaveTheXML = function (tc) {
+var SaveTheXML = function (tc)
+    {
     var file = new Parse.File(tc.PCRID + ".XML", tc.XML);
     return file.save().then(function () {
         var TheXML = Parse.Object.extend("XMLClass");
@@ -306,9 +340,8 @@ var SaveTheXML = function (tc) {
         txml.save()
     })
 };
-
-
-var SaveThePDF = function (TheCall) {
+var SaveThePDF = function (TheCall)
+    {
     var file = new Parse.File(TheCall.PCRID + ".PDF", TheCall.PDF);
     return file.save().then(function () {
         var ThePCR = Parse.Object.extend("PDFClass");
@@ -338,7 +371,6 @@ var getCallMtx = function (pcrId) {
         error: function (error) { }
     });
 };
-
 var getHTMLObject = function (pcrId) {
     var cm = Parse.Object.extend("HTMLClass");
     var query = new Parse.Query(cm);
@@ -349,8 +381,6 @@ var getHTMLObject = function (pcrId) {
         error: function (error) { }
     });
 };
-
-
 var getAgency = function () {
     var Agency = Parse.Object.extend("Agency");
     var query = new Parse.Query(Agency);
@@ -368,50 +398,6 @@ String.prototype.getBytes = function () {
     }
     return bytes;
 };
-var setCallMetrix = function (pcrid) {
-    var cmID = null;
-    var callmetrix = Parse.Object.extend("CallMetrix");
-    var query = new Parse.Query(callmetrix)
-    query.equalTo("PCRID", pcrid);
-    return query.find(
-        {
-            success: function (results) {
-                if (results.length > 0) {
-                    cmID = results[0].id
-                }
-                else {
-                    cmID = "";
-                }
-            },
-            error: function (user, error) {
-                console.warn('Error ' + error.code + ': ' + error.message);
-            }
-        }).then(
-    function (object) {
-
-        var cm = new callmetrix();
-        if (cmID !== null) {
-            cm.set("objectId", cmID);
-        };
-        cm.set("PCRID", pcrid);
-        cm.set("RespAgencyName", "So this is he Greatest Test Agency");
-        cm.set("PaymentType", "Sat Payment Type");
-        cm.save(null, {
-            success: function (myClass) {
-                console.log(myClass.id)
-            },
-            error: function (myCall, error) {
-                alert('Failed to create new object, with error code: ' + error.message);
-            }
-        });
-    }
-
-    ,
-    function (error) {
-        console.log('Error ' + error.code + ': ' + error.message);
-    })
-};
-
 
 var sendIt = function (tc) {
     var sub = tc;
@@ -444,7 +430,6 @@ var getHTML = function (pcr) {
         error: function (error) { }
     });
 };
-
 var sendToTom = function (tc) {
     return Parse.Cloud.httpRequest({
         method: 'POST',
@@ -459,8 +444,6 @@ var sendToTom = function (tc) {
         console.error('Request failed with response code ');
     })
 };
-
-
 var saveHTMLClass = function (TheCall) {
 
     var _htmlID = null;
@@ -505,8 +488,75 @@ var saveHTMLClass = function (TheCall) {
         console.log('Error ' + error.code + ': ' + error.message);
     })
 };
+var setVehicleMileage = function (vehicleID, tc)
+{
+    var V = Parse.Object.extend("Vehicle");
+    var v= new V();
+    v.id = vehicleID;
 
+    if (typeof tc.Props === 'undefined') {
+        throw new UserException("Call.Props undefined");
+    }
+    else {
+        if (typeof tc.Props["RespOnSceneMiles"] === 'undefined') {
+            throw new UserException("setVehicleMileage:  Missing Value");
+        }
+        else {
+            if (typeof tc.Props["RespOnSceneMiles"] === '') {
+                throw new UserException("setVehicleMileage:  Missing RespOnSceneMiles");
+            }
+        };
 
+        if (typeof tc.Props["RespDestinationMiles"] === 'undefined')
+        {
+            throw new UserException("RespDestinationMiles:  Missing Value");
+        }
+        else
+        {
+            if (typeof tc.Props["RespDestinationMiles"] === 'undefined') {
+                throw new UserException("RespDestinationMiles:  Missing Value");
+            }
+        }
+    };
+   
+   // Set a new value on quantity
+    v.set("Odometner", vehicleID);
 
-
-
+    // Save
+    v.save(null, {
+        success: function (point) {
+            // Saved successfully.
+        },
+        error: function (point, error) {
+            // The save failed.
+            // error is a Parse.Error with an error code and description.
+        }
+    });
+};
+var getPCRObject = function (pcrID) {
+    //Only once.  MoBi 
+    var cm = Parse.Object.extend("PCR");
+    var query = new Parse.Query(cm);
+    query.equalTo("objectId", pcrID);
+    query.include("user")
+    query.include("vehicle")
+    return query.find({
+        //return query.first({
+        success: function (results) {
+        },
+        error: function (error) { }
+    });
+};
+var getAgencyRigs = function (agencyId) {
+    var cm = Parse.Object.extend("Vehicle");
+    var query = new Parse.Query(cm);
+    query.equalTo("agencyId", agencyId);
+    query.equalTo("active", true);
+    query.descending()
+    return query.find({
+        
+        success: function (results) {
+        },
+        error: function (error) { }
+    });
+};

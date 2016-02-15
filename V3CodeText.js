@@ -16,7 +16,7 @@ exports.setV3English = function (TheCall) {
     var EventLen = 0;
     var BO = {};
 
-    BO = TheCall.V3;
+    BO = TheCall;
 
     Props["CreatedDate"] = moment().utc().format("MM/DD/YYYY");
 
@@ -25,14 +25,31 @@ exports.setV3English = function (TheCall) {
             Props["PCRID"] = TheCall.PCRObjectID;
         }
     };
+    var cGroup = [];
 
-    if (typeof BO.eRecord !== 'undefined') {
-        var obj = {};
-        var obj = BO.eRecord;
-        if (typeof obj["eRecord.01"] !== 'undefined') {
-            // Props["PCRID"] = setPropsect(obj["eRecord.01"]);
+    if (typeof BO.CrewIDS !== 'undefined') {
+
+        for (var t = 0; t < BO.CrewIDS.length; t++) {
+
+            console.log(BO.CrewIDS[t].objectId)
+            
+            var yy = getCrewName(BO.CrewIDS[t].objectId)
+            yy.then(function (cn) {
+                var name =""
+                name = cn.attributes.firstName + " " + cn.attributes.lastName
+       
+                cGroup.push(name)
+            });
         }
-    };
+    }
+    Props.CrewNames = cGroup
+    //if (typeof BO.eRecord !== 'undefined') {
+    //    var obj = {};
+    //    var obj = BO.eRecord;
+    //    if (typeof obj["eRecord.01"] !== 'undefined') {
+    //         Props["PCRID"] = setPropsect(obj["eRecord.01"]);
+    //    }
+    //};
 
     if (typeof BO.eDispatch !== 'undefined') {
         var obj = {};
@@ -2160,10 +2177,13 @@ exports.setV3English = function (TheCall) {
         }
     };
 
+
+    
+
     var CrewString = "";
     if (typeof BO.eCrew != 'undefined')
     {
-        for (var t = 0; t < BO.eCrew["CrewGroup"].length; t++) 
+        for (var t = 0; t < BO.eCrew["CrewGroup"].length; t++)
         {
             var crewObj = new Object();
             var obj = BO.eCrew["CrewGroup"][t]
@@ -2172,6 +2192,16 @@ exports.setV3English = function (TheCall) {
             crewObj.MemberLevel = "";
             crewObj.Role = "";
             if (typeof obj["eCrew.01"] !== 'undefined') {
+                
+                                        
+
+
+                //var yy = this.getCrewName(obj["eCrew.01"])
+                //yy.then(function (cn) {
+                //    console.log("CN")
+                //    console.log(cn)
+                //});
+
                 crewObj.Name = setPropsect(obj["eCrew.01"]);
                 CrewString = CrewString + " " + crewObj.Name;
                 crewObj.StateID = setPValue(obj["eCrew.01"]);
@@ -2395,6 +2425,8 @@ var chunkStr = function (str, chunkLength) {
     return AR;
 };
 
+
+
 var sortBy = (function ()
 {
     var _toString = Object.prototype.toString,
@@ -2417,3 +2449,15 @@ var sortBy = (function ()
         });
     };
 }());
+
+var getCrewName = function (id) {
+    var usr = Parse.Object.extend("User");
+    var query = new Parse.Query(usr);
+    query.equalTo("objectId", id);
+   
+    return query.first({
+        success: function (results) {
+        },
+        error: function (error) { }
+    });
+};

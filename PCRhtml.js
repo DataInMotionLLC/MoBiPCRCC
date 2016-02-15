@@ -1,8 +1,6 @@
 exports.setHTML= function (TheCall) {
 
     var Props = TheCall.Props;
-    console.log("Props")
-    console.log(Props)
     var htmlDoc = "";
     htmlDoc = htmlDoc+ "<!DOCTYPE html>";
     htmlDoc = htmlDoc+ "<html lang=\"en\" xmlns=\"http://www.w3.org/1999/xhtml\">";

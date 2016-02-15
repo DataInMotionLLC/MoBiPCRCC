@@ -69,7 +69,6 @@ exports.setV2XML = function (EMSDataSet) {
             };
             v2XML.WEE("E01");
         };
-        console.log("After 01")
         if (typeof eDS.E02 !== 'undefined')
         {
             v2XML.WSE("E02");

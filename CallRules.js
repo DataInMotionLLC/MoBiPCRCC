@@ -1,12 +1,14 @@
 u = require('cloud/Utilities.js');
-exports.setCallRules = function (p) {
+exports.setCallRules = function (call) {
+    var p = call.Props;
     u.RaiseError("setCallRules", 100, "setCallRules", "setCallRules");
-    //Mileage Rules
-    if (p["RespBeginMileage"] == "") {
-        u.RaiseError("Missing Begin Odometer", 0, "setCallRules", "Missing Begin Odometer");
+    if (typeof p["RespBeginMileage"] !== 'undefined') {
+        if (p["RespBeginMileage"] == "") {
+            u.RaiseError("Missing Begin Odometer", 0, "setCallRules", "Missing Begin Odometer");
+        }
     };
 
-    if (p["RespOnSceneMiles"] !== "") {
+    if (typeof p["RespOnSceneMiles"] !== 'undefined') {
         if (p["RespBeginMileage"] !== "") {
             if (p["RespBeginMileage"] > p["RespOnSceneMiles"]) {
                 u.RaiseError("Begin Mileage " + p["RespBeginMileage"] + " Cannot Exceed On Scene Mileage " + p["RespOnSceneMiles"], 10, "setCallRules", "Begin Mileage " + p["RespBeginMileage"] + " Cannot Exceed On Scene Mileage");
@@ -30,8 +32,8 @@ exports.setCallRules = function (p) {
             }
         }
     };
-    /////
-    ///Patient Rules
+    ///
+    //Patient Rules
     if (p["PatientLastName"] == "") {
         u.RaiseError("Missing Patient Last Name", 10, "setCallRules", "Missing Patient Last Name");
     };
