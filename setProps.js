@@ -14,21 +14,23 @@ exports.setProps = function () {
     p["Intervals"] = [];
     p["DispoPatientMovedFromRig"] = "";
     
-    p.IntervalNotified = 0;
-    p.IntervalUnitAck = 0;
-    p.IntervalUnitEnRoute = 0;
-    p.IntervalUnitAtScene = 0;;
-    p.IntervalUnitAtPatient = 0;
-    p.IntervalUnitTransferToCare = 0;
-    p.IntervalUnitLeftScene = 0;
-    p.IntervalUnitAtLanding = 0;
-    p.IntervalUnitPatientArrived = 0;
-    p.IntervalUnitTransferCare = 0;
-    p.IntervalUnitBackInService = 0;
-    p.IntervalUnitCancel = 0;
-    p.IntervalUnitHome = 0;
-    p.IntevalUnitComplete = 0;
-
+    var Intervals = {}
+    Intervals.IntervalNotified = 0;
+    Intervals.IntervalUnitAck = 0;
+    Intervals.IntervalUnitEnRoute = 0;
+    Intervals.IntervalUnitAtScene = 0;;
+    Intervals.IntervalUnitAtPatient = 0;
+    Intervals.IntervalUnitTransferToCare = 0;
+    Intervals.IntervalUnitLeftScene = 0;
+    Intervals.IntervalUnitAtLanding = 0;
+    Intervals.IntervalUnitPatientArrived = 0;
+    Intervals.IntervalUnitTransferCare = 0;
+    Intervals.IntervalUnitBackInService = 0;
+    Intervals.IntervalUnitCancel = 0;
+    Intervals.IntervalUnitHome = 0;
+    Intervals.IntevalUnitComplete = 0;
+    Intervals.IntervalUnitComplete = 0;
+    p.Intervals = Intervals;
 
     /*
     EMS AGENCY NAME
@@ -247,6 +249,7 @@ exports.setProps = function () {
     p["HasGCSTotal"] = false;
 
     p["Crew"] = "";
+    p["CrewString"] = "";
     p["CrewCount"] = 0;
 
     p["ChiefComplaint"] = "";

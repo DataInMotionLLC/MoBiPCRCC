@@ -35,6 +35,7 @@ var client = require('cloud/myMailModule-1.0.0.js');
 Parse.Cloud.define("getPCR", function (request, response) {
     var pcrStatus = "Open"
     var _status = ""
+    var errObj = {};
     //Paramters
     var _Call = {};
     u.setBuild("Start")
@@ -46,6 +47,7 @@ Parse.Cloud.define("getPCR", function (request, response) {
             else {
                 var _pcrID = request.params.PCRID
                 _Call.PCRID = _pcrID;
+                errObj.pcrID = _pcrID;
             }
         };
 
@@ -56,15 +58,21 @@ Parse.Cloud.define("getPCR", function (request, response) {
             else {
                 var _status = request.params.status
                 _Call.status = _status;
+                errObj.status = _status;
             }
         }
     };
 
     u.setBuild("FetchBusinessObject")
     var pcr = getPCRObject(_pcrID);
-    pcr.then(function (P) {
+    pcr.then(function (P)
+    {
         if (P.length == 0) {
-            response.success("Bad PCR")
+            var e = mailError("getPCRObject", errObj)
+            e.then(function (er) {
+                response.success(er)
+            });
+            response.success("Invalid PCR " + _pcrID)
         }
         else {
             var _ca = P[0];
@@ -86,6 +94,7 @@ Parse.Cloud.define("getPCR", function (request, response) {
             {
                 if (typeof P[0].attributes.agencyId !== 'undefined') {
                     _Call.agencyID = P[0].attributes.agencyId;
+                    errObj.agencyID = _Call.agencyID
                 };
                 if (typeof P[0].attributes.PCRID !== 'undefined') {
                     _Call.PCRID = P[0].attributes.PCRID;
@@ -99,17 +108,29 @@ Parse.Cloud.define("getPCR", function (request, response) {
                     _Call.userLastName = P[0].attributes.user.attributes.lastName;
                     _Call.userFirstName = P[0].attributes.user.attributes.firstName;
                     _Call.userName = P[0].attributes.user.attributes.userName;
+                    errObj.userName = _Call.userName;
 
                 };
                 if (typeof P[0].attributes.vehicleId !== 'undefined') {
                     _Call.vehicleId = P[0].attributes.vehicleId;
+                    errObj.vehicleId = _Call.vehicleId;
                 };
                 if (typeof P[0].attributes.vehicle !== 'undefined') {
                     if (typeof P[0].attributes.vehicle.attributes !== 'undefined')
                     {
+
+                        if (typeof P[0].attributes.vehicle.attributes.createdAt !== 'undefined') {
+                            var xx = P[0].attributes.vehicle.attributes.createdAt;
+                            console.log(xx);
+                            var ddd = new Date(xx);
+                            _Call.PCRDate = moment.utc(ddd).format("MM/DD/YYYY HH:mm");
+                        };
+                        if (typeof P[0].attributes.vehicle.attributes.name !== 'undefined') {
+                            _Call.VehicleName = P[0].attributes.vehicle.attributes.name;
+                        };
                         if (typeof P[0].attributes.vehicle.attributes.location !== 'undefined') {
-                            _Call.Location = P[0].attributes.vehicle.attributes.location;                            
-                        }
+                            _Call.Location = P[0].attributes.vehicle.attributes.location;
+                        };
                         if (typeof P[0].attributes.vehicle.attributes.crew !== 'undefined') {
                             _Call.CrewIDS = P[0].attributes.vehicle.attributes.crew;
                         };
@@ -120,7 +141,7 @@ Parse.Cloud.define("getPCR", function (request, response) {
 
         var eList = getAll();
         eList.then(function (elements) {
-            x.Genv34.getObj("WW8AAvhbs0").then(function (rawParse) {
+            x.Genv34.getObj(_pcrID).then(function (rawParse) {
                 if (typeof rawParse.attributes === 'undefined') {
                     response.success("Failed Fetch: rawParse")
                 };
@@ -171,7 +192,7 @@ Parse.Cloud.define("getPCR", function (request, response) {
                     //try {
                         u.setBuild("BeginGenPCRObject");
                         var _v3 = v.setTheCall(_Call)                    //Get Attribute List
-                        _Call.Version3 = _v3;                                  //Assign Attributes to Business Entity                                    
+                        _Call.Version3 = _v3;                            //Assign Attributes to Business Entity                                    
                         _Call.ObjectList = _v3.RawPCRObjects;
                     //}
                     //catch (e) {
@@ -213,7 +234,7 @@ Parse.Cloud.define("getPCR", function (request, response) {
 
                         var callM = callMetrix.setCallMetrix(_Call)
                         callM.then(function (ddr) {
-                            ////        //If the call is well-formed, build it.
+                            //        //If the call is well-formed, build it.
                             var o1 = new Array();
                             o1 = u.getFatalErrors();
                             if (o1.length === 0) {
@@ -221,10 +242,13 @@ Parse.Cloud.define("getPCR", function (request, response) {
                             }
                             else {
                                 var BuildStatus = "FAILED Fatal Error Count: " + o1.length;
+                                _Call.FATALERRORS = o1;
                             };
                             _Call.BuildStatus = BuildStatus;
-                            ////////////////////////////////////////////////
-                            //////////////////////////////////////////////                                    
+                            
+
+                            //////////////////////////////////////////////
+                            ////////////////////////////////////////////                                    
                             var p1 = saveHTMLClass(_Call);
                             p1.then(function () {
                                 var status = _Call.status
@@ -276,15 +300,18 @@ Parse.Cloud.define("getPCR", function (request, response) {
                                                     _Call.Warnings = WarningsE;
                                                 };
                                                 var y = sendIt(_Call)
-                                                y.then(function (theMail) {
-                                                    var tom = sendToTom(_Call)
-                                                    tom.then(function (theTom) {
-                                                    });
-                                                });
+                                                y.then(function (theMail)
+                                                {
+                                                    //var tom = sendToTom(_Call)
+                                                    //tom.then(function (theTom) {
+                                                    //    _Call.Sent = "True";
+                                                    //});
+                                               
                                                 //var cMet = setCrewMetrix(_Call);
                                                 //cMet.then(function (ceM) 
                                                 //{
-                                                response.success(_Call)
+                                    response.success(_Call)
+
 
 
                                                 //}, function (error) {
@@ -297,35 +324,72 @@ Parse.Cloud.define("getPCR", function (request, response) {
                                                 //});
 
 
-                                                //}, function (error) {
-                                                
+                                                    //}, function (error) {
+                                                })
+                                                ;
                                             });
                                         };
                                         //});
                                     }, function (error) {
-                                        response.success("Save HTML")
+                                        var e = mailError("SaveHTML", errObj)
+                                        e.then(function (er) {
+                                            response.success(er)
+                                        });
+                                        response.success("SaveHTML")
                                     });
+                                }
+                                else
+                                {
+                                    response.success(_Call)
                                 }
                             });
                         }, function (error) {
-                            response.success("saveHTMLClass")
+                            var e = mailError("SetCallMetrix", errObj)
+                            e.then(function (er) {
+                                response.success(er)
+                            });
+
+                                response.success("Error: Set Call Metrix")
                         });
 
                     }, function (error) {
-                        response.success("Agency Rigs")
+                        var e = mailError("GetAgencyRigs", errObj)
+                        e.then(function (er) {
+                            response.success(er)
+                        });
+                        response.success("Error: Agency Rigs")
                     });
                 }, function (error) {
+                    var e = mailError("GetElements", errObj)
+                    e.then(function (er) {
+                        response.success(er)
+                    });
                     response.success("Elements Errors")
                 });
             }, function (error) {
-                response.success("7")
+                var e = mailError("getAgency", errObj)
+                e.then(function (er) {
+                    response.success(er)
+                });
+                response.success("getAgency Errors")
             });
 
         }, function (error) {
-            response.success("8")
+            var e = mailError("getElements", errObj)
+            e.then(function (er) {
+                response.success(er)
+            });
+            response.success("getElements Errors")
         });
     }, function (error)
-    { response.success("9") });
+    {
+        var e = mailError("getPCR", errObj)
+        e.then(function (er) {
+            response.success(er)
+        });
+        response.success("getPCR Errors")
+    });
+    
 });
 
 
@@ -398,28 +462,69 @@ String.prototype.getBytes = function () {
     }
     return bytes;
 };
-
 var sendIt = function (tc) {
     var sub = tc;
     var h = tc.HTMLDoc;
     //var e = getHTML(tc.Props.PCRID)
     //e.then(function (er) {
-       
+
     client.initialize('mg.datainmotionllc.com', 'key-dd6c965d8a32b0a4db474a678e02de87');
 
     return client.sendEmail({
-        to: 'arner.derek@gmail.com',        
-        cc: 'yintothayang@gmail.com',
+        to: 'bouviereil@hotmail.com',
+        //cc: ,
         from: "MyMail@DataInMotion.com",
         subject: tc.Props.DispatchComplaint,
-        generateTextFromHTML: true,        
+        generateTextFromHTML: true,
         html: h
     }).then(function (httpResponse) {
         console.log("Update CallMetrix with Sent Date/Status")
-            return httpResponse
-        });
+        return httpResponse
+    });
     // });
 };
+var mailError = function (from, err) {
+    console.log(from)
+    console.log("err")
+    console.log(err)
+    var pcr = ""
+    var status = "";
+    var agency = "";
+    var username = "";
+    var vehicle = "";
+
+    if (typeof err.pcrID != 'undefined') {
+        pcr = err.pcrID
+    };
+    if (typeof err.status != 'undefined') {
+        status = err.status
+    }
+    if (typeof err.agencyID != 'undefined') {
+        agency = err.agency
+    }
+    if (typeof err.userName != 'undefined') {
+        username = err.username
+    }
+    if (typeof err.vehicleId != 'undefined') {
+        vehicle = err.vehicle
+    }
+    client.initialize('mg.datainmotionllc.com', 'key-dd6c965d8a32b0a4db474a678e02de87');
+    
+
+    var etext = "PCR: " + pcr + " Call Status: " + status + " Agency: " + agency +  " User: " + username + " Vehicle: " + vehicle
+    return client.sendEmail({
+        to: 'bouvierneil@hotmail.com',        
+        from: "MyMail@DataInMotion.com",
+        subject: from,
+        text: etext
+    }).then(function (httpResponse) {
+        console.log("Update CallMetrix with Sent Date/Status")
+        return httpResponse
+    });
+    // });
+};
+
+
 var getHTML = function (pcr) {
     var html = Parse.Object.extend("HTMLClass");
     var query = new Parse.Query(html);

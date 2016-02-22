@@ -437,9 +437,11 @@ exports.seteDispatch = function (pcrObj, NemsisList) {
     };
 
     if (typeof eDispatch !== 'undefined') {
+        console.log("DIPATCH")
         return eDispatch;
     }
     else {
+        console.log("DIPATCH NULL")
         return null;
     }
 };

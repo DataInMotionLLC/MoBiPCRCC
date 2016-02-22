@@ -1,284 +1,427 @@
 var u = require('cloud/Utilities.js');
+var moment = require('moment');
 var summaryArray = new Array();
-exports.setCallSummary = function (TheCall) {
-    var rA = [];
-    
-    //Props["CallDisposition"] = "CanceledOnSceneNoPatient";
-    //Props["CallHasPatient"] = false;
-    //Props["CallHasTransport"] = false;
-    //Props["CallHasTreatment"] = false;
-    //Props["CallStatus"] = "Cancel";
+exports.setCallSummary = function (TheCall)
+{
+    var rA = [];  
     
     if (typeof TheCall.Props == 'undefined') {
-        u.RaiseError("setCallSummary", 100, "Undefined TheCall.Props Object", "setCallSummary");
-        
+        u.RaiseError("setCallSummary", 100, "Undefined TheCall.Props Object", "setCallSummary");        
     };
+
     var BO = TheCall.Props;
-    if (typeof TheCall.Props.Intervals === 'undefined') {
-        
+    if (typeof TheCall.Props.Intervals === 'undefined') {        
         u.RaiseError("setCallSummary", 100, "Undefined TheCall.Props Object", "setCallSummary");
         
     };
     var p = "";
-
-    if (TheCall["status"] !== "") {
-        p = "Status: " + TheCall["status"]
-        //setLine("Status", TheCall["Status"]);
-    }
-
-    if (BO["PCRID"] !== "") {
-        p = p + "\t" + "Call ID: " + TheCall["PCRID"]
-    }
-    
-    if (BO["CallDate"] !== "") {
-        p = p + "\t" + "Date: " + BO["CallDate"]
-    }
-    if (BO["RespAgencyNumber"] !== "") {
-        p = p + "\t" + "Agency: " + BO["RespAgencyNumber"]        
+    if (typeof TheCall["VehicleName"] !== 'undefined') {
+        p = TheCall["VehicleName"]  
     };
-    rA.push(p)
-
-    var p = "";
-    if (BO["DispatchComplaint"] !== "") {
-        p = p + "Dispatch Complaint: " + BO["DispatchComplaint"];
+    if (typeof BO["CallType"] !== 'undefined') {
+        p = "Type: " + BO["CallType"]
     };
-    if (BO["DispatchCallLocation"] !== "") {
-        p = p + "\t" + "Dispatched From: " + BO["DispatchCallLocation"]
-    }
-    rA.push(p)
-
-    p = "";
-    if (BO["Disposition"] !== "") {
-        p = p + "Disposition: " + BO["Disposition"]
-    }
-    if (BO["DispoTo"] !== "") {
-        p = p + "\t" + "To: " + BO["DispoTo"]
+    if (typeof BO["CreatedDate"] !== 'undefined') {
+        p = p + "    Report Date:  " + BO["CreatedDate"]
     };
-
-    rA.push(p)
-
-    p = "";
-    if (typeof BO.Intervals !== 'undefined') {
-        if (BO.Intervals["IntervalUnitAck"] !== "") {
-            p = p + "to Acknowlege: " + BO.Intervals["IntervalUnitAck"]
-        }
-        if (BO.Intervals["IntervalUnitEnRoute"] !== "") {
-            p = p + "\t" + "to EnRoute: " + BO.Intervals["IntervalUnitEnRoute"]
-        }
-
-        if (BO.Intervals["IntervalUnitAtScene"] !== "") {
-            p = p + "\t" + "to Scene: " + BO.Intervals["IntervalUnitAtScene"]
-        }
-
-        if (BO.Intervals["IntervalUnitAtPatient"] !== "") {
-            p = p + "\t" + "to Patient: " + BO.Intervals["IntervalUnitAtPatient"]
-        };
-        rA.push(p)
-        p = "";
-
-        if (BO.Intervals["IntervalUnitLeftScene"] !== "") {
-            p = p + "to Left Scene: " + BO.Intervals["IntervalUnitLeftScene"]
-        }
-        if (BO.Intervals["IntervalUnitPatientArrived:"] !== "") {
-            p = p + "\t" + "to Arrival: " + BO.Intervals["IntervalUnitPatientArrived"]
-        }
-        if (BO.Intervals["IntervalUnitTransferCare:"] !== "") {
-            p = p + "\t" + "to Transfer Of Care: " + BO.Intervals["IntervalUnitTransferCare"]
-        }
-        if (BO.Intervals["IntervalUnitComplete"] !== "") {
-            p = p + "\t" + "to Complete: " + BO.Intervals["IntervalUnitComplete"]
-        }
-        rA.push(p)
-        p = "";
-        
-        if (BO.Intervals["IntervalUnitHome"] !== "") {
-            p = p + "\t" + "to Home: " + BO.Intervals["IntervalUnitHome"]
-        }
-        if (BO.Intervals["IntervalUnitBackInService"] !== "") {
-            p = p + "\t" + "to Back In Service: " + BO.Intervals["IntervalUnitBackInService"]
-        }
+    if (typeof TheCall["status"] !== 'undefined') {
+        p = p + "   " + TheCall["status"]
     };
-
-    if (typeof TheCall.Props.eDispatch === 'undefined') {
-        setM("M", "Dispatch Information")
-    }
-    else {
-        if (BO["DispatchComplaint"] == "") {
-            setM("M", "DispatchComplaint")
-        };
-        if (BO["DispatchEMDPerformed"] !== "") {
-            setLine("Dispatch EMD Performed", BO["DispatchEMDPerformed"]);
-        }
-        else {
-            setM("M", "Dispatch EMD Performed")
-        };
+    if (typeof BO["TimePSAP"] !== 'undefined') {
+        p = p + "    Initial Time:  " + BO["TimePSAP"]
     };
-    
-    
-    if (typeof TheCall.Props.eDisposition === 'undefined') {
-        setM("M", "Disposition Information")
-    }
-    else {
-        if ((typeof BO["CallHasTransport"] !== 'undefined') && (BO["CallHasTransport"] == true)) {
-            if (BO["DispoTo"] !== "") {
-                setM("U", "Destination/Transfered to Name ");
-            };
-            if (BO["DispoToCode"] !== "") {
-                setM("U", "Destination/Transfered to Code");
-            };
-            if (BO["DispoState"] !== "") {
-                setM("M", "Destination State");
-            };
-            if (BO["DispoCounty"] !== "") {
-                setM("M", "Destination County");
-            };
-            if (BO["DispoZip"] !== "") {
-                setM("M", "Destination Zip Code");
-            };
-            if (BO["DispoTransportMethod"] !== "") {
-                setM("M", "EMS Transport Method");
-            };
-            if (BO["DispoTransportModeFromScene"] !== "") {
-                setM("M", "Transport Mode From Scene");
-            };
-            if (BO["AddDispoTransportModeFromScene"] !== "") {
-                setM("M", "Additional Transport Mode Descriptors");
-            };
-            if (BO["DispoReasonForChoosing"] !== "") {
-                setM("M", "Reason For Choosing Destination");
-            };
-            if (BO["DispoDestinationType"] !== "") {
-                setM("M", "Destination Type");
-            }
-            else {
-                if (BO["DispoDestinationType"] === "Hospital-Emergency Department") {
-                    if (BO["DispoPatientDestination"] !== "") {
-                        setM("U", "Hospital In-Patient Destination");
+    if (p.length != 0) {
+        rA.push(p);
+    };
+    var p = ""
+
+    var cs = ""
+    if (typeof TheCall.CrewIDS !== 'undefined') {
+        if (typeof TheCall.CrewIDS.length !== 0) {
+            for (var i = 0; i < TheCall.CrewIDS.length ; i++) {
+                var f = "";
+                var l = "";
+                if (typeof TheCall.CrewIDS[i].lastName != 'undefined') {
+                    if (TheCall.CrewIDS[i].lastName != '') {
+                        l = TheCall.CrewIDS[i].lastName;
+                    }
+                };
+
+                if (typeof TheCall.CrewIDS[i].firstName != 'undefined') {
+                    if (TheCall.CrewIDS[i].firstName != '') {
+                        f = TheCall.CrewIDS[i].firstName;
                     }
                 }
+
+                var nme = ""
+                if (f !== "") {
+                    nme = f + " "
+                }
+                if (l !== "") {
+                    nme = nme + l;
+                }
+            }
+            cs = cs + nme + " "
+        }
+    };
+    p = "Crew: " + cs
+    if (p.length != 0) {
+        rA.push(p)
+    };
+
+
+    if (typeof BO["TimeUnitNotified"] !== 'undefined') {
+        p = p + "Notified: " + BO["TimeUnitNotified"]
+    };
+    if (typeof BO["TimeAcknowledged"] !== 'undefined') {
+        p = p + "    Unit Ack: " + BO["TimeAcknowledged"]
+    };
+    if (typeof BO["TimeEnRoute"] !== 'undefined')
+    {
+        if (BO["TimeEnRoute"] !== "")
+        {
+            p = p + "    EnRoute: " + BO["TimeEnRoute"]
+        }
+        else
+        {
+            setM("M", "En Route")
+        }
+    };
+
+    if (BO["CallStatus"] !== "Cancel") {
+        if (typeof BO["TimeAtScene"] !== 'undefined') {
+            if (BO["TimeAtScene"] !== "") {
+                p = p + "    At Scene: " + BO["TimeAtScene"]
+            }
+            else {
+                setM("M", "At Scene")
+            }
+        };
+
+        if (typeof BO["TimeAtPatient"] !== 'undefined') {
+            if (BO["TimeAtPatient"] !== "") {
+                p = p + "    At Patient: " + BO["TimeAtPatient"]
+            }
+            else {
+                setM("M", "At Patient")
+            }
+        };
+
+        if (typeof BO["TimeTransfer"] !== 'undefined') {
+            p = p + "    Transfer: " + BO["TimeTransfer"]
+        };
+        if (p.length != 0) {
+            rA.push(p);
+        };
+        var p = "";
+        if (typeof BO["TimeLeftScene"] !== 'undefined') {
+            if (BO["TimeLeftScene"] !== "") {
+                p = p + "Left Scene: " + BO["TimeLeftScene"]
+            }
+            else {
+                setM("M", "Left Scene")
+            }
+        };
+
+        if (BO["CallHasTransport"] == true) {
+            if (typeof BO["TimePatientArrived"] !== 'undefined') {
+                if (BO["TimePatientArrived"] !== "") {
+                    p = p + "    Patient Arrived: " + BO["TimePatientArrived"]
+                }
+                else {
+                    setM("M", "Time Patient Arrived")
+                }
             };
-            if ((typeof BO["DispoHospitalActivation"] !== 'undefined') && (BO["DispoHospitalActivation"] !== "")) {
-                setM("U", "Destination Team Pre-Arrival Alert or Activation");
+            if (typeof BO["TimeTransferPatientCare"] !== 'undefined') {
+                if (BO["TimeTransferPatientCare"] !== "") {
+                    p = p + "    Transfer: " + BO["TimeTransferPatientCare"]
+                }
+                else {
+                    setM("M", "Time Transfer Patient Care")
+                }
             }
         }
-    };
-    if (typeof TheCall.Props.eResponse === 'undefined') {
-        setM("M", "Response Information")
-    }
-    else
-        {
-        if (BO["RespIncidentNumber"] != "") {
-            setM("M", "RespIncidentNumber")
-        };
-
-        if (BO["RespTypeOfServiceRequest"] != "") {
-            setM("M", "Type Of Service Request")
-        };
-
-        if (BO["RespPrimaryRoleOfUnit"] != "") {
-            setM("M", "Primary Role Of Unit")
-        };
-
-        if (BO["RespBeginMileage"] != "") {
-            setM("M", "Begin Mileage")
-        };
-
-        if (BO["RespOnSceneMiles"] != "") {
-            setM("M", "On Scene Mileage")
-        };
-
-        if (BO["RespDestinationMiles"] !== "") {
-            setM("M", "At Destination Mileage")
-        }
-        if (BO["RespPrimaryRoleOfUnit"] !== "") {
-            setM("M", "Primary Role Of Unit")
-        };
-        if (BO["RespRig#"] !== "") {
-            setM("M", "Unit Number")
-        };
-        if (BO["EMSUnitCallSign"] !== "") {
-            setM("M", "Unit Call Sign")
-        };
-        if (BO["RespUnitLevelOfCare"] !== "") {
-            setM("M", "Unit Level Of Care")
-        };
-
-        if (BO["RespResponseModeToScene"] == "") {
-            setM("M", "Response Mode To Scene")
-        };
-        if (BO["RespAddResponseModeToScene"] == "") {
-            setM("M", "Add Response Mode Indicators")
-        }        
-    };
-    if (typeof TheCall.Props.eTimes === 'undefined') {
-        setM("M", "Time Information")
     }
     else
     {
-        if (BO["TimeDispatchNotified"] !== "") {
-            setLine("Notified", BO["TimeDispatchNotified"]);
-        }
-        else {
-            setM("M", "Time Dispatch Notified")
-        };
-
-        if (BO["TimeAcknowledged"] !== "") {
-            setLine("Acknowledged", BO["TimeAcknowledged"]);
-        }
-        else {
-            setM("M", "TimeAcknowledged")
-        };
-
-        if (BO["TimeAtScene"] !== "") {
-            setLine("At Scene", BO["TimeAtScene"]);
-        }
-        else {
-            setM("M", "TimeAtScene")
+        if (typeof BO["TimeCancel"] !== 'undefined') {
+            if (BO["TimeCancel"] !== "") {
+                p = p + "    Cancel: " + BO["TimeCancel"]
+            }
+            else {
+                setM("M", "Time Transfer Patient Care")
+            }
         }
     };
-    /////
-    ///Patient Rules
-    if (typeof TheCall.Props.ePatient === 'undefined') {
-        setM("U", "Patient Data Not Recorded");
-    }
-    else {
-        if (BO["PatientLastName"] == "") {
-            setM("U", "Patient Last Name");            
-        };
-        if (BO["PatientFirstName"] == "") {
-            setM("U", "Patient First Name");
-        };
-        if (BO["PatientZip"] == "") {
-            setM("U", "Patient Address Zip Code");
-        };
-        if (BO["PatientCity"] == "") {
-            setM("U", "Patient Address City");            
-        };
 
-        if (BO["PatientCompleteAddress"] == "") {
-            setM("U", "Patient Address ");                        
-        };
-        if (BO["PatientPhone"] == "") {
-            setM("U", "Patient Phone Number");            
-        };        
-        if (BO["Gender"] == "") {
-            setM("U", "Patient Gender");            
-        };
-        if (BO["PatientDOB"] == "") {
-            setM("U", "Patient Date of Birth");            
-        };
-        if (BO["Age"] == "") {
-            setM("U", "Patient Age");            
+    if (typeof BO["TimeBackHome"] !== 'undefined') {
+        if (BO["TimeBackHome"] !== "") {
+            p = p + "    Home: " + BO["TimeBackHome"]
         }
+        else {
+            setM("M", "Time Back Home")
+        }
+    };
+
+    if (typeof BO["TimeCallComplete"] !== 'undefined') {
+        if (BO["TimeCallComplete"] !== "") {
+            p = p + "    Complete: " + BO["TimeCallComplete"]
+        }
+        else {
+            setM("M", "Time Call Complete")
+        }
+    };
+    if (p.length != 0) {
+        rA.push(p);
     };
     
+    
+    ////DIPATCH
+    if (typeof TheCall.Version3.eDispatch == 'undefined') {
+        setM("M", "All Dispatch Data")
+    }
+    else {
+        if (BO["DispatchComplaint"] == "") {
+            setM("M", "Dispatch Complaint/Reason")
+        }
+    };
+
+
+    ///RESPONSE
+    if (typeof TheCall.Version3.eResponse == 'undefined') {
+        setM("M", "All Reponse Data")
+    }
+    else {        
+        if (BO.RespIncidentNumber == "") {
+            setM("M", "Response Incident Number")
+        };
+        if (BO["RespRig#"] == "") {
+            setM("M", "Unit Number")
+        };
+        if (BO["EMSUnitCallSign"] == "") {
+            setM("M", "EMS Unit Call Sign")
+        };
+        if (BO["DispatchComplaint"] == "Standy") {
+            if (BO["RespStandByPurpose"] == "") {
+                setM("M", "Standby Purpose")
+            }
+        };
+        if (BO["RespUnitLevelOfCare"] == "") {
+            setM("M", "Unit Level Of Care")
+        };
+        if (BO["CallStatus"] == "Normal") {
+            if (BO["RespOnSceneMiles"] == "") {
+                setM("M", "On Scene Odometer")
+            };
+            if (BO["RespOnSceneMiles"] == "") {
+                setM("M", "On Scene Odometer")
+            };
+            if (BO["RespTypeOfServiceRequest"] == "") {
+                setM("M", "Type Of Service Request")
+            };
+            if (BO["RespPrimaryRoleOfUnit"] == "") {
+                setM("M", "Primary Role Of Unit")
+            };
+            if (BO["RespResponseModeToScene"] == "") {
+                setM("M", "Response Mode To Scene")
+            };
+            if (p.CallHasTransport == true) {
+                if (BO["DispoTransportModeFromScene"] == "") {
+                    setM("M", "Transport Mode From Scene")
+                };
+                if (BO["RespDestinationMiles"] == "") {
+                    setM("M", "Destination Odometer")
+                }
+            };
+            if (BO["RespOnSceneMiles"] == "") {
+                setM("M", "On Scene Odometer")
+            };
+            if (BO["RespBeginMileage"] == "") {
+                setM("M", "Beginning (En-Route) Odometer")
+            }
+        }
+    };
+    if (p.length != 0) {
+        rA.push(p);
+    };
+
+    ///TIMES
+    if (typeof TheCall.eTimes == 'undefined')
+    {
+        setM("M", "All Call Times")
+    }
+    else {
+        if (BO["TimeDispatchNotified"] !== "") {
+            setM("M", "Time Dispatch Notified")
+        }
+        if (BO["TimeUnitNotified"] !== "") {
+            setM("M", "Unit Notified Time")
+        }
+    };
+        
+    p = "";
+    if (typeof BO.Intervals !== 'undefined') {
+        if (BO.Intervals["IntervalDispatchNotified"] !== "") {
+            p = p + "Dispatch/Notification: " + BO.Intervals["IntervalDispatchNotified"]
+        };
+        if (BO.Intervals["IntervalUnitAck"] !== "") {
+            p = p + "  Notification/Acknowlege: " + BO.Intervals["IntervalUnitAck"]
+        };
+        if (BO.Intervals["IntervalUnitEnRoute"] !== "") {
+            p = p + "  Ack/EnRoute: " + BO.Intervals["IntervalUnitEnRoute"]
+        };
+        if (BO.Intervals["IntervalUnitAtScene"] !== "") {
+            p = p + "EnRoute/Scene: " + BO.Intervals["IntervalUnitAtScene"]
+        }
+
+        if (BO.Intervals["IntervalUnitAtPatient"] !== "") {
+            p = p + "  At Scene/Patient: " + BO.Intervals["IntervalUnitAtPatient"]
+        };
+        if (p.length != 0) {
+            rA.push(p)
+        };
+        p = "";
+
+        if (BO.Intervals["IntervalUnitLeftScene"] !== "") {
+            p = p + "AtPat/LeftScene: " + BO.Intervals["IntervalUnitLeftScene"]
+        }
+        if (BO.Intervals["IntervalUnitPatientArrived:"] !== "") {
+            p = p + "    Scene/Arrived: " + BO.Intervals["IntervalUnitPatientArrived"]
+        }
+        if (BO.Intervals["IntervalUnitTransferCare:"] !== "") {
+            p = p + "    Scene/TranferOfCare: " + BO.Intervals["IntervalUnitTransferCare"]
+        }
+        if (BO.Intervals["IntervalUnitComplete"] !== "") {
+            p = p + "    TransCare/Complete: " + BO.Intervals["IntervalUnitComplete"]
+        }
+        if (p.length != 0) {
+            rA.push(p)
+        }
+        p = "";
+
+        if (BO.Intervals["IntervalUnitHome"] !== "") {
+            p = p + "Complete/Home: " + BO.Intervals["IntervalUnitHome"]
+        }
+        if (BO.Intervals["IntervalUnitBackInService"] !== "") {
+            p = p + "Complete/InService: " + BO.Intervals["IntervalUnitBackInService"]
+        }
+        if (p.length != 0) {
+            rA.push(p);
+
+        };
+
+
+
+        if (typeof TheCall.Props.eDisposition === 'undefined') {
+            setM("M", "Disposition Information")
+        }
+        else {
+            p = "";
+            if ((["CallHasTransport"] == true)) {
+                if (BO["DispoTo"] !== "") {
+                    setM("U", "Destination/Transfered to Name ");
+                }
+                else {
+                    p = p + "Destination : " + BO.Intervals["DispoTo"]
+                };
+                ;
+                if (BO["DispoToCode"] !== "") {
+                    setM("U", "Destination/Transfered to Code");
+                };
+                if (BO["DispoState"] !== "") {
+                    setM("M", "Destination State");
+                };
+                if (BO["DispoCounty"] !== "") {
+                    setM("M", "Destination County");
+                };
+                if (BO["DispoZip"] !== "") {
+                    setM("M", "Destination Zip Code");
+                };
+                if (BO["DispoTransportMethod"] !== "") {
+                    setM("M", "EMS Transport Method");
+                };
+                if (BO["DispoTransportModeFromScene"] !== "") {
+                    setM("M", "Transport Mode From Scene");
+                };
+                if (BO["AddDispoTransportModeFromScene"] !== "") {
+                    setM("M", "Additional Transport Mode Descriptors");
+                };
+                if (BO["DispoReasonForChoosing"] !== "") {
+                    setM("M", "Reason For Choosing Destination");
+                };;
+                if (BO["DispoDestinationType"] !== "") {
+                    setM("M", "Destination Type");
+                }
+                else {
+                    if (BO["DispoDestinationType"] === "Hospital-Emergency Department") {
+                        if (BO["DispoPatientDestination"] !== "") {
+                            setM("U", "Hospital In-Patient Destination");
+                        }
+                    }
+                };
+                if ((typeof BO["DispoHospitalActivation"] !== 'undefined') && (BO["DispoHospitalActivation"] !== "")) {
+                    setM("U", "Destination Team Pre-Arrival Alert or Activation");
+                }
+                if (p.length != 0) {
+                    rA.push(p);
+                };
+            }
+        };
+        ///Patient Rules
+        if ((typeof TheCall.Props.ePatient === 'undefined') && (BO["CallHasPatient"] !== true)) {
+            setM("U", "Patient Data Not Recorded");
+        }
+        else {
+            p = "";
+            if (BO["PatientLastName"] == "") {
+                setM("U", "Patient Last Name");
+            }
+            else {
+                p = p + "Patient: " + BO.Intervals["PatientLastName"]
+            };
+
+            if (BO["PatientFirstName"] == "") {
+                setM("U", "Patient First Name");
+            }
+            else {
+                p = p + ", " + BO.Intervals["PatientFirstName"]
+            };
+
+            if (BO["PatientZip"] == "") {
+                setM("U", "Patient Address Zip Code");
+            };
+            if (BO["PatientCity"] == "") {
+                setM("U", "Patient Address City");
+            };
+            if (BO["PatientCompleteAddress"] == "") {
+                setM("U", "Patient Address ");
+            };
+            if (BO["PatientPhone"] == "") {
+                setM("U", "Patient Phone Number");
+            };
+            if (BO["Gender"] == "") {
+                setM("U", "Patient Gender");
+            };
+            if (BO["PatientDOB"] == "") {
+                setM("M", "Patient Date of Birth");
+            }
+            else {
+                p = p + "DOB: " + BO.Intervals["PatientDOB"]
+            };
+            if (BO["Age"] == "") {
+                setM("U", "Patient Age");
+            }
+            if (p.length != 0) {
+                rA.push(p);
+            };
+        };
+    };
     if (BO["CallStatus"] != 'Cancel') {
         if (typeof TheCall.Props.eScene === 'undefined') {
             setM("M", "Scene Data");
         }
         else
-        {
-           
+        {           
             if (BO["SceneState"] == "") {
                 setM("M", "Scene State");
             };
@@ -290,7 +433,7 @@ exports.setCallSummary = function (TheCall) {
                     setM("U", "Number of Patients On Scene");
                 };
 
-                    if (BO["MassCasualtyIncident"] == "") {
+                if (BO["MassCasualtyIncident"] == "") {
                     setM("U", "Mass Casualty Incident");
                 };
 
@@ -421,6 +564,9 @@ exports.setCallSummary = function (TheCall) {
             };
         }
     };
+
+    BO["Medications"]
+    BO["Procedures"]
     
     for (var i = 0; i < summaryArray.length; i++)
     {
@@ -455,13 +601,13 @@ var setM = function (t, txt)
     var sm = {};
 
     if (t == 'M') {
-        sm.type = "MISSING:"
+        sm.type = "MISSING"
     };
     //if (t == 'B') {
     //    sm.type = "BAD DATA:"
     //};
     if (t == 'U') {
-        sm.type = "UNKNOWN:"
+        sm.type = "UNKNOWN"
     };
 
     if (typeof txt !== 'undefined') {        

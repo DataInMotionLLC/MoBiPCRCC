@@ -20,19 +20,19 @@ exports.setCallMetrix = function (thecall) {
     //    metrix.set["Year"] = ctime.YEAR4;
     //    metrix.set["MonthNumber"] = ctime.monthNumber;
     //};
-    metrix.set("RespAgencyName", p["RespAgencyName"]);
-    metrix.set("PaymentType", p["PaymentType"]);
-    metrix.set("IntervalNotified", p["Intervals"]["IntervalNotified"]);
-    metrix.set("IntervalUnitAck", p["Intervals"]["IntervalUnitAck"]);
-    metrix.set("IntervalUnitEnRoute", p["Intervals"]["IntervalUnitEnRoute"]);
-    metrix.set("IntervalUnitAtScene", p["Intervals"]["IntervalUnitAtScene"]);
-    metrix.set("IntervalUnitAtPatient", p["Intervals"]["IntervalUnitAtPatient"]);
-    metrix.set("PatientName", p["PatientName"]);
-    metrix.set("PatientDOB", p["PatientDOB"])
-    metrix.set("PatientAddress", p["PatientAddress"]);
-    metrix.set("PatientSSN4", p["SSN"]);
-    metrix.set("PatientGender", p["Gender"]);
-    metrix.set("PatientLocation", p["PatientLocation"]);
+    //metrix.set("RespAgencyName", p["RespAgencyName"]);
+    //metrix.set("PaymentType", p["PaymentType"]);
+    //metrix.set("IntervalNotified", p["Intervals"]["IntervalNotified"]);
+    //metrix.set("IntervalUnitAck", p["Intervals"]["IntervalUnitAck"]);
+    //metrix.set("IntervalUnitEnRoute", p["Intervals"]["IntervalUnitEnRoute"]);
+    //metrix.set("IntervalUnitAtScene", p["Intervals"]["IntervalUnitAtScene"]);
+    //metrix.set("IntervalUnitAtPatient", p["Intervals"]["IntervalUnitAtPatient"]);
+    //metrix.set("PatientName", p["PatientName"]);
+    //metrix.set("PatientDOB", p["PatientDOB"])
+    //metrix.set("PatientAddress", p["PatientAddress"]);
+    //metrix.set("PatientSSN4", p["SSN"]);
+    //metrix.set("PatientGender", p["Gender"]);
+    //metrix.set("PatientLocation", p["PatientLocation"]);
     //metrix.set("PatientBarriersToCare", p["HistBarriersToCare"]);
     //metrix.set("PatientPhone", p["PatientPhone"]);
     //metrix.set("PatientAddressLocation", p["PatientAddressLocation"]);

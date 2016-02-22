@@ -9,16 +9,16 @@ exports.setV3English = function (TheCall) {
     if (typeof TheCall === 'undefined') {
         return Props
     };
-
+    console.log(TheCall.P[0])
 
     var Event = new Object();
     var Events = new Array();
     var EventLen = 0;
     var BO = {};
 
-    BO = TheCall;
+    BO = TheCall.Version3;
 
-    Props["CreatedDate"] = moment().utc().format("MM/DD/YYYY");
+    Props["CreatedDate"] = moment(TheCall["PCRDate"]).utc().format("MM/DD/YYYY");
 
     if (typeof TheCall.PCRObjectID !== 'undefined') {
         if (TheCall.PCRObjectID != "") {
@@ -58,18 +58,21 @@ exports.setV3English = function (TheCall) {
             Props["DispatchComplaint"] = setPropsect(obj["eDispatch.01"]);
             if (Props["DispatchComplaint"] === "Standby") {
                 Props["CallType"] = "Standby"
-            };
-            if (Props["DispatchComplaint"] === "Traffic/Transportation Incident") {
+            }
+            else if (Props["DispatchComplaint"] === "Traffic/Transportation Incident") {
                 Props["CallType"] = "MVC"
-            };
-            if (Props["DispatchComplaint"] === "Automated Crash Notification") {
+            }
+            else if (Props["DispatchComplaint"] === "Automated Crash Notification") {
                 Props["CallType"] = "MVC"
-            };
-            if (Props["DispatchComplaint"] === "Transfer/Interfacility/Palliative Care") {
+            }
+            else if (Props["DispatchComplaint"] === "Transfer/Interfacility/Palliative Care") {
                 Props["CallType"] = "Transfer"
-            };
-            if (Props["DispatchComplaint"] === "Airmedical Transport") {
+            }
+            else if (Props["DispatchComplaint"] === "Airmedical Transport") {
                 Props["CallType"] = "AirTransport"
+            }
+            else {
+                Props["CallType"] = "Response"
             };
         };
         if (typeof obj["eDispatch.02"] !== 'undefined') {
@@ -351,10 +354,16 @@ exports.setV3English = function (TheCall) {
             };
             Props["DispoHospitalActivation"] = preAct;
         }
-    };    
-    Props.Intervals = [];
-    if (typeof BO.eTimes !== 'undefined') {
-        var Inter = intervals.setIntervals(BO.eTimes)
+    };
+
+    if (typeof BO.eTimes === 'undefined')
+    {
+        Props["TimePSAP"] = moment(TheCall.PCRDate).format("HH:mm");
+    }
+    else
+
+    {
+        var Inter = intervals.setIntervals(TheCall)
         Props.Intervals = Inter
         
         var obj = {};
@@ -363,17 +372,20 @@ exports.setV3English = function (TheCall) {
             var o = setPValue(obj["eTimes.01"]);
             if (o !== "") {
                 Props["TimePSAP"] = moment(o).format("HH:mm");
-                var Event = new Object();
-                Event.Time = Props["TimePSAP"]
-                Event.Name = "PSAP Time"
-                var v = [];
-                v.push("PSAP Time")
-                Event.Value = v;
-                EventLen = EventLen + v.length;
-                Events.push(Event)
-
             }
+            else {
+                Props["TimePSAP"] = moment(TheCall.PCRDate).format("HH:mm");
+            };
+            var Event = new Object();
+            Event.Time = Props["TimePSAP"]
+            Event.Name = "PSAP Time"
+            var v = [];
+            v.push("PSAP Time")
+            Event.Value = v;
+            EventLen = EventLen + v.length;
+            Events.push(Event)
         };
+
         if (typeof obj["eTimes.02"] !== 'undefined') {
             var o = setPValue(obj["eTimes.02"]);
             if (o !== "") {
@@ -1685,7 +1697,7 @@ exports.setV3English = function (TheCall) {
                 obj2 = obj.ProcedureGroup[i];
                 if (typeof obj2["eProcedures.01"] !== 'undefined') {
                     if (obj2["eProcedures.01"].IsNull == true) {
-                        u.RaiseError("Procedure Time Required", 0, "v3CodeText", "");
+                        u.RaiseError("Procedure Time Required", 0, setPropsect(obj2["eProcedures.03"]), "");
                     }
                     else {
                         var tP = setPValue(obj2["eProcedures.01"]);
@@ -1760,6 +1772,10 @@ exports.setV3English = function (TheCall) {
                 var theMed = new Object();
                 if (typeof obj2["eMedications.01"] !== 'undefined') {
                     if (obj2["eMedications.01"].IsNull == false) {
+                        u.RaiseError("Missing Medication Admin Time", 10, setPropsect(obj2["eMedications.03"]));
+                    }
+                    else
+                    {
                         var s = "";
                         var tM = setPropsect(obj2["eMedications.01"]);
                         theMed["Time"] = moment(tM).format("HH:mm");
@@ -2461,3 +2477,10 @@ var getCrewName = function (id) {
         error: function (error) { }
     });
 };
+
+
+errObj.pcrID
+errObj.status
+errObj.agencyID
+errObj.userName
+errObj.vehicleId

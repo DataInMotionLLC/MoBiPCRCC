@@ -4,6 +4,8 @@ inv = require('cloud/Interventions.js');
 pat= require('cloud/Patient.js');
 exports.setTheCall = function (thePCR)
 {
+
+
     u.RaiseError("setV3Call", 100, "setV3Call", "setV3Call");
     var parseObject = thePCR.PCRObject;
     var rawObjects = new Array();
@@ -83,12 +85,14 @@ exports.setTheCall = function (thePCR)
         rawObjects.push(rawObject)
         rawObject = undefined;
         eDispatchObject.HasDataSet = true;
-        var _Dispatch = new Object()
+        var _Dispatch = new Object();
         try {
-            u.RaiseError("seteDispatch(eDispatchObject, NEMSISElements)", 100, "V3Call", "seteDispatch(eDispatchObject, NEMSISElements)");
             _Dispatch = dsp.seteDispatch(eDispatchObject, NEMSISElements);
+            u.RaiseError("seteDispatch(eDispatchObject, NEMSISElements)", 100, "V3Call", "seteDispatch(eDispatchObject, NEMSISElements)");
+            
         }
-        catch (e) {
+        catch (e)
+        {
             u.RaiseError("seteDispatch", 0, "setV3Call.seteDispatch");
             _Dispatch = null;
         };
@@ -104,92 +108,91 @@ exports.setTheCall = function (thePCR)
 
     
     
-        try {
+    try
+    {
             u.RaiseError("u.getObjectFromOLTPExtract(parseObject, eDisposition)", 100, "V3Call", "u.getObjectFromOLTPExtract(parseObject, eDisposition)");
-            var eDispositionObject = u.getObjectFromOLTPExtract(parseObject, "eDisposition");
-         
-            
-        }
-        catch (e) {
+            var eDispositionObject = u.getObjectFromOLTPExtract(parseObject, "eDisposition");                 
+    }
+    catch (e)
+    {
             u.RaiseError("eDispositionObject", 0, "setV3Call.u.getObjectFromOLTPExtract.eDisposition", e);
         };
         
-        if (eDispositionObject.IsUndefined == true) {
+    if (eDispositionObject.IsUndefined == true) {
+        u.RaiseError("Null Element List", 0, "setV3Call.eDisposition34")
+    }
+    else {
+
+        var rawObject = {};
+        rawObject.Payload = eDispositionObject
+        rawObjects.push(rawObject)
+        rawObject = undefined;
+
+        eDispositionObject.HasDataSet = true;
+        var _Disposition = {};
+
+        try {
+            u.RaiseError("seteDisposition(eDispositionObject, NEMSISElements)", 100, "V3Call", "seteDisposition");
+            _Disposition = dsp.seteDisposition(eDispositionObject, NEMSISElements);
+
+        }
+        catch (e) {
+            u.RaiseError("seteDisposition", 0, "setV3Call.eDisposition", e);
+            _Disposition = null;
+        };
+        if (_Disposition === null) {
             u.RaiseError("Null Element List", 0, "setV3Call.eDisposition34")
         }
         else {
-         
-            var rawObject = {};
-            rawObject.Payload = eDispositionObject
-            rawObjects.push(rawObject)
-            rawObject = undefined;
-
-            eDispositionObject.HasDataSet = true;
-            var _Disposition = {};
-
-            try {
-                u.RaiseError("seteDisposition(eDispositionObject, NEMSISElements)", 100, "V3Call", "seteDisposition");
-                _Disposition = dsp.seteDisposition(eDispositionObject, NEMSISElements);
-
-            }
-            catch (e) {
-                u.RaiseError("seteDisposition", 0, "setV3Call.eDisposition", e);
-                _Disposition = null;
-            };
-            if (_Disposition === null) {
-                u.RaiseError("Null Element List", 0, "setV3Call.eDisposition34")
-            }
-            else {
-                var eDisposition = {};
-                eDisposition = _Disposition;
-                theCall.eDisposition = eDisposition;
-                if (typeof eDisposition.CustomResults !== 'undefined') {
-                    if (eDisposition.CustomResults.length > 0) {
-                        eCustomResults = eCustomResults.concat(eDisposition.CustomResults)
-                    }
+            var eDisposition = {};
+            eDisposition = _Disposition;
+            theCall.eDisposition = eDisposition;
+            if (typeof eDisposition.CustomResults !== 'undefined') {
+                if (eDisposition.CustomResults.length > 0) {
+                    eCustomResults = eCustomResults.concat(eDisposition.CustomResults)
                 }
             }
-        };
-
-        try {
-            u.RaiseError("u.getObjectFromOLTPExtract(parseObject, eResponse)", 100, "V3Call", "getObjectFromOLTPExtract");
-            var eResponseObject = u.getObjectFromOLTPExtract(parseObject, "eResponse");
-            eResponseObject.HasDataSet = false;
         }
-        catch (e) {
-            u.RaiseError("eResponseObject", 0, "setV3Call.u.getObjectFromOLTPExtract.eResponse", e);
-        };
+    };
+
+    try {
+        u.RaiseError("u.getObjectFromOLTPExtract(parseObject, eResponse)", 100, "V3Call", "getObjectFromOLTPExtract");
+        var eResponseObject = u.getObjectFromOLTPExtract(parseObject, "eResponse");
+        eResponseObject.HasDataSet = false;
+    }
+    catch (e) {
+        u.RaiseError("eResponseObject", 0, "setV3Call.u.getObjectFromOLTPExtract.eResponse", e);
+    };
 
      
+    if (typeof eResponseObject !== 'undefined' && eResponseObject.IsUndefined === true) {
+        var rawObject = {};
+        rawObject.Name = "eResponseObject"
+        rawObject.Payload = eResponseObject
+        rawObjects.push(rawObject)
+        u.RaiseError("eResponse Null or Undefined", 0, "setV3Call.eResponse34");
+    }
+    else {
+        eResponseObject.HasDataSet = true;
+        var _Response = {};
+        try {
+            u.RaiseError("seteResponse(eResponseObject, NEMSISElements)", 100, "V3Call", "seteResponse");
+            _Response = dsp.seteResponse(eResponseObject, NEMSISElements);
+        }
+        catch (e) {
+            u.RaiseError("seteResponse(eResponseObject, NEMSISElements)", 0, "V3Call", "seteResponse");
+            _Response = null;
+        };
 
-        if (typeof eResponseObject !== 'undefined' && eResponseObject.IsUndefined === true) {
-            var rawObject = {};
-            rawObject.Name = "eResponseObject"
-            rawObject.Payload = eResponseObject
-            rawObjects.push(rawObject)
-            u.RaiseError("eResponse Null or Undefined", 0, "setV3Call.eResponse34");
+        if (_Response === null) {
+            u.RaiseError("eResponse Null or Undefined", 0, "setV3Call.eResponse34")
         }
         else {
-            eResponseObject.HasDataSet = true;
-            var _Response = {};
-            try {
-                u.RaiseError("seteResponse(eResponseObject, NEMSISElements)", 100, "V3Call", "seteResponse");
-                _Response = dsp.seteResponse(eResponseObject, NEMSISElements);
-            }
-            catch (e) {
-                u.RaiseError("seteResponse(eResponseObject, NEMSISElements)", 0, "V3Call", "seteResponse");
-                _Response = null;
-            };
-
-            if (_Response === null) {
-                u.RaiseError("eResponse Null or Undefined", 0, "setV3Call.eResponse34")
-            }
-            else {
-                var eResponse = {};
-                eResponse = _Response;
-                theCall.eResponse = eResponse;
-            }
-        };
+            var eResponse = {};
+            eResponse = _Response;
+            theCall.eResponse = eResponse;
+        }
+    };
 
      
     try {
