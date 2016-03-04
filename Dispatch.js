@@ -437,11 +437,9 @@ exports.seteDispatch = function (pcrObj, NemsisList) {
     };
 
     if (typeof eDispatch !== 'undefined') {
-        console.log("DIPATCH")
         return eDispatch;
     }
     else {
-        console.log("DIPATCH NULL")
         return null;
     }
 };
@@ -1420,11 +1418,10 @@ exports.seteCrew = function (pcrObj, NemsisList) {
         }
     }
 };
-exports.seteNarrative = function (TheCall) {
+exports.seteNarrative = function (pcrObj, NemsisList) {
     u.RaiseError("seteNarrative", 100, "Dispatch.js", "seteNarrative");
     var eNarrative = new Object();
-    var pNarrative = new Object();
-    pNarrative = TheCall.pNarrative;
+    var pNarrative = pcrObj;
     if (pNarrative.HasDataSet == false) {
         return null;
     }

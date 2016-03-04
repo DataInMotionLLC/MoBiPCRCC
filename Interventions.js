@@ -406,7 +406,7 @@ exports.seteDevice = function (pcrObj, NemsisList) {
                                     };
 
                                     //edevice.05/////////////////////////////
-                                    try {
+                                    try {                                        
                                         WFG["eDevice.05"] = u.setBusinessObject(_eRG, NemsisList, "eDevice.05");
                                     }
 

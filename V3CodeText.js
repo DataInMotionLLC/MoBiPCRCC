@@ -1,15 +1,19 @@
 var PCRArray = [];
-var moment = require('moment');
+var mom = require('cloud/moment.js');
 sp= require('cloud/setProps.js');
 var intervals = require('cloud/setIntervals.js');
 var nar = require('cloud/Narrative.js');
+u = require('cloud/Utilities.js');
 exports.setV3English = function (TheCall) {
     Props = sp.setProps();
+    Props["VehicleID"] = TheCall.vehicleId
+    var timeZoneOffset = TheCall.TimeZoneOffset;
     
     if (typeof TheCall === 'undefined') {
         return Props
     };
-    console.log(TheCall.P[0])
+
+    var ag = {};
 
     var Event = new Object();
     var Events = new Array();
@@ -17,8 +21,8 @@ exports.setV3English = function (TheCall) {
     var BO = {};
 
     BO = TheCall.Version3;
-
-    Props["CreatedDate"] = moment(TheCall["PCRDate"]).utc().format("MM/DD/YYYY");
+    var d = new Date(TheCall["CreatedDate"])
+    Props["CreatedDate"] = mom(d).utc().format("MM/DD/YYYY");
 
     if (typeof TheCall.PCRObjectID !== 'undefined') {
         if (TheCall.PCRObjectID != "") {
@@ -29,27 +33,24 @@ exports.setV3English = function (TheCall) {
 
     if (typeof BO.CrewIDS !== 'undefined') {
 
-        for (var t = 0; t < BO.CrewIDS.length; t++) {
-
-            console.log(BO.CrewIDS[t].objectId)
-            
+        for (var t = 0; t < BO.CrewIDS.length; t++) {            
             var yy = getCrewName(BO.CrewIDS[t].objectId)
             yy.then(function (cn) {
-                var name =""
+                var name = ""
                 name = cn.attributes.firstName + " " + cn.attributes.lastName
-       
+
                 cGroup.push(name)
             });
         }
     }
     Props.CrewNames = cGroup
-    //if (typeof BO.eRecord !== 'undefined') {
-    //    var obj = {};
-    //    var obj = BO.eRecord;
-    //    if (typeof obj["eRecord.01"] !== 'undefined') {
-    //         Props["PCRID"] = setPropsect(obj["eRecord.01"]);
-    //    }
-    //};
+    if (typeof BO.eRecord !== 'undefined') {
+        var obj = {};
+        var obj = BO.eRecord;
+        if (typeof obj["eRecord.01"] !== 'undefined') {
+             Props["PCRID"] = setPropsect(obj["eRecord.01"]);
+        }
+    };
 
     if (typeof BO.eDispatch !== 'undefined') {
         var obj = {};
@@ -336,8 +337,10 @@ exports.setV3English = function (TheCall) {
 
                     Props["DispoPreActTime"] = setPValue(obj1.HospitalTeamActivationGroup[i]["eDisposition.25"]);
                     var Event = new Object();
-                    Event.Time = moment(Props["DispoPreActTime"]).format("HH:mm")
+                    //Event.Time = mom(Props["DispoPreActTime"]).format("HH:mm")
+                    Event.Time = setLocalTime(ag, Props["DispoPreActTime"])
                     Event.Name = "Prearrival Alert"
+
                     var v = [];
                     v.push("Prearrival Alert")
                     Event.Value = v;
@@ -358,7 +361,8 @@ exports.setV3English = function (TheCall) {
 
     if (typeof BO.eTimes === 'undefined')
     {
-        Props["TimePSAP"] = moment(TheCall.PCRDate).format("HH:mm");
+        Props["TimePSAP"] = mom(TheCall.PCRDate).format("HH:mm");
+        Event.Time = u.setLocalTime(ag, Props["TimePSAP"])
     }
     else
 
@@ -371,13 +375,14 @@ exports.setV3English = function (TheCall) {
         if (typeof obj["eTimes.01"] !== 'undefined') {
             var o = setPValue(obj["eTimes.01"]);
             if (o !== "") {
-                Props["TimePSAP"] = moment(o).format("HH:mm");
+                Props["TimePSAP"] = mom(o).format("HH:mm");
+                Event.Time = Props["TimePSAP"];
             }
             else {
-                Props["TimePSAP"] = moment(TheCall.PCRDate).format("HH:mm");
+                Props["TimePSAP"] = mom(TheCall.PCRDate).format("HH:mm");
+                Event.Time = Props["TimePSAP"];
             };
-            var Event = new Object();
-            Event.Time = Props["TimePSAP"]
+            var Event = new Object(); 
             Event.Name = "PSAP Time"
             var v = [];
             v.push("PSAP Time")
@@ -389,9 +394,13 @@ exports.setV3English = function (TheCall) {
         if (typeof obj["eTimes.02"] !== 'undefined') {
             var o = setPValue(obj["eTimes.02"]);
             if (o !== "") {
-                Props["TimeDispatchNotified"] = moment(o).format("HH:mm");
+                var iii = new Date(o);
+                var tt = mom(iii)
+
+                Props["TimeDispatchNotified"] = mom(tt).subtract({ 'hours': timeZoneOffset }).format("HH:mm:ss")
+
                 var Event = new Object();
-                Event.Time = Props["TimeDispatchNotified"]
+                Event.Time = Props["TimeDispatchNotified"];
                 Event.Name = "Dispatch Notified"
                 var v = [];
                 v.push("Dispatch Notified")
@@ -401,13 +410,17 @@ exports.setV3English = function (TheCall) {
             }
         };
         if (typeof obj["eTimes.03"] !== 'undefined') {
+
             var o = setPValue(obj["eTimes.03"]);
-            if (o !== "") {
-                Props["TimeUnitNotified"] = moment(o).format("HH:mm");
-                Props["CallDate"] = moment(o).format("MM/DD/YYYY");
+            
+            if (o !== "") {                
+                var iii = new Date(o);
+                var tt = mom(iii)
+                Props["TimeUnitNotified"] = mom(tt).subtract({ 'hours': timeZoneOffset }).format("HH:mm:ss")
                 var Event = new Object();
-                Event.Time = Props["TimeUnitNotified"]
                 Event.Name = "Unit Notified"
+                Event.Time = Props["TimeUnitNotified"];
+                Props["EncounterBeginTime"] = o;
                 var v = [];
                 v.push("Unit Notified");
                 Event.Value = v;
@@ -418,7 +431,9 @@ exports.setV3English = function (TheCall) {
         if (typeof obj["eTimes.04"] !== 'undefined') {
             var o = setPValue(obj["eTimes.04"]);
             if (o !== "") {
-                Props["TimeAcknowledged"] = moment(o).format("HH:mm");
+                var iii = new Date(o);
+                var tt = mom(iii)
+                Props["TimeAcknowledged"] = mom(tt).subtract({ 'hours': timeZoneOffset }).format("HH:mm:ss")
                 var Event = new Object();
                 Event.Time = Props["TimeAcknowledged"];
                 Event.Name = "Acknowledged";
@@ -432,7 +447,9 @@ exports.setV3English = function (TheCall) {
         if (obj["eTimes.05"].IsNull == false) {
             var o = setPValue(obj["eTimes.05"]);
             if (o !== "") {
-                Props["TimeEnRoute"] = moment(o).format("HH:mm");
+                var iii = new Date(o);
+                var tt = mom(iii)
+                Props["TimeEnRoute"] = mom(tt).subtract({ 'hours': timeZoneOffset }).format("HH:mm:ss")
                 var Event = new Object()
                 Event.Time = Props["TimeEnRoute"];
                 Event.Name = "En Route";
@@ -446,7 +463,10 @@ exports.setV3English = function (TheCall) {
         if (typeof obj["eTimes.06"] !== 'undefined') {
             var o = setPValue(obj["eTimes.06"]);
             if (o !== "") {
-                Props["TimeAtScene"] = moment(o).format("HH:mm");
+                var iii = new Date(o);
+                var tt = mom(iii)
+                Props["TimeAtScene"] = mom(tt).subtract({ 'hours': timeZoneOffset }).format("HH:mm:ss")
+
                 var Event = new Object();
                 Event.Time = Props["TimeAtScene"];
                 Event.Name = "At Scene";
@@ -460,7 +480,7 @@ exports.setV3English = function (TheCall) {
         if (typeof obj["eTimes.07"] !== 'undefined') {
             var o = setPValue(obj["eTimes.07"]);
             if (o !== "") {
-                Props["TimeAtPatient"] = moment(o).format("HH:mm");
+                Props["TimeAtPatient"] = mom(o).format("HH:mm");
                 var Event = new Object();
                 Event.Time = Props["TimeAtPatient"];
                 Event.Name = "At Patient";
@@ -474,7 +494,10 @@ exports.setV3English = function (TheCall) {
         if (typeof obj["eTimes.08"] !== 'undefined') {
             var o = setPValue(obj["eTimes.07"]);
             if (o !== "") {
-                Props["TimeTransfer"] = moment(o).format("HH:mm");
+                var iii = new Date(o);
+                var tt = mom(iii)
+                Props["TimeTransfer"] = mom(tt).subtract({ 'hours': timeZoneOffset }).format("HH:mm:ss")
+
                 var Event = new Object();
                 Event.Time = Props["TimeTransfer"];
                 Event.Name = "Transfer";
@@ -488,7 +511,9 @@ exports.setV3English = function (TheCall) {
         if (typeof obj["eTimes.09"] !== 'undefined') {
             var o = setPValue(obj["eTimes.09"]);
             if (o !== "") {
-                Props["TimeLeftScene"] = moment(o).format("HH:mm");
+                var iii = new Date(o);
+                var tt = mom(iii)
+                Props["TimeLeftScene"] = mom(tt).subtract({ 'hours': timeZoneOffset }).format("HH:mm:ss")
                 var Event = new Object();
                 Event.Time = Props["TimeLeftScene"];
                 Event.Name = "Left Scene";
@@ -502,7 +527,10 @@ exports.setV3English = function (TheCall) {
         if (typeof obj["eTimes.10"] !== 'undefined') {
             var o = setPValue(obj["eTimes.10"]);
             if (o !== "") {
-                Props["TimeArrivalAtLanding"] = moment(o).format("HH:mm");
+                var iii = new Date(o);
+                var tt = mom(iii)
+                Props["TimeArrivalAtLanding"] = mom(tt).subtract({ 'hours': timeZoneOffset }).format("HH:mm:ss")
+
                 var Event = new Object();
                 Event.Time = Props["TimeArrivalAtLanding"];
                 Event.Name = "Arrived At Landing";
@@ -516,7 +544,10 @@ exports.setV3English = function (TheCall) {
         if (typeof obj["eTimes.11"] !== 'undefined') {
             var o = setPValue(obj["eTimes.11"]);
             if (o !== "") {
-                Props["TimePatientArrived"] = moment(o).format("HH:mm");
+                var iii = new Date(o);
+                var tt = mom(iii)
+                Props["TimePatientArrived"] = mom(tt).subtract({ 'hours': timeZoneOffset }).format("HH:mm:ss")
+
                 var Event = new Object();
                 Event.Time = Props["TimePatientArrived"];
                 Event.Name = "Patient Arrived";
@@ -531,7 +562,9 @@ exports.setV3English = function (TheCall) {
         if (typeof obj["eTimes.12"] !== 'undefined') {
             var o = setPValue(obj["eTimes.12"]);
             if (o !== "") {
-                Props["TimeTransferPatientCare"] = moment(o).format("HH:mm");
+                var iii = new Date(o);
+                var tt = mom(iii)
+                Props["TimeTransferPatientCare"] = mom(tt).subtract({ 'hours': timeZoneOffset }).format("HH:mm:ss")
                 var Event = new Object();
                 Event.Time = Props["TimeTransferPatientCare"];
                 Event.Name = "Transfer Patient Care";
@@ -546,10 +579,14 @@ exports.setV3English = function (TheCall) {
         if (typeof obj["eTimes.13"] !== 'undefined') {
             var o = setPValue(obj["eTimes.13"]);
             if (o !== "") {
-                Props["TimeUnitBackInService"] = moment(o).format("HH:mm");
+                var iii = new Date(o);
+                var tt = mom(iii)
+                Props["TimeUnitBackInService"] = mom(tt).subtract({ 'hours': timeZoneOffset }).format("HH:mm:ss")
+
                 var Event = new Object();
                 Event.Time = Props["TimeUnitBackInService"];
                 Event.Name = "Unit Back In Service";
+                Props["EncounterEndTime"] = o;
                 var v = [];
                 v.push("Back InService")
                 Event.Value = v;
@@ -561,7 +598,10 @@ exports.setV3English = function (TheCall) {
         if (typeof obj["eTimes.14"] !== 'undefined') {
             var o = setPValue(obj["eTimes.14"]);
             if (o !== "") {
-                Props["TimeCancel"] = moment(o).format("HH:mm");
+                var iii = new Date(o);
+                var tt = mom(iii)
+                Props["TimeCancel"] = mom(tt).subtract({ 'hours': timeZoneOffset }).format("HH:mm:ss")
+                
                 var Event = new Object();
                 Event.Time = Props["TimeCancel"];
                 Event.Name = "Cancel";
@@ -576,7 +616,10 @@ exports.setV3English = function (TheCall) {
         if (typeof obj["eTimes.15"] !== 'undefined') {
             var o = setPValue(obj["eTimes.15"]);
             if (o !== "") {
-                Props["TimeBackHome"] = moment(o).format("HH:mm");
+                var iii = new Date(o);
+                var tt = mom(iii)
+                Props["TimeBackHome"] = mom(tt).subtract({ 'hours': timeZoneOffset }).format("HH:mm:ss")
+
                 var Event = new Object();
                 Event.Time = Props["TimeBackHome"];
                 Event.Name = "Back Home";
@@ -590,7 +633,10 @@ exports.setV3English = function (TheCall) {
         if (typeof obj["eTimes.16"] !== 'undefined') {
             var o = setPValue(obj["eTimes.16"]);
             if (o !== "") {
-                Props["TimeCallComplete"] = moment(o).format("HH:mm");
+                var iii = new Date(o);
+                var tt = mom(iii)
+                Props["TimeCallComplete"] = mom(tt).subtract({ 'hours': timeZoneOffset }).format("HH:mm:ss")
+
                 var Event = new Object();
                 Event.Time = Props["TimeCallComplete"];
                 Event.Name = "Call Complete";
@@ -726,7 +772,7 @@ exports.setV3English = function (TheCall) {
             var PatientName = "";
             var objPN = obj.PatientNameGroup;
             if (typeof objPN["ePatient.03"] !== 'undefined') {
-                Props["PatientFirstName"] = setPropsect("ePatient.03", objPN["ePatient.03"]);
+                Props["PatientFirstName"] = setPropsect( objPN["ePatient.03"]);
                 PatientName = PatientName + Props["PatientFirstName"];
             };
             
@@ -739,6 +785,11 @@ exports.setV3English = function (TheCall) {
 
                 Props["PatientLastName"] = setPropsect(objPN["ePatient.02"]);
                 PatientName = PatientName + Props["PatientLastName"];
+            };
+            if (typeof objPN["ePatient.03"] !== 'undefined') {
+
+                Props["PatientFirstName"] = setPropsect(objPN["ePatient.03"]);
+                
             };
 
             if (PatientName === "") {
@@ -803,19 +854,19 @@ exports.setV3English = function (TheCall) {
             Props["PatientAge"] = Props["Age"] + " " + Props["AgeUnits"];
         };
         if (typeof obj["ePatient.17"] !== 'undefined') {
-            Props["PatientDOB"] = setPropsect("ePatient.17", obj["ePatient.17"]);
+            Props["PatientDOB"] = setPValue(obj["ePatient.17"]);
         };
         if (typeof obj["ePatient.18"] !== 'undefined') {
-            Props["PatientPhone"] = setPropsect("ePatient.18", obj["ePatient.18"]);
+            Props["PatientPhone"] = setPropsect(obj["ePatient.18"]);
         }
         if (typeof obj["ePatient.19"] !== 'undefined') {
-            Props["Email"] = setPropsect("ePatient.19", obj["ePatient.19"]);
+            Props["Email"] = setPropsect(obj["ePatient.19"]);
         };
         if (typeof obj["ePatient.20"] !== 'undefined') {
-            Props["PatientDriversLicenseState"] = setPropsect("ePatient.20", obj["ePatient.20"]);
+            Props["PatientDriversLicenseState"] = setPropsect( obj["ePatient.20"]);
         }
         if (typeof obj["ePatient.21"] !== 'undefined') {
-            Props["PatientDriversLicense"] = setPropsect("ePatient.21", obj["ePatient.21"]);
+            Props["PatientDriversLicense"] = setPropsect(obj["ePatient.21"]);
         }
     };    
     if (typeof BO.eHistory !== 'undefined') {
@@ -1047,8 +1098,10 @@ exports.setV3English = function (TheCall) {
     if (typeof BO.eSituation !== 'undefined') {
         var obj = {};
         var obj = BO.eSituation;
-        if (typeof obj["eSituation.01"] !== 'undefined') {
-            Props["OnsetDateTime"] - setPropsect(obj["eSituation.01"]);
+        if (typeof obj["eSituation.01"] !== 'undefined') 
+        {
+            //Props["OnsetDateTime"] = setPropsect(obj["eSituation.01"]);
+            Props["OnsetDateTime"] = setPropsect(obj["eSituation.01"])
         };
         if (typeof obj["eSituation.02"] !== 'undefined') {
             Props["PossibleInjury"] = setPropsect(obj["eSituation.02"]);
@@ -1264,10 +1317,14 @@ exports.setV3English = function (TheCall) {
                     var air = {}
                     obj2 = obj["eAirway.ConfirmationGroup"][x]
 
-                    if (typeof obj2["eAirway.02"] !== 'undefined') {
+                    if (typeof obj2["eAirway.02"] !== 'undefined') {  
                         air["AirwaDateTime"] = setPValue(obj2["eAirway.02"]);
                         var Event = new Object();
-                        Event.Time = moment(air["AirwaDateTime"]).format("HH:mm");
+                        
+                        setlocal
+
+
+                        Event.Time = mom(air["AirwaDateTime"]).format("HH:mm");
                         Event.Name = "Airway Confirmation";
                         var v = [];
                         v.push(Event.Time)
@@ -1326,7 +1383,7 @@ exports.setV3English = function (TheCall) {
         };
 
         if (typeof obj["eArrest.05"] !== 'undefined') {
-            Props["CareinProgessonArrival"] = setPropsect("eArrest.05", obj["eArrest.05"]);
+            Props["CareinProgessonArrival"] = setPropsect(obj["eArrest.05"]);
         };
 
         if (typeof obj["eArrest.06"] !== 'undefined') {
@@ -1363,7 +1420,7 @@ exports.setV3English = function (TheCall) {
         if (typeof obj["eArrest.19"] !== 'undefined') {
             Props["CPRTime"] = setPValue(obj["eArrest.19"]);
             var Event = new Object();
-            Event.Time = moment(Props["CPRTime"]).format("HH:mm");
+            Event.Time = mom(Props["CPRTime"]).format("HH:mm");
             Event.Name = "CPR";
             var v = [];
             v.push(Event.Time)
@@ -1524,7 +1581,7 @@ exports.setV3English = function (TheCall) {
                     }
                     else {
                         var t = setPValue(aObj["eExam.03"]);
-                        theAssessment["Time"] = moment(t).format("HH:mm")
+                        theAssessment["Time"] = mom(t).format("HH:mm")
                         var Event = new Object();
                         Event.Time = theAssessment["Time"];
                         Event.Name = "Assessment";
@@ -1659,7 +1716,7 @@ exports.setV3English = function (TheCall) {
                         };
 
                         if (typeof aObj["eExam.20"] !== 'undefined') {
-                            theAssessment["Neurological"] = setPropsect("eExam.20", aObj["eExam.20"]);
+                            theAssessment["Neurological"] = setPropsect(aObj["eExam.20"]);
                             //var Neuro = setPValue("eExam.20", aObj["eExam.20"]);
                             if (theAssessment["Neurological"] !== "") {
                                 v.push("Neurological:  " + theAssessment["Neurological"])
@@ -1701,10 +1758,10 @@ exports.setV3English = function (TheCall) {
                     }
                     else {
                         var tP = setPValue(obj2["eProcedures.01"]);
-                        //theProc["Time"] = moment(tP).format("HH:mm")
-                        theProc["ProcedureDate"] = moment(tP).format("MM/DD/YYYY");
+                        //theProc["Time"] = mom(tP).format("HH:mm")
+                        theProc["ProcedureDate"] = mom(tP).format("MM/DD/YYYY");
                         var Event = new Object();
-                        Event.Time = moment(tP).format("HH:mm");
+                        Event.Time = mom(tP).format("HH:mm");
                         Event.Name = "Procedure Time";
 
 
@@ -1778,7 +1835,7 @@ exports.setV3English = function (TheCall) {
                     {
                         var s = "";
                         var tM = setPropsect(obj2["eMedications.01"]);
-                        theMed["Time"] = moment(tM).format("HH:mm");
+                        theMed["Time"] = mom(tM).format("HH:mm");
                         var Event = new Object();
                         Event.Time = theMed["Time"];
                         Event.Name = "Medication Time";
@@ -1943,7 +2000,7 @@ exports.setV3English = function (TheCall) {
                     theProtocol["Protocols"] = setPropsect(obj["ProtocolGroup"][x]["eProtocols.01"]);
                 };
                 if (typeof obj["ProtocolGroup"][x]["eProtocols.02"] !== 'undefined') {
-                    theProtocol["AgeGroup"] = setPropsect("eProtocols.02", obj["ProtocolGroup"][x]["eProtocols.02"]);
+                    theProtocol["AgeGroup"] = setPropsect(obj["ProtocolGroup"][x]["eProtocols.02"]);
                 };
 
                 if (typeof ProtocolArray === 'undefined') {
@@ -1970,7 +2027,7 @@ exports.setV3English = function (TheCall) {
 
             if (typeof obj["eVitals.01"] !== 'undefined') {
                 var t = setPropsect(obj["eVitals.01"]);
-                theVitals["TimeTaken"] = moment(t).format("HH:mm")
+                theVitals["TimeTaken"] = mom(t).format("HH:mm")
                 var Event = new Object();
                 Event.Time = theVitals["TimeTaken"];
                 Event.Name = "Vital Taken";
@@ -2249,7 +2306,7 @@ exports.setV3English = function (TheCall) {
                     u.RaiseError("Evenit Type Required", 0, "v3CodeText", "");
                 }
                 else {
-                    if (typeof obj["eDevice.03"].IsNull == true) {
+                    if ( obj["eDevice.03"].IsNull == true) {
                         u.RaiseError("Event Type Required", 0, "v3CodeText", "");
                     }
                     else {
@@ -2267,7 +2324,7 @@ exports.setV3English = function (TheCall) {
                         }
                         else {
                             var dObj = new Object();
-                            dObj.Time = moment(setPValue(obj["eDevice.03"])).format("HH:mm");
+                            dObj.Time = mom(setPValue(obj["eDevice.03"])).format("HH:mm");
                             var Event = new Object();
                             Event.Time = dObj.Time
                             Event.Name = "Device Time";
@@ -2327,18 +2384,59 @@ exports.setV3English = function (TheCall) {
         if (typeof devArray !== 'undefined') {
             if (devArray.length > 0) {
                 var eDevice = new Object();
-                eDevice.DeviceGroup = devArray()
+                var DeviceGroup = devArray;
+                eDevice.DeviceGroup = DeviceGroup;
                 Props["Device"] = eDevice;
             }
         }
     };
     
+
+    if (typeof BO.eNarrative !== 'undefined')
+    {
+        if (typeof BO.eNarrative["eNarrative.01"] !== 'undefined')
+        {
+            if (BO.eNarrative["eNarrative.01"].IsNull == false)
+            {
+                Props["CrewNarrative"] = setPropsect(BO.eNarrative["eNarrative.01"]);
+            }
+        }
+    };
+
     var r = nar.setNarrative(Props)
 
     var b = r.match(/(.{1,120})/g);
 
     Props["Narrative"] = b
-    //Props["Narrative"] = chunkStr(r, 150)
+
+    var rt = getRoute(Props)
+    rt.then(function (rout) {
+        var EncR = [];
+        var dis = 0;
+        var a = Parse.GeoPoint;
+        var b = Parse.GeoPoint;
+        if (rout && rout.length > 0) {
+            for (var i = 0; i < rout.length ; i++) {
+
+                if (i == 0) {
+                    a = rout[0].attributes.geoPoint
+                }
+                else {
+                    b = rout[i].attributes.geoPoint
+                    var s = a.milesTo(b)
+                    dis = dis + s;
+                    a = rout[i].attributes.geoPoint
+
+                }
+
+                EncR.push(rout[i].attributes.timestamp + "|" + rout[i].attributes.geoPoint.latitude + ":" + rout[i].attributes.geoPoint.longitude + "|" + rout[i].attributes.speed + "|" + rout[i].attributes.batteryLevel + "|" + rout[i].attributes.altitude + " " + s + " " + rout[i].attributes.vehicle.id);
+
+            };
+            Props["EncounterRoute"] = EncR
+            Props["AMiles"] = dis
+        };
+
+    });
 
     var d = sortBy(Events, { prop: "Time" });
     d.Count = EventLen
@@ -2440,9 +2538,6 @@ var chunkStr = function (str, chunkLength) {
     }
     return AR;
 };
-
-
-
 var sortBy = (function ()
 {
     var _toString = Object.prototype.toString,
@@ -2465,7 +2560,6 @@ var sortBy = (function ()
         });
     };
 }());
-
 var getCrewName = function (id) {
     var usr = Parse.Object.extend("User");
     var query = new Parse.Query(usr);
@@ -2477,10 +2571,28 @@ var getCrewName = function (id) {
         error: function (error) { }
     });
 };
+var getRoute = function (Props) {
 
+    var from = new Date(Props["EncounterBeginTime"]);
+    var to = new Date(Props["EncounterEndTime"]);
+    var rig = Props["VehicleID"]
 
-errObj.pcrID
-errObj.status
-errObj.agencyID
-errObj.userName
-errObj.vehicleId
+    var RIG = Parse.Object.extend("VehicleLocation");
+    var query = new Parse.Query(RIG);    
+    query.greaterThan("timestamp", from)
+    query.lessThan("timestamp", to)
+    query.equalTo("vehicle",
+        {
+            __type: "Pointer",
+            className: "Vehicle",
+            objectId: rig
+        })
+    query.descending("timestamp");
+    return query.find({
+        success: function (results) {
+        },
+        error: function (error) {
+            console.log("ERRRRRRRR")
+        }
+    });
+};

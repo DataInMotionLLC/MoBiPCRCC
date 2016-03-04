@@ -1,10 +1,15 @@
-//var Utils = require('cloud/UtilitiesCC.js');
-//var jsXML = require('cloud/JSXMLWriterCC.js');
-//exports.setV3XML = function (TheCall) {
-var setV3XML = function (TheCall) 
+var u = require('cloud/Utilities.js');
+var jsXML = require('cloud/XMLWriter34.js');
+exports.setBillFile = function (TheCall) 
 {
-    //var XML = new jsXML.XMLWriter('UTF-8', '1.0');
-    var XML = new XMLWriter('UTF-8', '1.0');
+    console.log("TheCall.Props")
+    console.log(TheCall.Props.EncounterRoute.length)
+    if (typeof TheCall.Props.EncounterRoute === 'undefined') {
+        console.log("Encounter Greoup Not exist")
+    };
+   
+    var XML = new jsXML.XMLWriter('UTF-8', '1.0');
+    
 
     XML.WSD();
 
@@ -16,42 +21,42 @@ var setV3XML = function (TheCall)
     XML.WSE("DemographicGroup");
     XML.WEE();
     XML.WSE("PatientCareReport");
-    if (typeof TheCall != 'undefined') {
-        if (typeof TheCall.eRecord != 'undefined') {
+    if (typeof TheCall.Version3 != 'undefined') {
+        if (typeof TheCall.Version3.eRecord != 'undefined') {
 
             var obj = {};
-            var obj = TheCall.eRecord;
+            var obj = TheCall.Version3.eRecord;
             XML.WSE("eRecord");
 
-            if (IsOk(obj["eRecord.01"]) == true) {
+            if (u.IsOk(obj["eRecord.01"]) == true) {
                 XML.WES("eRecord.01", escapeXml(obj["eRecord.01"].vSet[0].val));
             };
 
             XML.WSE("eRecord.SoftwareApplicationGroup");
 
-            if (IsOk(obj["eRecord.02"]) == true) {
+            if (u.IsOk(obj["eRecord.02"]) == true) {
                 XML.WES("eRecord.02", escapeXml(obj["eRecord.02"].vSet[0].val));
             };
 
-            if (IsOk(obj["eRecord.03"]) == true) {
+            if (u.IsOk(obj["eRecord.03"]) == true) {
                 XML.WES("eRecord.03", escapeXml(obj["eRecord.03"].vSet[0].val));
             };
-            if (IsOk(obj["eRecord.04"]) == true) {
+            if (u.IsOk(obj["eRecord.04"]) == true) {
                 XML.WES("eRecord.04", escapeXml(obj["eRecord.04"].vSet[0].val));
             };
             XML.WEE("eRecord.SoftwareApplicationGroup");
             XML.WEE("eRecord");
         };
-        if (typeof TheCall.eDispatch != 'undefined') {
+        if (typeof TheCall.Version3.eDispatch != 'undefined') {
             XML.WSE("eDispatch");
             var obj = {};
-            var obj = TheCall.eDispatch;
+            var obj = TheCall.Version3.eDispatch;
 
-            if (IsOk(obj["eDispatch.01"]) == true) {
+            if (u.IsOk(obj["eDispatch.01"]) == true) {
                 XML.WES("eDispatch.01", escapeXml(obj["eDispatch.01"].vSet[0].val));
             };
 
-            if (IsOk(obj["eDispatch.02"]) == true) {
+            if (u.IsOk(obj["eDispatch.02"]) == true) {
                 XML.WES("eDispatch.02", obj["eDispatch.02"].vSet[0].val);
             }
             else {
@@ -66,9 +71,9 @@ var setV3XML = function (TheCall)
             };
             XML.WEE();
         };
-        if (typeof TheCall.eDisposition != 'undefined') {
+        if (typeof TheCall.Version3.eDisposition != 'undefined') {
             var obj = {};
-            var obj = TheCall.eDisposition;
+            var obj = TheCall.Version3.eDisposition;
 
             XML.WSE("eDisposition");
 
@@ -126,9 +131,9 @@ var setV3XML = function (TheCall)
             };
             XML.WEE();
         };
-        if (typeof TheCall.eTimes != 'undefined') {
+        if (typeof TheCall.Version3.eTimes != 'undefined') {
             var obj = {};
-            obj = TheCall.eTimes;
+            obj = TheCall.Version3.eTimes;
             XML.WSE("eTimes");
             if (typeof obj["eTimes.01"] != 'undefined') {
                 if (obj["eTimes.01"].IsNull == false) {
@@ -225,9 +230,9 @@ var setV3XML = function (TheCall)
             };
             XML.WEE()
         };
-        if (typeof TheCall.eResponse != 'undefined') {
+        if (typeof TheCall.Version3.eResponse != 'undefined') {
             var obj = {};
-            obj = TheCall.eResponse;
+            obj = TheCall.Version3.eResponse;
             XML.WSE("eResponse");
             if (typeof obj["AgencyGroup"] != 'undefined') {
                 var objA = obj["AgencyGroup"];
@@ -308,10 +313,10 @@ var setV3XML = function (TheCall)
 
             XML.WEE();
         };
-        if (typeof TheCall.ePatient != 'undefined') {
+        if (typeof TheCall.Version3.ePatient != 'undefined') {
             XML.WSE("ePatient")
             var obj = {};
-            obj = TheCall.ePatient;
+            obj = TheCall.Version3.ePatient;
 
             if (typeof obj["ePatient.01"] != 'undefined') {
                 if (obj["ePatient.01"].IsNull == false) {
@@ -420,7 +425,7 @@ var setV3XML = function (TheCall)
 
             if (typeof obj["ePatient.17"] != 'undefined') {
                 if (obj["ePatient.17"].IsNull == false) {
-                    XML.WES("ePatient.17", getDOB(obj["ePatient.17"].vSet[0].val));
+                    XML.WES("ePatient.17", obj["ePatient.17"].vSet[0].val);
                 }
             };
 
@@ -465,10 +470,10 @@ var setV3XML = function (TheCall)
             };
             XML.WEE()
         };
-        if (typeof TheCall.ePayment != 'undefined') {
+        if (typeof TheCall.Version3.ePayment != 'undefined') {
             var obj = {};
 
-            var obj = TheCall.ePayment;
+            var obj = TheCall.Version3.ePayment;
             XML.WSE("ePayment")
             if (typeof obj["ePayment.01"] != 'undefined') {
                 if (obj["ePayment.01"].IsNull == false) {
@@ -843,9 +848,9 @@ var setV3XML = function (TheCall)
             };
             XML.WEE();
         };
-        if (typeof TheCall.eScene != 'undefined') {
+        if (typeof TheCall.Version3.eScene != 'undefined') {
             var obj = {};
-            var obj = TheCall.eScene
+            var obj = TheCall.Version3.eScene
             XML.WSE("eScene")
 
             if (typeof obj["eScene.15"] != 'undefined') {
@@ -886,23 +891,24 @@ var setV3XML = function (TheCall)
             };
             XML.WEE();
         };
-        if (typeof TheCall.eNarrative != 'undefined') {
+        if (typeof TheCall.Version3.eNarrative != 'undefined') {
+            if (typeof TheCall.Version3.eNarrative["eNarrative.01"] != 'undefined') {
 
-            if (typeof TheCall.eNarrative["eNarrative.01"] != 'undefined') {
-
-                if (TheCall.eNarrative["eNarrative.01"].IsNull == false) {
+                if (TheCall.Version3.eNarrative["eNarrative.01"].IsNull == false) {
                     XML.WSE("eNarrative");
-                    XML.WES("eNarrative.01", escapeXml(TheCall.eNarrative["eNarrative.01"].vSet[0]));
+                    console.log("BillFileNa")
+                    console.log(TheCall.Version3.eNarrative["eNarrative.01"].vSet[0].val)
+                    XML.WES("eNarrative.01", escapeXml(TheCall.Version3.eNarrative["eNarrative.01"].vSet[0].val));
                     XML.WEE();
                 }
                 else {
-                    if (typeof TheCall.eNarrative["eNarrative.01"].NV != 'undefined') {
-                        if (TheCall.eNarrative["eNarrative.01"].NV == true) {
+                    if (typeof TheCall.Version3.eNarrative["eNarrative.01"].NV != 'undefined') {
+                        if (TheCall.Version3.eNarrative["eNarrative.01"].NV == true) {
 
                             XML.WSE("eNarrative");
                             XML.WSE('eNarrative.01');
                             XML.WAS('xsi:nil', 'true');
-                            XML.WAS('NV', TheCall.eNarrative["eNarrative.01"].vSet[0]);
+                            XML.WAS('NV', TheCall.Version3.eNarrative["eNarrative.01"].vSet[0]);
                             XML.WEE();
                             XML.WEE();
                         }
@@ -910,12 +916,12 @@ var setV3XML = function (TheCall)
                 }
             }
         };
-        if (typeof TheCall.eCrew != 'undefined') {
-            if (typeof TheCall.eCrew["CrewGroup"] != 'undefined') {
+        if (typeof TheCall.Version3.eCrew != 'undefined') {
+            if (typeof TheCall.Version3.eCrew["CrewGroup"] != 'undefined') {
                 XML.WSE("eCrew");
-                for (var x = 0; x < TheCall.eCrew["CrewGroup"].length; x++) {
+                for (var x = 0; x < TheCall.Version3.eCrew["CrewGroup"].length; x++) {
                     var obj = {};
-                    obj = TheCall.eCrew["CrewGroup"][x]
+                    obj = TheCall.Version3.eCrew["CrewGroup"][x]
 
                     XML.WSE("eCrew.CrewGroup");
 
@@ -943,7 +949,31 @@ var setV3XML = function (TheCall)
                 XML.WEE();
             }
         };
+        console.log("Encounter Route")
+        console.log(TheCall.Props)
+        if (typeof TheCall.Props.EncounterRoute != 'undefined') {
+            XML.WSE("EncouterRoute");
+            console.log("IN Encounter Route")
+            for (var x = 0; x < TheCall.Props.EncounterRoute.length; x++) {
+                var enc = TheCall.Props.EncounterRoute[x].split("|");
+                var encTime = enc[0]
+                var encGeo = enc[1]
+                var encspeed = enc[2]
+                var encbattery = enc[3]
+                var encAlt = enc[4]
+
+                XML.WES("Timestamp", encTime);
+                XML.WES("Coords", encGeo);
+                XML.WES("Speed", encSpeed);
+                XML.WES("Altitut=de", encAlt);
+            }
+            XML.WEE();
+        };
+        //if (typeof TheCall.XMLHtml != 'undefined') {
+        //    XML.WES("PCR", TheCall.XMLHtml);
+        //};
         XML.WEE();
+
     }
     var XMLDoc = XML.flush()
     return XMLDoc;

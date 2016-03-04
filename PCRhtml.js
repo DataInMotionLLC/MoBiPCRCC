@@ -24,13 +24,13 @@ exports.setHTML= function (TheCall) {
     htmlDoc = htmlDoc + setCell(33, 33, "Call Priority", Props["DispatchPriority"]);
     htmlDoc = htmlDoc + setCell(33, 33, "Agency Name", Props["RespAgencyName"]);
     htmlDoc = htmlDoc + setCell(33, 33, "Created By", Props["CreatedBy"]);
-    htmlDoc = htmlDoc + "/<tr>";
+    htmlDoc = htmlDoc + "</tr>";
 
     htmlDoc = htmlDoc + "<tr>";
     htmlDoc = htmlDoc + setCell(33, 33, "Call Sign", Props["EMSUnitCallSign"])
     htmlDoc = htmlDoc + setCell(33, 33, " ", " ")
     htmlDoc = htmlDoc + setCell(33, 33, "Created Date", Props["CreatedDate"])
-    htmlDoc = htmlDoc + "/<tr>";
+    htmlDoc = htmlDoc + "</tr>";
     htmlDoc = htmlDoc + "</table>";
     htmlDoc = htmlDoc + "</div>"
 
@@ -46,25 +46,25 @@ exports.setHTML= function (TheCall) {
     htmlDoc = htmlDoc + setCell(33, 33, "Urgency", Props["ResponseUrgency"]);
     htmlDoc = htmlDoc + setCell(33, 33, "Acknowledged", Props["TimeAcknowledged"]);
     htmlDoc = htmlDoc + setCell(33, 33, "Transport", Props["TimeLeftScene"]);
-    htmlDoc = htmlDoc + "/<tr>";
+    htmlDoc = htmlDoc + "</tr>";
 
     htmlDoc = htmlDoc + "<tr>";
     htmlDoc = htmlDoc + setCell(33, 33, "Date", Props["CallDate"]);
     htmlDoc = htmlDoc + setCell(33, 33, "Responding", Props["TimeEnRoute"]);
     htmlDoc = htmlDoc + setCell(33, 33, "At Destination", Props["TimePatientArrived"]);
-    htmlDoc = htmlDoc + "/<tr>";
+    htmlDoc = htmlDoc + "</tr>";
 
     htmlDoc = htmlDoc + "<tr>";
     htmlDoc = htmlDoc + setCell(33, 33, "Address", Props["DispoToAddress"]);
     htmlDoc = htmlDoc + setCell(33, 33, "On Scene", Props["TimeAtScene"]);
     htmlDoc = htmlDoc + setCell(33, 33, "Transfer Of Care", Props["TimeTransfer"]);
-    htmlDoc = htmlDoc + "/<tr>";
+    htmlDoc = htmlDoc + "</tr>";
 
     htmlDoc = htmlDoc + "<tr>";
     htmlDoc = htmlDoc + setCell(33, 33, "       ", "");
     htmlDoc = htmlDoc + setCell(33, 33, "Patient Contact", Props["TimeAtPatient"]);
     htmlDoc = htmlDoc + setCell(33, 33, "Back In Service", Props["TimeUnitBackInService"]);
-    htmlDoc = htmlDoc + "/<tr>";
+    htmlDoc = htmlDoc + "</tr>";
     
     
     htmlDoc = htmlDoc + "</table>";
@@ -74,13 +74,13 @@ exports.setHTML= function (TheCall) {
     htmlDoc = htmlDoc + "<table border=\"0\" width=\"100%\">";
     htmlDoc = htmlDoc + "<tr>";
     htmlDoc = htmlDoc + setCell(5, 5, "Service Requested:", Props["RespTypeOfServiceRequest"]);
-    htmlDoc = htmlDoc + "/<tr>";
+    htmlDoc = htmlDoc + "</tr>";
     htmlDoc = htmlDoc + "<tr>";
     htmlDoc = htmlDoc + setCell(33, 33, "Complaint:", Props["DispatchComplaint"], 1);
-    htmlDoc = htmlDoc + "/<tr>"    
+    htmlDoc = htmlDoc + "</tr>"    
     htmlDoc = htmlDoc + "<tr>";;
     htmlDoc = htmlDoc + setCell(33, 33, "Number of Patients:", Props["NumberOfPatientsAtScene"]);
-    htmlDoc = htmlDoc + "/<tr>";
+    htmlDoc = htmlDoc + "</tr>";
 
     htmlDoc = htmlDoc + "<tr>";
     htmlDoc = htmlDoc + setCell(20, 20, "To Scene", Props["ToSceneMileage"]);
@@ -360,36 +360,63 @@ exports.setHTML= function (TheCall) {
             htmlDoc = htmlDoc + "</tr>";
     };
 
-        htmlDoc = htmlDoc + "</table>";
-        htmlDoc = htmlDoc + "</div>"
+    htmlDoc = htmlDoc + "</table>";
+    htmlDoc = htmlDoc + "</div>"
 
 
-        htmlDoc = htmlDoc + "<p></p>"
-        htmlDoc = htmlDoc + "<div style=\"width:100%;background:#F9EECF;border:1px solid black;text-align:center\">"
-        htmlDoc = htmlDoc + "<p><b>History of Present Illness</b></p>"
-        htmlDoc = htmlDoc + "</div>"
-        htmlDoc = htmlDoc + "<div style=\"width:100%;background:#F9EECF;border:1px solid black;text-align:left\">"
-        htmlDoc = htmlDoc + "<table border=\"0\" width=\"100%\">";
+    htmlDoc = htmlDoc + "<p></p>"
+    htmlDoc = htmlDoc + "<div style=\"width:100%;background:#F9EECF;border:1px solid black;text-align:center\">"
+    htmlDoc = htmlDoc + "<p><b>History of Present Illness</b></p>"
+    htmlDoc = htmlDoc + "</div>"
+    htmlDoc = htmlDoc + "<div style=\"width:100%;background:#F9EECF;border:1px solid black;text-align:left\">"
+    htmlDoc = htmlDoc + "<table border=\"0\" width=\"100%\">";
     htmlDoc = htmlDoc + "<tr>";
     htmlDoc = htmlDoc + setCell(20, 20, "Complaint", Props["ChiefComplaint"]);
     htmlDoc = htmlDoc + setCell(20, 20, "Duration:", Props["ChiefComplaintDuration"])
     htmlDoc = htmlDoc + setCell(20, 20, "Weight:", Props["Weight"])
     htmlDoc = htmlDoc + "</tr>"
-    htmlDoc = htmlDoc + "</div>"
     htmlDoc = htmlDoc + "</table>";
+    htmlDoc = htmlDoc + "</div>"
+    
+    htmlDoc = htmlDoc + "<p></p>"
+    htmlDoc = htmlDoc + "<div style=\"width:100%;background:#F9EECF;border:1px solid black;text-align:center\">"
+    htmlDoc = htmlDoc + "<p><b>Narrative</b></p>"
+    htmlDoc = htmlDoc + "</div>"
+    htmlDoc = htmlDoc + "<div style=\"width:100%;background:#F9EECF;border:1px solid black;text-align:left\">"
+    htmlDoc = htmlDoc + "<table border=\"0\" width=\"100%\">";
+    htmlDoc = htmlDoc + "<tr>";
+    htmlDoc = htmlDoc + Props["CrewNarrative"];
+    htmlDoc = htmlDoc + "</tr>"
+    htmlDoc = htmlDoc + "</table>";
+    htmlDoc = htmlDoc + "</div>"
+
 
     htmlDoc = htmlDoc + "<p></p>"
+    htmlDoc = htmlDoc + "<div style=\"width:100%;background:#F9EECF;border:1px solid black;text-align:center\">"
+    htmlDoc = htmlDoc + "<p><b>Synopsis</b></p>"
+    htmlDoc = htmlDoc + "</div>"
     htmlDoc = htmlDoc + "<div style=\"width:100%;background:#F9EECF;border:1px solid black;text-align:left\">"
     htmlDoc = htmlDoc + "<table border=\"0\" width=\"100%\">";
     htmlDoc = htmlDoc + "<tr>";
     htmlDoc = htmlDoc + Props["Narrative"];
     htmlDoc = htmlDoc + "</tr>"
-    htmlDoc = htmlDoc + "</div>"
     htmlDoc = htmlDoc + "</table>";
-
-    htmlDoc = htmlDoc + "</table border>";
     htmlDoc = htmlDoc + "</div>"
 
+
+    htmlDoc = htmlDoc + "<p></p>"
+    htmlDoc = htmlDoc + "<div style=\"width:100%;background:#F9EECF;border:1px solid black;text-align:center\">"
+    htmlDoc = htmlDoc + "<p><b>Synopsis</b></p>"
+    htmlDoc = htmlDoc + "</div>"
+    htmlDoc = htmlDoc + "<div style=\"width:100%;background:#F9EECF;border:1px solid black;text-align:left\">"
+    htmlDoc = htmlDoc + "<table border=\"0\" width=\"100%\">";
+    htmlDoc = htmlDoc + "<tr>";
+    htmlDoc = htmlDoc + "<img src=\"http://files.parsetfss.com/592a8c26-56b5-4d40-b89c-694dcd7078dd/tfss-78277794-7584-4068-8de6-67f3c31a0dae-image.png\"  style=\"width:1000px;height:333px;\">"
+    htmlDoc = htmlDoc + "</tr>"
+    htmlDoc = htmlDoc + "</table>";
+    htmlDoc = htmlDoc + "</div>"
+
+   
 
     return htmlDoc;
 

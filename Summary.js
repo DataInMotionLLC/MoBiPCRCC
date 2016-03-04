@@ -15,21 +15,19 @@ exports.setCallSummary = function (TheCall)
         
     };
     var p = "";
-    if (typeof TheCall["VehicleName"] !== 'undefined') {
-        p = TheCall["VehicleName"]  
+    if (typeof TheCall["status"] !== 'undefined') {
+        p = p +  TheCall["status"]
     };
+    //if (typeof TheCall["VehicleName"] !== 'undefined') {
+    //    p = TheCall["VehicleName"]  
+    //};
     if (typeof BO["CallType"] !== 'undefined') {
         p = "Type: " + BO["CallType"]
     };
     if (typeof BO["CreatedDate"] !== 'undefined') {
         p = p + "    Report Date:  " + BO["CreatedDate"]
     };
-    if (typeof TheCall["status"] !== 'undefined') {
-        p = p + "   " + TheCall["status"]
-    };
-    if (typeof BO["TimePSAP"] !== 'undefined') {
-        p = p + "    Initial Time:  " + BO["TimePSAP"]
-    };
+    
     if (p.length != 0) {
         rA.push(p);
     };
@@ -68,10 +66,14 @@ exports.setCallSummary = function (TheCall)
     if (p.length != 0) {
         rA.push(p)
     };
-
+    ///////////////////////////////////////////
+    p = "";
+    if (typeof BO["TimePSAP"] !== 'undefined') {
+        p = p + "Initial Time:  " + BO["TimePSAP"]
+    };
 
     if (typeof BO["TimeUnitNotified"] !== 'undefined') {
-        p = p + "Notified: " + BO["TimeUnitNotified"]
+        p = p + "    Notified: " + BO["TimeUnitNotified"]
     };
     if (typeof BO["TimeAcknowledged"] !== 'undefined') {
         p = p + "    Unit Ack: " + BO["TimeAcknowledged"]
@@ -87,11 +89,14 @@ exports.setCallSummary = function (TheCall)
             setM("M", "En Route")
         }
     };
-
+    if (p.length != 0) {
+        rA.push(p)
+    };
+    p = "";
     if (BO["CallStatus"] !== "Cancel") {
         if (typeof BO["TimeAtScene"] !== 'undefined') {
             if (BO["TimeAtScene"] !== "") {
-                p = p + "    At Scene: " + BO["TimeAtScene"]
+                p = p + "At Scene: " + BO["TimeAtScene"]
             }
             else {
                 setM("M", "At Scene")
@@ -110,23 +115,24 @@ exports.setCallSummary = function (TheCall)
         if (typeof BO["TimeTransfer"] !== 'undefined') {
             p = p + "    Transfer: " + BO["TimeTransfer"]
         };
-        if (p.length != 0) {
-            rA.push(p);
-        };
-        var p = "";
+        
         if (typeof BO["TimeLeftScene"] !== 'undefined') {
             if (BO["TimeLeftScene"] !== "") {
-                p = p + "Left Scene: " + BO["TimeLeftScene"]
+                p = p + "    Left Scene: " + BO["TimeLeftScene"]
             }
             else {
                 setM("M", "Left Scene")
             }
         };
-
+        if (p.length != 0) {
+            rA.push(p);
+        };
+        /////////////////////////////
+        var p = "";
         if (BO["CallHasTransport"] == true) {
             if (typeof BO["TimePatientArrived"] !== 'undefined') {
                 if (BO["TimePatientArrived"] !== "") {
-                    p = p + "    Patient Arrived: " + BO["TimePatientArrived"]
+                    p = p + "Patient Arrived: " + BO["TimePatientArrived"]
                 }
                 else {
                     setM("M", "Time Patient Arrived")
@@ -141,22 +147,31 @@ exports.setCallSummary = function (TheCall)
                 }
             }
         }
+        if (p.length != 0) {
+            rA.push(p);
+        };
+        var p = "";
     }
+
     else
     {
         if (typeof BO["TimeCancel"] !== 'undefined') {
             if (BO["TimeCancel"] !== "") {
-                p = p + "    Cancel: " + BO["TimeCancel"]
+                p = p + "Cancel: " + BO["TimeCancel"]
             }
             else {
                 setM("M", "Time Transfer Patient Care")
             }
         }
+        if (p.length != 0) {
+            rA.push(p);
+        };
+        var p = "";
     };
-
+    
     if (typeof BO["TimeBackHome"] !== 'undefined') {
         if (BO["TimeBackHome"] !== "") {
-            p = p + "    Home: " + BO["TimeBackHome"]
+            p = p + "Home: " + BO["TimeBackHome"]
         }
         else {
             setM("M", "Time Back Home")
@@ -174,7 +189,7 @@ exports.setCallSummary = function (TheCall)
     if (p.length != 0) {
         rA.push(p);
     };
-    
+    var p = "";
     
     ////DIPATCH
     if (typeof TheCall.Version3.eDispatch == 'undefined') {
@@ -246,35 +261,35 @@ exports.setCallSummary = function (TheCall)
     };
 
     ///TIMES
-    if (typeof TheCall.eTimes == 'undefined')
+    if (typeof TheCall.Version3.eTimes == 'undefined')
     {
         setM("M", "All Call Times")
     }
     else {
-        if (BO["TimeDispatchNotified"] !== "") {
+        if (BO["TimeDispatchNotified"] === "") {
             setM("M", "Time Dispatch Notified")
         }
-        if (BO["TimeUnitNotified"] !== "") {
+        if (BO["TimeUnitNotified"] === "") {
             setM("M", "Unit Notified Time")
         }
     };
         
     p = "";
     if (typeof BO.Intervals !== 'undefined') {
-        if (BO.Intervals["IntervalDispatchNotified"] !== "") {
+        if (BO.Intervals["IntervalDispatchNotified"] === "") {
             p = p + "Dispatch/Notification: " + BO.Intervals["IntervalDispatchNotified"]
         };
-        if (BO.Intervals["IntervalUnitAck"] !== "") {
+        if (BO.Intervals["IntervalUnitAck"] === "") {
             p = p + "  Notification/Acknowlege: " + BO.Intervals["IntervalUnitAck"]
         };
-        if (BO.Intervals["IntervalUnitEnRoute"] !== "") {
+        if (BO.Intervals["IntervalUnitEnRoute"] === "") {
             p = p + "  Ack/EnRoute: " + BO.Intervals["IntervalUnitEnRoute"]
         };
-        if (BO.Intervals["IntervalUnitAtScene"] !== "") {
+        if (BO.Intervals["IntervalUnitAtScene"] === "") {
             p = p + "EnRoute/Scene: " + BO.Intervals["IntervalUnitAtScene"]
         }
 
-        if (BO.Intervals["IntervalUnitAtPatient"] !== "") {
+        if (BO.Intervals["IntervalUnitAtPatient"] === "") {
             p = p + "  At Scene/Patient: " + BO.Intervals["IntervalUnitAtPatient"]
         };
         if (p.length != 0) {
@@ -282,16 +297,16 @@ exports.setCallSummary = function (TheCall)
         };
         p = "";
 
-        if (BO.Intervals["IntervalUnitLeftScene"] !== "") {
+        if (BO.Intervals["IntervalUnitLeftScene"] === "") {
             p = p + "AtPat/LeftScene: " + BO.Intervals["IntervalUnitLeftScene"]
         }
-        if (BO.Intervals["IntervalUnitPatientArrived:"] !== "") {
+        if (BO.Intervals["IntervalUnitPatientArrived:"] === "") {
             p = p + "    Scene/Arrived: " + BO.Intervals["IntervalUnitPatientArrived"]
         }
-        if (BO.Intervals["IntervalUnitTransferCare:"] !== "") {
+        if (BO.Intervals["IntervalUnitTransferCare:"] === "") {
             p = p + "    Scene/TranferOfCare: " + BO.Intervals["IntervalUnitTransferCare"]
         }
-        if (BO.Intervals["IntervalUnitComplete"] !== "") {
+        if (BO.Intervals["IntervalUnitComplete"] === "") {
             p = p + "    TransCare/Complete: " + BO.Intervals["IntervalUnitComplete"]
         }
         if (p.length != 0) {
@@ -299,10 +314,10 @@ exports.setCallSummary = function (TheCall)
         }
         p = "";
 
-        if (BO.Intervals["IntervalUnitHome"] !== "") {
+        if (BO.Intervals["IntervalUnitHome"] === "") {
             p = p + "Complete/Home: " + BO.Intervals["IntervalUnitHome"]
         }
-        if (BO.Intervals["IntervalUnitBackInService"] !== "") {
+        if (BO.Intervals["IntervalUnitBackInService"] === "") {
             p = p + "Complete/InService: " + BO.Intervals["IntervalUnitBackInService"]
         }
         if (p.length != 0) {
@@ -318,43 +333,47 @@ exports.setCallSummary = function (TheCall)
         else {
             p = "";
             if ((["CallHasTransport"] == true)) {
-                if (BO["DispoTo"] !== "") {
+                if (BO["DispoTo"] !== "")
+                {
                     setM("U", "Destination/Transfered to Name ");
                 }
                 else {
                     p = p + "Destination : " + BO.Intervals["DispoTo"]
                 };
                 ;
-                if (BO["DispoToCode"] !== "") {
+                if (BO["DispoToCode"] === "") {
                     setM("U", "Destination/Transfered to Code");
                 };
-                if (BO["DispoState"] !== "") {
+                if (BO["DispoState"] === "") {
                     setM("M", "Destination State");
                 };
-                if (BO["DispoCounty"] !== "") {
+                if (BO["DispoCounty"] === "") {
                     setM("M", "Destination County");
                 };
-                if (BO["DispoZip"] !== "") {
+                if (BO["DispoZip"] === "") {
                     setM("M", "Destination Zip Code");
                 };
-                if (BO["DispoTransportMethod"] !== "") {
+                if (BO["DispoTransportMethod"] === "") {
                     setM("M", "EMS Transport Method");
                 };
-                if (BO["DispoTransportModeFromScene"] !== "") {
+                if (BO["DispoTransportModeFromScene"] === "") {
                     setM("M", "Transport Mode From Scene");
                 };
-                if (BO["AddDispoTransportModeFromScene"] !== "") {
+                if (BO["AddDispoTransportModeFromScene"] === "") {
                     setM("M", "Additional Transport Mode Descriptors");
                 };
-                if (BO["DispoReasonForChoosing"] !== "") {
+                if (BO["DispoReasonForChoosing"] === "") {
                     setM("M", "Reason For Choosing Destination");
                 };;
-                if (BO["DispoDestinationType"] !== "") {
+                if (BO["DispoDestinationType"] === "") {
                     setM("M", "Destination Type");
                 }
-                else {
-                    if (BO["DispoDestinationType"] === "Hospital-Emergency Department") {
-                        if (BO["DispoPatientDestination"] !== "") {
+                else
+                {
+                    if (BO["DispoDestinationType"] === "Hospital-Emergency Department")
+                    {
+                        if (BO["DispoPatientDestination"] === "")
+                        {
                             setM("U", "Hospital In-Patient Destination");
                         }
                     }
@@ -368,7 +387,7 @@ exports.setCallSummary = function (TheCall)
             }
         };
         ///Patient Rules
-        if ((typeof TheCall.Props.ePatient === 'undefined') && (BO["CallHasPatient"] !== true)) {
+        if ((typeof TheCall.Version3.ePatient === 'undefined') && (BO["CallHasPatient"] !== true)) {
             setM("U", "Patient Data Not Recorded");
         }
         else {
@@ -377,14 +396,14 @@ exports.setCallSummary = function (TheCall)
                 setM("U", "Patient Last Name");
             }
             else {
-                p = p + "Patient: " + BO.Intervals["PatientLastName"]
+                p = p + "Patient: " + BO["PatientLastName"]
             };
 
             if (BO["PatientFirstName"] == "") {
                 setM("U", "Patient First Name");
             }
             else {
-                p = p + ", " + BO.Intervals["PatientFirstName"]
+                p = p + ", " + BO["PatientFirstName"]
             };
 
             if (BO["PatientZip"] == "") {
@@ -406,18 +425,30 @@ exports.setCallSummary = function (TheCall)
                 setM("M", "Patient Date of Birth");
             }
             else {
-                p = p + "DOB: " + BO.Intervals["PatientDOB"]
+                if (p.length > 2) {
+                    p = p + "   DOB: " + BO["PatientDOB"]
+                }
+                else
+                {
+                    p = p + "DOB: " + BO["PatientDOB"]
+                }
+
             };
             if (BO["Age"] == "") {
                 setM("U", "Patient Age");
             }
+
+            if (BO["SSN"] == "") {
+                setM("M", "Social Security Number");
+            }
+
             if (p.length != 0) {
                 rA.push(p);
             };
         };
     };
     if (BO["CallStatus"] != 'Cancel') {
-        if (typeof TheCall.Props.eScene === 'undefined') {
+        if (typeof TheCall.Version3.eScene === 'undefined') {
             setM("M", "Scene Data");
         }
         else

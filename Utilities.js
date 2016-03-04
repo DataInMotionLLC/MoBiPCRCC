@@ -1,5 +1,4 @@
-var moment = require('moment');
-
+var mom = require("cloud/moment.js");
 var CallErrors = new Object();
 var ErrorList = [];
 var CallLog = [];
@@ -154,8 +153,13 @@ var getValue = function (elementList, valueElement) {
                         {
                             valueObject.IsNull = false;                                 // The Object has valid Value, so set IsNull 
                             returnObject.val = elementList[i].attributes.value.trim();  // Good data, assign it to return object
+                            if (typeof elementList[i].attributes.file !== 'undefined') {
+                                valueObject.fileURL = elementList[i].attributes.file.url();
+                            };
+
                             if (typeof elementList[i].attributes.codeString !== 'undefined') {
                                 returnObject.text = elementList[i].attributes.codeString.trim();  // Good data, assign it to return object
+                                
                             }
                             else {
                                 returnObject.text = null;
@@ -395,7 +399,7 @@ exports.RaiseError = function (theError, theSeverity, theOrigin, error) {
             var Error = new Object();
         };
         Error.SMethod = theError;
-        Error.Time = moment().format("HH:mm:ss:SS");
+        Error.Time = mom().format("HH:mm:ss:SS");
         Error.Seq = seq++
     };
     if ((typeof error !== 'undefined') && (error !== null)) {
@@ -454,7 +458,7 @@ exports.getWarnings= function () {
 exports.setBuild = function(n)
 {
     var Build = new Object();
-    Build.Time = moment().format("mm:ss:SSS");
+    Build.Time = mom().format("mm:ss:SSS");
     Build.Event = n;
     BuildList.push(Build)
 }
@@ -485,6 +489,9 @@ exports.setBusinessObject = function (elementList, NemsisList, NemsisElement) {
 var SetItUp = function (inputVal) {
     var valObj = {};
     var CustomResults = [];
+    if (typeof inputVal.fileURL != 'undefined') {
+        valObj.fileURL = inputVal.fileURL;
+    }
     valObj.IsNull = inputVal.IsNull;
     valObj.ElementName = inputVal.props.ElementName;
     valObj.Usage = inputVal.props.Usage;
@@ -648,7 +655,7 @@ exports.getDateNumbers = function (d) {
     var weekNo = Math.ceil((((d - yearStart) / 86400000) + 1) / 7);
     // Return array of year and week number
     var YEAR = d.getFullYear()
-    YEAR = moment(d).format("YY")
+    YEAR = mom(d).format("YY")
     var ret = {};
     ret.YEAR = YEAR;
     ret.weekNumber = weekNumber;
@@ -657,3 +664,51 @@ exports.getDateNumbers = function (d) {
     ret.weekDay = md;
     return ret;
 };
+
+
+exports.getDateNumbers = function (d) {
+    var monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+    var weekday = new Array(7);
+    weekday[0] = "Sunday";
+    weekday[1] = "Monday";
+    weekday[2] = "Tuesday";
+    weekday[3] = "Wednesday";
+    weekday[4] = "Thursday";
+    weekday[5] = "Friday";
+    weekday[6] = "Saturday";
+    // Copy date so don't modify original
+    d = new Date();
+    var nn = d.getDay()
+    d.setHours(0, 0, 0);
+    // Set to nearest Thursday: current date + 4 - current day number
+    // Make Sunday's day number 7
+    d.setDate(d.getDate() + 4 - (d.getDay() || 7));
+    // Get first day of year
+    var yearStart = new Date(d.getFullYear(), 0, 1);
+
+    var m = d.getMonth();
+    var md = d.getDay();
+    var weekDay = weekday[nn];
+    var monthNumber = m + 1;
+    var monthStart = monthNames[m];
+    // Calculate full weeks to nearest Thursday
+    var weekNo = Math.ceil((((d - yearStart) / 86400000) + 1) / 7);
+    // Return array of year and week number
+    var YEAR = d.getFullYear()
+    YEAR = mom(d).format("YY")
+    var ret = {};
+    ret.YEAR = YEAR;
+    ret.weekNumber = weekNumber;
+    ret.monthStart = monthStart;
+    ret.monthNumber = monthNumber;
+    ret.weekDay = md;
+    return ret;
+};
+
+exports.setLocalTime = function (agency, theTime)
+{
+    //var a = mom(theTime);
+    //console.log(a)
+    //   var b = a.tz("America/Toronto").format('hh:mm')
+    return theTime
+}

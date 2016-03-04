@@ -809,7 +809,7 @@ exports.setTheCall = function (thePCR)
             var _Device = {};
             try {
                 u.RaiseError("seteDevice(theCall, NEMSISElements)", 100, "setV3Call", "seteDevice");
-                _Device = inv.seteDevice(theCall, NEMSISElements);
+                _Device = inv.seteDevice(eDeviceObject, NEMSISElements);
             }
             catch (e) {
                 u.RaiseError("seteDevice", 1, "eOther34", e);
@@ -856,7 +856,7 @@ exports.setTheCall = function (thePCR)
 
         try {
             u.RaiseError("u.getObjectFromOLTPExtract(parseObject, eNarrative)", 100, "setV3Call", "u.getObjectFromOLTPExtract(parseObject, eNarrative)");
-            var eLabsObject = u.getObjectFromOLTPExtract(parseObject, "eNarrative");
+            var eNarrativeObject = u.getObjectFromOLTPExtract(parseObject, "eNarrative");
             eNarrativeObject.HasDataSet = false;
         }
         catch (e) {
@@ -886,7 +886,6 @@ exports.setTheCall = function (thePCR)
                 theCall.eNarrative = eNarrative;
             }      
         };
-
 
     if (typeof rawObjects !== 'undefined') {
         if (rawObjects.length > 0) {

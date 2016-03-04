@@ -13,7 +13,7 @@ exports.setProps = function () {
     p["EMSAgencyOrganizationStatus"] = "";
     p["Intervals"] = [];
     p["DispoPatientMovedFromRig"] = "";
-    
+    p["EncounterRoute"] = "";
     var Intervals = {}
     Intervals.IntervalNotified = 0;
     Intervals.IntervalUnitAck = 0;
@@ -42,6 +42,7 @@ exports.setProps = function () {
     ORGANIZATIONAL TYPE
     ORGANIZATION STATUS
     */
+    p["CrewNarrative"] = "";
     p["CallStatus"] = "";
     p["CallHasPatient"] = "";
     p["CallHasTransport"] = "";
@@ -54,6 +55,7 @@ exports.setProps = function () {
     p["ToSceneMileage"] = ""
     p["CallNumber"] = "";
     p["CreatedBy"] = "";
+    p["CreatedDate"] = "";
     p["OtherAgencies"] = [];
     p["DispatchHasEMD"] = "";
     p["PCRID"] = "";
