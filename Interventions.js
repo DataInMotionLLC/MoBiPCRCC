@@ -434,6 +434,10 @@ exports.seteDevice = function (pcrObj, NemsisList) {
                                 var _eSG = [];
                                 var _eSG = pDevice.attributes.sections[_sI[xx]].attributes.sections[_cSG].attributes.elements;
                                 if (_eSG.length > 0) {
+                                    if (typeof SG === 'undefined')
+                                    {
+                                        var SG = {};
+                                    }
                                     //edevice.09/////////////////////////////
                                     try {
                                         SG["eDevice.09"] = u.setBusinessObject(_eSG, NemsisList, "eDevice.09");

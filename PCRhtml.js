@@ -403,6 +403,7 @@ exports.setHTML= function (TheCall) {
     htmlDoc = htmlDoc + "</table>";
     htmlDoc = htmlDoc + "</div>"
 
+    //LOOP THROUGH DEVICE AND INCLUDE IMAGE
 
     htmlDoc = htmlDoc + "<p></p>"
     htmlDoc = htmlDoc + "<div style=\"width:100%;background:#F9EECF;border:1px solid black;text-align:center\">"

@@ -20,50 +20,50 @@ exports.setTheCall = function (thePCR)
 
     //// ///////////////eRecord
     
-    try {
-        u.RaiseError("u.getObjectFromOLTPExtract(parseObject, eRecord)", 100, "setV3Call", "u.getObjectFromOLTPExtract(parseObject, eRecord)");
-        var eRecordObject = u.getObjectFromOLTPExtract(parseObject, "eRecord");
-    }
-    catch (e) {
-        u.RaiseError("eRecordObject", 0, "setV3Call.u.getObjectFromOLTPExtract.eRecord", e);
-    };
+    //try {
+    //    u.RaiseError("u.getObjectFromOLTPExtract(parseObject, eRecord)", 100, "setV3Call", "u.getObjectFromOLTPExtract(parseObject, eRecord)");
+    //    var eRecordObject = u.getObjectFromOLTPExtract(parseObject, "eRecord");
+    //}
+    //catch (e) {
+    //    u.RaiseError("eRecordObject", 0, "setV3Call.u.getObjectFromOLTPExtract.eRecord", e);
+    //};
 
-    if (typeof eRecordObject !== 'undefined' && eRecordObject.IsUndefined === true) {
-        u.RaiseError("No Data Found", 0, "v3Call.eRecord34");
-        eRecordObject.HasDataSet = false;
-    }
-    else {
-        var rawObject = {};
-        rawObject.Name = "eRecordObject"
-        rawObject.Payload = eRecordObject
-        rawObjects.push(rawObject)
-        rawObject = undefined;
+    //if (typeof eRecordObject !== 'undefined' && eRecordObject.IsUndefined === true) {
+    //    u.RaiseError("No Data Found", 0, "v3Call.eRecord34");
+    //    eRecordObject.HasDataSet = false;
+    //}
+    //else {
+    //    var rawObject = {};
+    //    rawObject.Name = "eRecordObject"
+    //    rawObject.Payload = eRecordObject
+    //    rawObjects.push(rawObject)
+    //    rawObject = undefined;
 
-        eRecordObject.HasDataSet = true;
-        var _Record = new Object()
+    //    eRecordObject.HasDataSet = true;
+    //    var _Record = new Object()
 
-        try {
-            u.RaiseError("seteRecord(eRecordObject, NEMSISElements)", 100, "V3Call", "seteRecord(eRecordObject, NEMSISElements)");
-            _Record = dsp.seteRecord(eRecordObject, NEMSISElements);
-        }
-        catch (e) {
-            u.RaiseError("seteRecord", 0, "V3Call.seteRecord");
-            _Record = null;
-        };
-        if (_Record === null) {
-            u.RaiseError("No Data Found", 0, "setV3Call.eRecordeRecord34");
-        }
-        else {
-            var eRecord = {};
-            eRecord = _Record;
-            theCall.eRecord = _Record;
-            if (typeof eRecord.CustomResults !== 'undefined') {
-                if (eRecord.CustomResults.length > 0) {
-                    eCustomResults = eCustomResults.concat(eRecord.CustomResults)
-                }
-            }
-        }
-    };
+    //    try {
+    //        u.RaiseError("seteRecord(eRecordObject, NEMSISElements)", 100, "V3Call", "seteRecord(eRecordObject, NEMSISElements)");
+    //        _Record = dsp.seteRecord(eRecordObject, NEMSISElements);
+    //    }
+    //    catch (e) {
+    //        u.RaiseError("seteRecord", 0, "V3Call.seteRecord");
+    //        _Record = null;
+    //    };
+    //    if (_Record === null) {
+    //        u.RaiseError("No Data Found", 0, "setV3Call.eRecordeRecord34");
+    //    }
+    //    else {
+    //        var eRecord = {};
+    //        eRecord = _Record;
+    //        theCall.eRecord = _Record;
+    //        if (typeof eRecord.CustomResults !== 'undefined') {
+    //            if (eRecord.CustomResults.length > 0) {
+    //                eCustomResults = eCustomResults.concat(eRecord.CustomResults)
+    //            }
+    //        }
+    //    }
+    //};
 
 
     try {

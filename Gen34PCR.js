@@ -156,21 +156,6 @@ var MW = {
 }
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 var Genv34 = {
     PCR : Parse.Object.extend("PCR"),
     Section : Parse.Object.extend("Section"),
@@ -223,7 +208,7 @@ var Genv34 = {
             return Parse.Promise.when(promises);
 
         }, function(error) {
-            console.log("Error finding pcrs: " + error.code + " " + error.message);
+            console.log("Error finding pcrs: ")// + error.code + " " + error.message);
         }).then(function(results){
             
             var agencyId = retPCR.get('agencyId');            
@@ -232,14 +217,14 @@ var Genv34 = {
             
             return q.first();
         }, function(error){
-            console.log("all tasks failed: "+error.code + " " + error.message);  
+            console.log("all tasks failed: ")//+error.code + " " + error.message);  
         }).then( function(object) {
             // Successfully retrieved the object.
             //agency = object;
 
             //return Parse.Promise.when(promises);
         }, function(error) {
-            console.log("failed to find agency with ID: " + agencyId + " err: " + error.code + ":" + error.message);
+            console.log("failed to find agency with ID: " + agencyId )//+ " err: " + error.code + ":" + error.message);
         }).then(function(object){
             var dem = retPCR.get("demDataSet");
             var demSections = dem.get("sections");

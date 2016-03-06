@@ -10,9 +10,6 @@ exports.setCallRules = function (call) {
     if (p["RespIncidentNumber#"] == "") {
         u.RaiseError("Missing Response Incident Number", 0, "setCallRules", "Missing Response Incident Number");
     };
-    if (p["ResponseUrgency"] == "") {
-        u.RaiseError("Missing Response Urgency ", 0, "setCallRules", "Missing Response Urgency");
-    };
     if (p["RespTypeOfServiceRequest"] == "") {
         u.RaiseError("Missing Onset Type Of Service Request", 0, "setCallRules", "Missing Onset Type Of Service Request");
     };

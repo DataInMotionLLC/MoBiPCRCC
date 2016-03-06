@@ -1,88 +1,94 @@
 u = require('cloud/Utilities.js');
 exports.seteRecord = function (pcrObj, NemsisList) {
-    u.RaiseError("seteRecord", 100, "Dispatch.js", "seteRecord");
-    if (typeof pcrObj === 'undefined') {
-        u.RaiseError("eRecordObject Null or Undefined", 0, "eRecord34")
-        return null
-    }
-    else {
-        var pRecord = pcrObj;
-    };
-    //////////////////////eRecord.01
-    if (pRecord.HasDataSet == false) {
-        u.RaiseError("seteRecord", 0, "eRecord34", "pRecord Null or Undefined")
-        return null;
-    };
+    var eRecord = {};
+    eRecord["eRecord.01"] = TheCall.PCRID;
+    eRecord["eRecord.02"] = "Data In Motion"
+    eRecord["eRecord.03"] = "MoBi cPCR"
+    eRecord["eRecord.04"]=  "3.05.16"
 
-    if (pRecord.attributes.elements === 'undefined') {
-        u.RaiseError("seteRecord", 0, "eRecord34", "pRecord Null or Undefined")
-        return null;
-    };
+    //    u.RaiseError("seteRecord", 100, "Dispatch.js", "seteRecord");
+//    if (typeof pcrObj === 'undefined') {
+//        u.RaiseError("eRecordObject Null or Undefined", 0, "eRecord34")
+//        return null
+//    }
+//    else {
+//        var pRecord = pcrObj;
+//    };
+//    //////////////////////eRecord.01
+//    if (pRecord.HasDataSet == false) {
+//        //u.RaiseError("seteRecord", 0, "eRecord34", "pRecord Null or Undefined")
+//        return null;
+//    };
 
-    //Element Array List
-    if (typeof pRecord.attributes.sections === 'undefined') {
-        u.RaiseError("seteRecord", 0, "eRecord34", "pRecord Null or Undefined")
-        return null
-    };
+//    if (pRecord.attributes.elements === 'undefined') {
+//        //u.RaiseError("seteRecord", 0, "eRecord34", "pRecord Null or Undefined")
+//        return null;
+//    };
 
-    if (typeof eRecord === 'undefined') {
-        var eRecord = new Object();
-    };
+//    //Element Array List
+//    if (typeof pRecord.attributes.sections === 'undefined') {
+//        //u.RaiseError("seteRecord", 0, "eRecord34", "pRecord Null or Undefined")
+//        return null
+//    };
 
-    var _el = [];
+//    if (typeof eRecord === 'undefined') {
+//        var eRecord = new Object();
+//    };
 
-    _el = (pRecord.attributes.elements);
+//    var _el = [];
 
-    if (_el.length >= 0) {
-        var eRecord = new Object();
-        try {
-            eRecord["eRecord.01"] = u.setBusinessObject(_el, NemsisList, "eRecord.01");
-        }
-        catch (e) {
-            u.RaiseError("eRecord.01", 1, "eRecord34", e);
-        };
+//    _el = (pRecord.attributes.elements);
 
-        _sI = u.getSectionIndex(pRecord, "eRecord.SoftwareApplicationGroup");
-        if (_sI[0] == -1) {
-            u.RaiseError("Section:eRecord.SoftwareApplicationGroup", 0, "eRecords34", e);
-            return null;
-        }
+//    if (_el.length >= 0) {
+//        var eRecord = new Object();
+//        try {
+    //            eRecord["eRecord.01"] = u.setBusinessObject(_el, NemsisList, "eRecord.01");
+//        }
+//        catch (e) {
+//            u.RaiseError("eRecord.01", 1, "eRecord34", e);
+//        };
 
-        else {
-            var _dL = [];  //section element array.  Item[0]==-1 indicates empty set
-            var _dL = pRecord.attributes.sections[_sI].attributes.elements;
-            if (_dL.length == 0) {
-                u.RaiseError("eRecord Null or Undefined", 0, "eRecord34", e);
-                return null;
-            }
-            else {
-                //eRecord.02////////////////////////////////////////////
-                try {
-                    eRecord["eRecord.02"] = u.setBusinessObject(_dL, NemsisList, "eRecord.02")
-                }
-                catch (e) {
-                    u.RaiseError("eRecord.02", 1, "eRecord34", e);
-                };
+//        _sI = u.getSectionIndex(pRecord, "eRecord.SoftwareApplicationGroup");
+//        if (_sI[0] == -1) {
+    //            u.RaiseError("Section:eRecord.SoftwareApplicationGroup", 0, "eRecords34", e);
+//            return null;
+//        }
 
-                //eRecord.03////////////////////////////////////////////
-                try {
-                    eRecord["eRecord.03"] = u.setBusinessObject(_dL, NemsisList, "eRecord.03")
-                }
+//        else {
+//            var _dL = [];  //section element array.  Item[0]==-1 indicates empty set
+//            var _dL = pRecord.attributes.sections[_sI].attributes.elements;
+//            if (_dL.length == 0) {
+//                u.RaiseError("eRecord Null or Undefined", 0, "eRecord34", e);
+//                return null;
+//            }
+//            else {
+//                //eRecord.02////////////////////////////////////////////
+//                try {
+//                    eRecord["eRecord.02"] = u.setBusinessObject(_dL, NemsisList, "eRecord.02")
+//                }
+//                catch (e) {
+//                    u.RaiseError("eRecord.02", 1, "eRecord34", e);
+//                };
 
-                catch (e) {
-                    u.RaiseError("eRecord.03", 1, "eRecord34", e);
-                };
-                //eRecord.04////////////////////////////////////////////
+//                //eRecord.03////////////////////////////////////////////
+//                try {
+//                    eRecord["eRecord.03"] = u.setBusinessObject(_dL, NemsisList, "eRecord.03")
+//                }
 
-                try {
-                    eRecord["eRecord.04"] = u.setBusinessObject(_dL, NemsisList, "eRecord.04")
-                }
-                catch (e) {
-                    u.RaiseError("eRecord.04", 1, "eRecord34", e);
-                };
-            }
-        }
-    };
+//                catch (e) {
+//                    u.RaiseError("eRecord.03", 1, "eRecord34", e);
+//                };
+//                //eRecord.04////////////////////////////////////////////
+
+//                try {
+//                    eRecord["eRecord.04"] = u.setBusinessObject(_dL, NemsisList, "eRecord.04")
+//                }
+//                catch (e) {
+//                    u.RaiseError("eRecord.04", 1, "eRecord34", e);
+//                };
+//            }
+//        }
+//    };
 
     if (typeof eRecord !== 'undefined') {
         return eRecord;

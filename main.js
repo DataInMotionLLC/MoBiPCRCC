@@ -6,7 +6,7 @@ v2 = require('cloud/V2Call.js');
 pdf = require('cloud/ThePDF.js');
 ht = require('cloud/PCRhtml.js');
 callMetrix = require('cloud/CallMetrix.js');
-crewMetrix = require('cloud/CrewMetrix.js');
+var crewMetrix = require('cloud/CrewMetrix.js');
 rules = require('cloud/CallRules.js');
 ver2XML = require('cloud/Version2XML.js');
 summary = require('cloud/Summary.js');
@@ -22,7 +22,7 @@ Parse.Cloud.define("getPCR", function (request, response) {
     var errObj = {};
     //Paramters
     var _Call = {};
-    _Call.TimeZoneOffset= 5
+    _Call.TimeZoneOffset = 5
     u.setBuild("Start")
 
     if (typeof request !== 'undefined') {
@@ -51,14 +51,16 @@ Parse.Cloud.define("getPCR", function (request, response) {
 
     u.setBuild("FetchBusinessObject")
     var pcr = getPCRObject(_pcrID);
-    pcr.then(function (P)
-    {
+    pcr.then(function (P) {
         if (P.length == 0) {
+            errObj.PCRID = _Call.PCRID
+            errObj.Agency = _Call.agencyID
+
             var e = mailError("getPCRObject", errObj)
             e.then(function (er) {
                 response.success(er)
             });
-            response.success("Invalid PCR " + _pcrID)
+            response.success("Invalid PCR:  Error Logged and Notification Submitted. " + _pcrID)
         }
         else {
             var _ca = P[0];
@@ -76,8 +78,7 @@ Parse.Cloud.define("getPCR", function (request, response) {
             _Call.pcrObjectID = P.id;
             _Call.WellFormed = false;
 
-            if (typeof P[0].attributes != 'undefined')
-            {
+            if (typeof P[0].attributes != 'undefined') {
                 if (typeof P[0].attributes.agencyId !== 'undefined') {
                     _Call.agencyID = P[0].attributes.agencyId;
                     errObj.agencyID = _Call.agencyID
@@ -109,8 +110,7 @@ Parse.Cloud.define("getPCR", function (request, response) {
                     errObj.vehicleId = _Call.vehicleId;
                 };
                 if (typeof P[0].attributes.vehicle !== 'undefined') {
-                    if (typeof P[0].attributes.vehicle.attributes !== 'undefined')
-                    {
+                    if (typeof P[0].attributes.vehicle.attributes !== 'undefined') {
 
                         if (typeof P[0].attributes.vehicle.attributes.name !== 'undefined') {
                             _Call.VehicleName = P[0].attributes.vehicle.attributes.name;
@@ -184,41 +184,59 @@ Parse.Cloud.define("getPCR", function (request, response) {
                         _Call.ObjectList = _v3.RawPCRObjects;
                     }
                     catch (e) {
-                        u.RaiseError("Failed generating PCR Object", 0, "TheCall.setV3Call", e);
+                        u.RaiseError("Failed generating PCR Object", 0, _Call.agencyID + "||" + _Call.PCRID, e);
                     };
 
-                    try {
-                        u.setBuild("SetCallProperties");
-                        var props = v3CT.setV3English(_Call);             //Reporting Payload
-                        _Call.Props = props;
-                        _Call.PCRID = _pcrID;
-                        rules.setCallRules(_Call);
+                    //try {
+                    u.setBuild("SetCallProperties");
+                    var props = v3CT.setV3English(_Call);             //Reporting Payload
+                    _Call.Props = props;
+                    _Call.PCRID = _pcrID;
+                    rules.setCallRules(_Call);
+
+                    var CallE = u.getCallErrors();
+                    var TimeE = u.getTimeErrors();
+                    var WarningsE = u.getWarnings();
+                    
+                    if (TimeE.length > 0) {
+                        _Call.TimeErrors = TimeE;
+                    };
+                    if (WarningsE.length > 0) {
+                        _Call.Warnings = WarningsE;
+                    };
+
+
+                    _Call.Errors = CallE
+
+
+                    var o1 = new Array();
+                    o1 = u.getFatalErrors();        //If the call is well-formed, build it.
+
+                    if (o1.length === 0) {
+                        var HasFatal = false;
                     }
-                    catch (e) {
-                        u.RaiseError("Failed generating Reporting Object", 0, "TheCall.setV3English", e);
+                    else {
+                        var HasFatal = true;
+                        _Call.FATALERRORS = o1;
                     };
 
-                    try {
+                    //try {
                         var _Summary = summary.setCallSummary(_Call)
                         _Call.Summary = _Summary;
-                    }
-                    catch (e) {
-                        u.RaiseError("Failed generating Summary Object", 0, "TheCall.setCallSummary", e);
-                    };
+                    //}
+                    //catch (e) {
+                    //    u.RaiseError("Failed generating Summary Object", 0, _Call.agencyID + "||" + _Call.PCRID, e);
+                    //};
 
                     try {
                         var htmltext = ht.setHTML(_Call)                //AsIs HTML Document
-                        _Call.htmltext = htmltext;                        
+                        _Call.htmltext = htmltext;
                         var htmlBytes = htmltext.getBytes();
                         _Call.HTML = htmlBytes;
                     }
                     catch (e) {
-                        u.RaiseError("Failed generating HTML Reporting Object", 0, "TheCall.setV3English", e);
+                        u.RaiseError("Failed generating HTML Reporting Object", 0, _Call.agencyID + "||" + _Call.PCRID, e);
                     };
-
-                    _Call.XMLHtml = "<![CDATA[" + htmltext + "]]>";
-                    var billFile = Bill.setBillFile(_Call)
-                    _Call.BillFile = billFile;
 
                     var p = getAgencyRigs(_Call.agencyID)  //Stamp Agency Rig Geo at time of call
                     p.then(function (allRigs) {
@@ -228,134 +246,186 @@ Parse.Cloud.define("getPCR", function (request, response) {
                         //var patId = setPatient.setCallMetrix(_Call)  // Keep track of the Call throughout workflow
                         //callM.then(function (ddr) {
 
-                        var callM = callMetrix.setCallMetrix(_Call)  // Keep track of the Call throughout workflow
-                        callM.then(function (ddr) {
-                            //        //If the call is well-formed, build it.
-                            var o1 = new Array();
-                            o1 = u.getFatalErrors();
-                            if (o1.length === 0) {
-                                var BuildStatus = "SUCCESS"
-                            }
-                            else {
-                                var BuildStatus = "FAILED Fatal Error Count: " + o1.length;
-                                _Call.FATALERRORS = o1;
-                            };
-                            _Call.BuildStatus = BuildStatus;
-                            
+                        var callM = callMetrix.setCallMetrix(_Call)  // Keep track of the Call throughout workflow                                                                                     
 
-                            //////////////////////////////////////////////
-                            ////////////////////////////////////////////                                    
-                            var p1 = saveHTMLClass(_Call);
-                            p1.then(function () {
-                                var status = _Call.status
-                                status = "INCOMPLETE"
-                                if (status !== "COMPLETE") {
+                        //////////////////////////////////////////////
+                        ////////////////////////////////////////////                                    
+                        var p1 = saveHTMLClass(_Call);
+                        p1.then(function () {
+                            var status = _Call.status
+                            status = "INCOMPLETE"
+                            if (status !== "COMPLETE") {
+                                try {
+                                    var dc = pdf.NewPDF(_Call);
+                                    _Call.PDF = dc;
+                                }
+                                catch (e) {
+                                    u.RaiseError("Failed generating PDF ", 0, _Call.agencyID + "||" + _Call.PCRID, e);
+                                };
+
+                                try {
+                                    _Call.Version2 = v2Object;
+                                    var v2Object = v2.setV2Call(_Call);
+                                    var v2XML = ver2XML.setV2XML(v2Object);
+                                    _Call.v2XML = v2XML;
+                                    var version2XMLByteArray = v2XML.getBytes();
+                                    _Call.XML = version2XMLByteArray;
+                                }
+                                catch (e) {
+                                    u.RaiseError("Failed generating Verson 2 Object", 0, _Call.agencyID + "||" + _Call.PCRID, e);
+                                }
 
 
-                                    try {
-                                        var dc = pdf.NewPDF(_Call);
-                                        _Call.PDF = dc;
-                                    }
-                                    catch (e) {
-                                        u.RaiseError("Failed generating PDF ", 0, "TheCall.setV2Call", e);
+                                /////////////////////////////////////////////////////////////////////
+                                /////////////////////////////////////////////////////////////////////
+                                //From here, we only process Good Calls
+
+                                var p = SaveThePDF(_Call);
+                                p.then(function () {
+
+                                    if (typeof _Call.XML !== 'undefined') {
+                                        var cXML = SaveTheXML(_Call);
+                                        cXML.then(function (Txml) {
+                                            u.setBuild("EndTime");
+
+                                            var y = sendIt(_Call)
+                                            y.then(function (theMail) {
+                                                var tom = sendToTom(_Call)
+                                                tom.then(function (theTom) {
+                                                    _Call.Sent = "True";
+                                                    var cMet = crewMetrix.setCrewMetrix(_Call);
+                                                    var yy = getCrewName(_Call.CrewIDS)
+                                                    yy.then(function (cn) {
+
+                                                        if (typeof cGroup === 'undefined') {
+                                                            var cGroup = [];
+                                                        };
+                                                        for (var i = 0; i < cn.length ; i++) {
+                                                            var name = ""
+                                                            name = cn[i].attributes.firstName + " " + cn[i].attributes.lastName
+                                                            cGroup.push(name)
+                                                        };
+                                                        _Call.CrewNames = cGroup.slice(0);
+                                                        var rt = getRoute(_Call)
+                                                        rt.then(function (rout) {
+                                                            var PCRRoute = []
+                                                            var dis = 0;
+                                                            var a = Parse.GeoPoint;
+                                                            var b = Parse.GeoPoint;
+                                                            if (rout && rout.length > 0) {
+                                                                for (var i = 0; i < rout.length ; i++) {
+                                                                    var routeDetail = {};
+                                                                    routeDetail.name = i.toString()
+                                                                    routeDetail.location = rout[i].attributes.geoPoint
+                                                                    PCRRoute.push(routeDetail)
+                                                                    if (i == 0) {
+                                                                        a = rout[0].attributes.geoPoint
+                                                                    }
+                                                                    else {
+                                                                        b = rout[i].attributes.geoPoint
+                                                                        var s = a.milesTo(b)
+                                                                        dis = dis + s;
+                                                                        a = rout[i].attributes.geoPoint
+                                                                    }
+                                                                    var ts = ""
+                                                                    if (typeof rout[i].attributes.timestamp != 'undefined') {
+                                                                        ts = rout[i].attributes.timestamp;
+                                                                    }
+                                                                    var lat = ""
+                                                                    if (typeof rout[i].attributes.geoPoint.latitude != 'undefined') {
+                                                                        lat = rout[i].attributes.geoPoint.latitude;
+                                                                    };
+                                                                    var lon = ""
+                                                                    if (typeof rout[i].attributes.geoPoint.longitude != 'undefined') {
+                                                                        lon = rout[i].attributes.geoPoint.longitude;
+                                                                    };
+                                                                    var speed = "";
+                                                                    if (typeof rout[i].attributes.speed != 'undefined') {
+                                                                        speed = rout[i].attributes.speed;
+                                                                    }
+                                                                    var bat = "";
+                                                                    if (typeof rout[i].attributes.batteryLevel != 'undefined') {
+                                                                        bat = rout[i].attributes.batteryLevel;
+                                                                    };
+                                                                    var alt = "";
+                                                                    if (typeof rout[i].attributes.altitude != 'undefined') {
+                                                                        alt = rout[i].attributes.altitude;
+                                                                    }
+                                                                    var rig = "";
+                                                                    if (typeof rout[i].attributes.vehicle.id != 'undefined');
+                                                                    {
+                                                                        rig = rout[i].attributes.vehicle.id;
+                                                                    }
+
+                                                                    var st = ts + "|" + lat + ":" + lon + "|" + speed + "|" + bat + "|" + alt + " " + dis + " " + rig;
+                                                                    if (typeof EncR === 'undefined') {
+                                                                        var EncR = [];
+                                                                    };
+                                                                    EncR.push(st)
+                                                                }
+                                                            };
+                                                            _Call["Route"] = EncR.slice(0);
+                                                            _Call.EncouterRoute = PCRRoute;
+                                                            _Call["AMiles"] = dis;
+                                                            try {
+
+                                                                _Call.XMLHtml = "<![CDATA[" + htmltext + "]]>";
+                                                                var billFile = Bill.setBillFile(_Call);
+                                                                _Call.BillFile = billFile;
+                                                            }
+                                                            catch (e) {
+                                                                u.RaiseError("Failed generating BillFile", 0, _Call.agencyID + "||" + _Call.PCRID, e);
+                                                            };
+
+                                                            _Call.WellFormed = true;
+
+
+                                                            response.success(_Call);
+
+
+
+
+
+                                                        }, function (error) {
+
+                                                        });
+
+                                                        //_Call.WellFormed = true;
+                                                        //response.success(_Call)
+                                                    }, function (error) {
+                                                        _Call.WellFormed = true;
+                                                        response.success(_Call)
+                                                    });
+
+                                                }, function (error) {
+                                                    response.success(_Call)
+                                                });
+
+                                            }, function (error) {
+                                            });
+                                        });
                                     };
 
-
-                                    try {
-                                        _Call.Version2 = v2Object;
-                                        var v2Object = v2.setV2Call(_Call);
-                                        var v2XML = ver2XML.setV2XML(v2Object);
-                                        _Call.v2XML = v2XML;
-                                        var version2XMLByteArray = v2XML.getBytes();
-                                        _Call.XML = version2XMLByteArray;
-                                    }
-                                    catch (e) {
-                                        u.RaiseError("Failed generating Verson 2 Object", 0, "TheCall.setV2Call", e);
-                                    }
-
-                                    var p = SaveThePDF(_Call);
-                                    p.then(function () {
-                                        
-                                        if (typeof _Call.XML !== 'undefined') {
-                                            var cXML = SaveTheXML(_Call);
-                                            cXML.then(function (Txml) {
-                                                u.setBuild("EndTime");
-                                                var FatalE = u.getFatalErrors();
-                                                var TimeE = u.getTimeErrors();
-                                                var WarningsE = u.getWarnings();
-                                                _Call.CallLog = u.getCallLog();
-                                                var TheEvent = new Object();
-
-                                                if (FatalE.length > 0) {
-                                                    _Call.HasFatal = true;
-                                                    _Call.Errors = FatalE;
-                                                };
-                                                if (TimeE.length > 0) {
-                                                    _Call.TimeErrors = TimeE;
-                                                };
-                                                if (WarningsE.length > 0) {
-                                                    _Call.Warnings = WarningsE;
-                                                };
-                                                //var y = sendIt(_Call)
-                                                //y.then(function (theMail)
-                                                //{
-                                                    //var tom = sendToTom(_Call)
-                                                    //tom.then(function (theTom) {
-                                                    //    _Call.Sent = "True";
-                                                    //});
-                                               
-                                                //var cMet = setCrewMetrix(_Call);
-                                                //cMet.then(function (ceM) 
-                                                //{
-                                                _Call.WellFormed = true;
-                                                    response.success(_Call.Props)
-
-
-
-                                                //}, function (error) {
-                                                //    response.success("Call Metrix")
-                                                //});
-                                                  
-
-                                                //}, function (error) {
-                                                //    response.success("2")
-                                                //});
-
-
-                                                    //}, function (error) {
-                                               // })
-                                                ;
-                                            });
-                                        };
-                                        //});
-                                    }, function (error) {
-                                        var e = mailError("SaveHTML", errObj)
-                                        e.then(function (er) {
-                                            response.success(er)
-                                        });
-                                        response.success("SaveHTML")
+                                }, function (error) {
+                                    var e = mailError("SaveHTML", errObj)
+                                    e.then(function (er) {
+                                        response.success(er)
                                     });
-                                }
-                                else
-                                {
                                     response.success(_Call)
-                                }
-                            });
-                        }, function (error) {
-                            var e = mailError("SetCallMetrix", errObj)
-                            e.then(function (er) {
-                                response.success(er)
-                            });
+                                });
 
-                                response.success("Error: Set Call Metrix")
-                    });
+                            }
+                            else {
+                                response.success(_Call)
+                            }
+                        });
 
                     }, function (error) {
                         var e = mailError("GetAgencyRigs", errObj)
                         e.then(function (er) {
                             response.success(er)
                         });
-                        response.success("Error: Agency Rigs")
+                        response.success("Error: Agency Rigs " + _Call.agencyID + "||" + _Call.PCRID)
                     });
                 }, function (error) {
                     var e = mailError("GetElements", errObj)
@@ -379,15 +449,14 @@ Parse.Cloud.define("getPCR", function (request, response) {
             });
             response.success("getElements Errors")
         });
-    }, function (error)
-    {
+    }, function (error) {
         var e = mailError("getPCR", errObj)
         e.then(function (er) {
             response.success(er)
         });
         response.success("getPCR Errors")
     });
-    
+
 });
 
 
@@ -463,8 +532,6 @@ String.prototype.getBytes = function () {
 var sendIt = function (tc) {
     var sub = tc;
     var h = tc.HTMLDoc;
-    //var e = getHTML(tc.Props.PCRID)
-    //e.then(function (er) {
 
     client.initialize('mg.datainmotionllc.com', 'key-dd6c965d8a32b0a4db474a678e02de87');
 
@@ -479,7 +546,6 @@ var sendIt = function (tc) {
         console.log("Update CallMetrix with Sent Date/Status")
         return httpResponse
     });
-    // });
 };
 var mailError = function (from, err) {
     console.log(from)
@@ -512,7 +578,7 @@ var mailError = function (from, err) {
     var etext = "PCR: " + pcr + " Call Status: " + status + " Agency: " + agency +  " User: " + username + " Vehicle: " + vehicle
     return client.sendEmail({
         to: 'bouvierneil@hotmail.com',        
-        from: "MyMail@DataInMotion.com",
+        from: "ErrorMail@DataInMotion.com",
         subject: from,
         text: etext
     }).then(function (httpResponse) {
@@ -521,8 +587,6 @@ var mailError = function (from, err) {
     });
     // });
 };
-
-
 var getHTML = function (pcr) {
     var html = Parse.Object.extend("HTMLClass");
     var query = new Parse.Query(html);
@@ -661,9 +725,6 @@ var getAgencyRigs = function (agencyId) {
         error: function (error) { }
     });
 };
-
-
-
 var setPatient= function (theParam) {
     var cmID = null;
     var pat = Parse.Object.extend("Patient");
@@ -716,8 +777,6 @@ var setPatient= function (theParam) {
             }
         });
 };
-
-
 Parse.Cloud.define("getPatient", function (request, response)
 {
     if (typeof request.params.SearchKey !== 'undefined')
@@ -760,3 +819,55 @@ Parse.Cloud.define("getPatient", function (request, response)
     });
 
 });
+var getCrewName = function (id) {
+    if (id.length == 0) {
+        return null
+    }
+    else {
+        for (var i = 0; i < id.length ; i++) {
+            if (typeof aa === 'undefined') {
+                var aa = [];
+            }
+            aa.push(id[i].objectId)
+        }
+    };
+    console.log("GetGrewNames")
+    var _user = Parse.Object.extend("User");
+    var query = new Parse.Query(_user);
+    //var sa = ["h6Skan9mV0", "rFf2SWLm60"]
+    query.containedIn("objectId", aa)
+    return query.find({
+        success: function (results) {
+            console.log("GetGrewNamesResults " + results.length)
+
+        },
+        error: function (error) {
+            console.log("ERRRRRRRR")
+        }
+    });
+};
+var getRoute = function (call) {
+
+    var from = new Date(call.Props["EncounterBeginTime"]);
+    var to = new Date(call.Props["EncounterEndTime"]);
+    var rig = call.vehicleId
+
+    var RIG = Parse.Object.extend("VehicleLocation");
+    var query = new Parse.Query(RIG);
+    query.greaterThan("timestamp", from)
+    query.lessThan("timestamp", to)
+    query.equalTo("vehicle",
+        {
+            __type: "Pointer",
+            className: "Vehicle",
+            objectId: rig
+        })
+    query.descending("timestamp");
+    return query.find({
+        success: function (results) {
+        },
+        error: function (error) {
+            console.log("ERRRRRRRR")
+        }
+    });
+};

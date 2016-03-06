@@ -3,7 +3,10 @@ var moment = require('moment');
 var summaryArray = new Array();
 exports.setCallSummary = function (TheCall)
 {
-    var rA = [];  
+    var rA = [];
+
+
+
     
     if (typeof TheCall.Props == 'undefined') {
         u.RaiseError("setCallSummary", 100, "Undefined TheCall.Props Object", "setCallSummary");        
@@ -14,6 +17,52 @@ exports.setCallSummary = function (TheCall)
         u.RaiseError("setCallSummary", 100, "Undefined TheCall.Props Object", "setCallSummary");
         
     };
+
+
+
+    //if (TimeE.length > 0) {
+    //    _Call.TimeErrors = TimeE;
+    //};
+    //if (WarningsE.length > 0) {
+    //    _Call.Warnings = WarningsE;
+    //};
+
+    if (typeof TheCall.Errors !== 'undefined') {
+        if (TheCall.Errors.length > 0) {
+            for (var i = 0; i < TheCall.Errors.length; i++) {
+                if (typeof TheCall.Errors[i].Text !== 'undefined')
+                {
+                    setM("E", TheCall.Errors[i].Text);
+                }
+                else
+                {
+                    var met = ""
+                    if (typeof TheCall.Errors[i].SMethod !== 'undefined') {
+                        met = TheCall.Errors[i].SMethod;
+                        met = "Error Message" +met + " "
+                    };
+                    var ss = ""
+                    if (typeof TheCall.Errors[i].Source !== 'undefined') {
+                        ss = TheCall.Errors[i].Source;
+                        ss ="Source: "+ ss + " "
+                    };
+                    var seq = ""
+                    if (typeof TheCall.Errors[i].Seq !== 'undefined') {
+                        seq = TheCall.Errors[i].Seq;
+                        seq = "Seq: "+ seq + " "
+                    };
+                    var text = seq +  ss + met
+                        setM("E", text);
+                }
+
+            }
+        }
+    };
+
+
+
+
+
     var p = "";
     if (typeof TheCall["status"] !== 'undefined') {
         p = p +  TheCall["status"]
@@ -634,9 +683,9 @@ var setM = function (t, txt)
     if (t == 'M') {
         sm.type = "MISSING"
     };
-    //if (t == 'B') {
-    //    sm.type = "BAD DATA:"
-    //};
+    if (t == 'E') {
+        sm.type = "ERROR: "
+    };
     if (t == 'U') {
         sm.type = "UNKNOWN"
     };

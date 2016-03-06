@@ -421,25 +421,30 @@ exports.RaiseError = function (theError, theSeverity, theOrigin, error) {
         }
         else if (theSeverity === 0) {
             Fatal.push(Error);
+            ErrorList.push(Error);
         }
         else if (theSeverity === -1) {
             Fatal.push(Error)
+            
         }
         else if (theSeverity === 1) {
-            Warning.push(Error)
+            Fatal.push(Error)
+            ErrorList.push(Error);
         }
         else if (theSeverity === 2) {
             Time.push(Error)
+            ErrorList.push(Error);
         }
         else if (theSeverity === 10) {
             Rules.push(Error)
+            ErrorList.push(Error);
         }         
         
     }
     
 };
 exports.getCallErrors = function () {
-    return CallErrors;
+    return ErrorList;
 };
 exports.getCallLog = function () {
     return CallLog;
@@ -454,22 +459,19 @@ exports.getFatalErrors = function () {
 exports.getWarnings= function () {
     return Warning;
 };
-
-exports.setBuild = function(n)
-{
+exports.setBuild = function (n) {
     var Build = new Object();
     Build.Time = mom().format("mm:ss:SSS");
     Build.Event = n;
     BuildList.push(Build)
-}
-
+};
 function formatPhoneNumber(s) {
     var s2 = ("" + s).replace(/\D/g, '');
     var m = s2.match(/^(\d{3})(\d{3})(\d{4})$/);
     return (!m) ? null : "(" + m[1] + ") " + m[2] + "-" + m[3];
 };
 exports.setBusinessObject = function (elementList, NemsisList, NemsisElement) {    
-    //RaiseError("setBusinessObject", 100, "setBusinessObject", NemsisElement);
+    
     var _v = new Array();
     _v = getValue(elementList, NemsisElement);
     var Props = findById(NemsisList, NemsisElement);
@@ -477,7 +479,7 @@ exports.setBusinessObject = function (elementList, NemsisList, NemsisElement) {
         _v.props = Props;
     }
     else {
-        throw new Error("Element not defined in NEMSIS Config")
+        //RaiseError("Element not defined in NEMSIS Config", 10,  NemsisElement, 0);
     }
     _v.Name = NemsisElement;
 
@@ -664,8 +666,6 @@ exports.getDateNumbers = function (d) {
     ret.weekDay = md;
     return ret;
 };
-
-
 exports.getDateNumbers = function (d) {
     var monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
     var weekday = new Array(7);
@@ -704,7 +704,6 @@ exports.getDateNumbers = function (d) {
     ret.weekDay = md;
     return ret;
 };
-
 exports.setLocalTime = function (agency, theTime)
 {
     //var a = mom(theTime);
