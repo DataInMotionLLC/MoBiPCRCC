@@ -31,46 +31,55 @@ exports.setNarrative = function (Props)
     var ElementArray = [];
     var p = "";    
         
-    p = p + setLine("Crew responded to ");
-
-    p = p + setLine(BO["RespTypeOfServiceRequest"] + " ");
-    
-    p = p + setLine("call involving ");
-    p = p + setLine(BO.Gender + " ");
-    p = p + setLine("age, " + BO["PatientAge"]);
-    p = p + setLine(" to  " + BO["LocationType"]);
-    p = p + setLine(" for " + BO["DispatchComplaint"]);
-    p = endSentence(p);
-
-    p = p + setLine("Unit Response " + BO.ResponseUrgency);
-    p = p + setLine(" with " + BO.RespResponseModeToScene);
-    p = endSentence(p);
+    if (BO["RespTypeOfServiceRequest"] !== "") {
+        p = p + setLine("Crew responded to ");
+        p = p + setLine(BO["RespTypeOfServiceRequest"] + " ");
+        p = p + setLine("call involving ");
+        if (BO.Gender !== "") {
+            p = p + setLine(BO.Gender + " ");
+        };
+        if (BO["PatientAge"] !== "") {
+            p = p + setLine("age, " + BO["PatientAge"]);
+        };
+        if (BO["LocationType"] !== "") {
+            p = p + setLine(" to  " + BO["LocationType"]);
+        };
+        if (BO["DispatchComplaint"] !== "") {
+            p = p + setLine(" for " + BO["DispatchComplaint"]);
+        };
+        p = endSentence(p);
+    };
+    if (BO.RespResponseModeToScene !== "") {
+        p = p + setLine("Unit Responsd with " + BO.RespResponseModeToScene);
+        p = endSentence(p);
+    };
         
-
-    p = p + setLine("Patient Chief Complaint is ");
-    p = p + setLine(BO["ChiefComplaint"]);
-    if (typeof BO.Vitals !== "undefined") {
-        if (BO.Vitals !== "") {
-            if (BO.Vitals[0]["PainScale"] !== "") {
-                p = p + setLine(" pain rated at " + BO.Vitals[0]["PainScale"]);     
+    if (BO["ChiefComplaint"] !== "") {
+        p = p + setLine("Patient Chief Complaint is ");
+        p = p + setLine(BO["ChiefComplaint"]);
+        if (typeof BO.Vitals !== "undefined") {
+            if (BO.Vitals !== "") {
+                if (BO.Vitals[0]["PainScale"] !== "") {
+                    p = p + setLine(" pain rated at " + BO.Vitals[0]["PainScale"]);
+                }
             }
         }
-    }
-    p = endSentence(p);
+        p = endSentence(p);
 
-    p = p + "\n"
-    
-    p = p + setLine("The primary problem appears to be ");
-    p = p + setLine(BO["PrimarySymptom"]);
-    p = endSentence(p);
+        p = p + "\n"
+    };
+    if (BO["PrimarySymptom"] !== "") {
+        p = p + setLine("The primary problem appears to be ");
+        p = p + setLine(BO["PrimarySymptom"]);
+        p = endSentence(p);
 
-    p = p + setLine("UPON ARRIVAL PATIENT WAS FOUND ");    
-    p = endSentence(p);
+        //        p = p + setLine("UPON ARRIVAL PATIENT WAS FOUND ");
+        //p = endSentence(p);
 
-    p = p + setLine("The primary problem appears to be ");
-    p = p + setLine(BO["PrimarySymptom"]);
-    p = endSentence(p);
-
+        //p = p + setLine("The primary problem appears to be ");
+        //p = p + setLine(BO["PrimarySymptom"]);
+        //p = endSentence(p);
+    };
     if (BO.InitialAcuity !== "") {    
         p = p + setLine("The general impression of the patient was " + BO.InitialAcuity);
         p = endSentence(p);

@@ -13,8 +13,9 @@ exports.setBillFile = function (TheCall) {
     XML.WSE("DemographicGroup");
     XML.WEE();
     XML.WSE("PatientCareReport");
-    if (typeof TheCall.Version3 != 'undefined') {
-            //if (typeof TheCall.Version3.eRecord != 'undefined') {
+    if (typeof TheCall.Version3 != 'undefined')
+    {
+            if (typeof TheCall.Version3.eRecord != 'undefined') {
 
                 var obj = {};
                 var obj = TheCall.Version3.eRecord;
@@ -40,7 +41,7 @@ exports.setBillFile = function (TheCall) {
                 };
                 XML.WEE("eRecord.SoftwareApplicationGroup");
                 XML.WEE("eRecord");
-            //};
+            };
             if (typeof TheCall.Version3.eDispatch != 'undefined') {
                 XML.WSE("eDispatch");
                 var obj = {};

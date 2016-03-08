@@ -5,7 +5,6 @@ pat= require('cloud/Patient.js');
 exports.setTheCall = function (thePCR)
 {
 
-
     u.RaiseError("setV3Call", 100, "setV3Call", "setV3Call");
     var parseObject = thePCR.PCRObject;
     var rawObjects = new Array();
@@ -18,52 +17,21 @@ exports.setTheCall = function (thePCR)
     var version3 = {};
     var eCustomResults = [];
 
-    //// ///////////////eRecord
+    // ///////////////eRecord
     
-    //try {
-    //    u.RaiseError("u.getObjectFromOLTPExtract(parseObject, eRecord)", 100, "setV3Call", "u.getObjectFromOLTPExtract(parseObject, eRecord)");
-    //    var eRecordObject = u.getObjectFromOLTPExtract(parseObject, "eRecord");
-    //}
-    //catch (e) {
-    //    u.RaiseError("eRecordObject", 0, "setV3Call.u.getObjectFromOLTPExtract.eRecord", e);
-    //};
 
-    //if (typeof eRecordObject !== 'undefined' && eRecordObject.IsUndefined === true) {
-    //    u.RaiseError("No Data Found", 0, "v3Call.eRecord34");
-    //    eRecordObject.HasDataSet = false;
-    //}
-    //else {
-    //    var rawObject = {};
-    //    rawObject.Name = "eRecordObject"
-    //    rawObject.Payload = eRecordObject
-    //    rawObjects.push(rawObject)
-    //    rawObject = undefined;
-
-    //    eRecordObject.HasDataSet = true;
-    //    var _Record = new Object()
-
-    //    try {
-    //        u.RaiseError("seteRecord(eRecordObject, NEMSISElements)", 100, "V3Call", "seteRecord(eRecordObject, NEMSISElements)");
-    //        _Record = dsp.seteRecord(eRecordObject, NEMSISElements);
-    //    }
-    //    catch (e) {
-    //        u.RaiseError("seteRecord", 0, "V3Call.seteRecord");
-    //        _Record = null;
-    //    };
-    //    if (_Record === null) {
-    //        u.RaiseError("No Data Found", 0, "setV3Call.eRecordeRecord34");
-    //    }
-    //    else {
-    //        var eRecord = {};
-    //        eRecord = _Record;
-    //        theCall.eRecord = _Record;
-    //        if (typeof eRecord.CustomResults !== 'undefined') {
-    //            if (eRecord.CustomResults.length > 0) {
-    //                eCustomResults = eCustomResults.concat(eRecord.CustomResults)
-    //            }
-    //        }
-    //    }
-    //};
+    var eRecord = {};
+    eRecord["eRecord.01"] = thePCR.PCRID;
+    eRecord["eRecord.02"] = "Data In Motion"
+    eRecord["eRecord.03"] = "MoBi cPCR"
+    eRecord["eRecord.04"] = "3.05.16"
+            
+    theCall.eRecord = eRecord;
+    if (typeof eRecord.CustomResults !== 'undefined') {
+        if (eRecord.CustomResults.length > 0) {
+            eCustomResults = eCustomResults.concat(eRecord.CustomResults)
+        }
+    };
 
 
     try {
@@ -105,7 +73,6 @@ exports.setTheCall = function (thePCR)
             theCall.eDispatch = eDispatch;
         }
     };
-
     
     
     try
@@ -119,7 +86,7 @@ exports.setTheCall = function (thePCR)
         };
         
     if (eDispositionObject.IsUndefined == true) {
-        u.RaiseError("Null Element List", 0, "setV3Call.eDisposition34")
+        //u.RaiseError("Null Element List", 0, "setV3Call.eDisposition34")
     }
     else {
 
@@ -140,8 +107,9 @@ exports.setTheCall = function (thePCR)
             u.RaiseError("seteDisposition", 0, "setV3Call.eDisposition", e);
             _Disposition = null;
         };
+
         if (_Disposition === null) {
-            u.RaiseError("Null Element List", 0, "setV3Call.eDisposition34")
+            //u.RaiseError(" Missing Disposition:Null Element List", 0, "setV3Call.eDisposition34")
         }
         else {
             var eDisposition = {};

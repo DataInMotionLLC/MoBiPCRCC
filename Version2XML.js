@@ -50,9 +50,7 @@ exports.setV2XML = function (EMSDataSet) {
         
         if (typeof eDS.E01 !== 'undefined') {
             v2XML.WSE("E01");
-            console.log("E01")
             if (u.IsOk(eDS.E01.E01_01) == true) {
-            console.log(eDS.E01)
             var d = eDS.E01.E01_01.toString();
                 var da = d.substring(0, 31)                
                 v2XML.WES("E01_01", da)

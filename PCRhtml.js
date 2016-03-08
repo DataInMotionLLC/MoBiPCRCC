@@ -1,5 +1,10 @@
 exports.setHTML= function (TheCall) {
-
+    if (typeof TheCall == 'undefined') {
+        return null
+    };
+    if (typeof TheCall.Props == 'undefined') {
+        return null
+    };
     var Props = TheCall.Props;
     var htmlDoc = "";
     htmlDoc = htmlDoc+ "<!DOCTYPE html>";

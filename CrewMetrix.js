@@ -3,19 +3,16 @@ var moment = require('moment');
 exports.setCrewMetrix = function (TheCall) {
     var BO = {};
     if (typeof TheCall === 'undefined') {
-        console.log("Undecfined TheCall")
         u.RaiseError("Set Crew Modalites", 0, "setCrewModalities", "Set Crew Modalites");
         return null
     };
 
     if (typeof TheCall.Props === 'undefined') {
-        console.log("Undecfined Props")
         u.RaiseError("Set Crew Modalites", 0, "setCrewModalities", "Missing Call Properties");
         return null
     };
 
     if (typeof TheCall.PCRID === 'undefined') {
-        console.log("Undecfined PCRID")
         u.RaiseError("Set Crew Modalites", 0, "setCrewModalities", "Missing Call PCRID");
         return null
     };

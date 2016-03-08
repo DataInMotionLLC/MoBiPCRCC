@@ -1,94 +1,89 @@
 u = require('cloud/Utilities.js');
 exports.seteRecord = function (pcrObj, NemsisList) {
     var eRecord = {};
-    eRecord["eRecord.01"] = TheCall.PCRID;
-    eRecord["eRecord.02"] = "Data In Motion"
-    eRecord["eRecord.03"] = "MoBi cPCR"
-    eRecord["eRecord.04"]=  "3.05.16"
-
     //    u.RaiseError("seteRecord", 100, "Dispatch.js", "seteRecord");
-//    if (typeof pcrObj === 'undefined') {
-//        u.RaiseError("eRecordObject Null or Undefined", 0, "eRecord34")
-//        return null
-//    }
-//    else {
-//        var pRecord = pcrObj;
-//    };
-//    //////////////////////eRecord.01
-//    if (pRecord.HasDataSet == false) {
-//        //u.RaiseError("seteRecord", 0, "eRecord34", "pRecord Null or Undefined")
-//        return null;
-//    };
+    //if (typeof pcrObj === 'undefined') {
+    //    u.RaiseError("eRecordObject Null or Undefined", 0, "eRecord34")
+    //    return null
+    //}
+    //else {
+    //    var pRecord = pcrObj;
+    //};
+    ////////////////////////eRecord.01
+    //if (pRecord.HasDataSet == false) {
+    //    //u.RaiseError("seteRecord", 0, "eRecord34", "pRecord Null or Undefined")
+    //    return null;
+    //};
 
-//    if (pRecord.attributes.elements === 'undefined') {
-//        //u.RaiseError("seteRecord", 0, "eRecord34", "pRecord Null or Undefined")
-//        return null;
-//    };
+    //if (pRecord.attributes.elements === 'undefined') {
+    //    //u.RaiseError("seteRecord", 0, "eRecord34", "pRecord Null or Undefined")
+    //    return null;
+    //};
 
-//    //Element Array List
-//    if (typeof pRecord.attributes.sections === 'undefined') {
-//        //u.RaiseError("seteRecord", 0, "eRecord34", "pRecord Null or Undefined")
-//        return null
-//    };
+    ////Element Array List
+    //if (typeof pRecord.attributes.sections === 'undefined') {
+    //    //u.RaiseError("seteRecord", 0, "eRecord34", "pRecord Null or Undefined")
+    //    return null
+    //};
 
-//    if (typeof eRecord === 'undefined') {
-//        var eRecord = new Object();
-//    };
+    //if (typeof eRecord === 'undefined') {
+    //    var eRecord = new Object();
+    //};
 
-//    var _el = [];
+    //var _el = [];
 
-//    _el = (pRecord.attributes.elements);
+    //_el = (pRecord.attributes.elements);
 
-//    if (_el.length >= 0) {
-//        var eRecord = new Object();
-//        try {
+    //if (_el.length >= 0) {
+    //    var eRecord = new Object();
+    //    try {
     //            eRecord["eRecord.01"] = u.setBusinessObject(_el, NemsisList, "eRecord.01");
-//        }
-//        catch (e) {
-//            u.RaiseError("eRecord.01", 1, "eRecord34", e);
-//        };
+    //    }
+    //    catch (e) {
+    //        u.RaiseError("eRecord.01", 1, "eRecord34", e);
+    //    };
 
-//        _sI = u.getSectionIndex(pRecord, "eRecord.SoftwareApplicationGroup");
-//        if (_sI[0] == -1) {
+    //    _sI = u.getSectionIndex(pRecord, "eRecord.SoftwareApplicationGroup");
+    //    if (_sI[0] == -1) {
     //            u.RaiseError("Section:eRecord.SoftwareApplicationGroup", 0, "eRecords34", e);
-//            return null;
-//        }
+    //        return null;
+    //    }
 
-//        else {
-//            var _dL = [];  //section element array.  Item[0]==-1 indicates empty set
-//            var _dL = pRecord.attributes.sections[_sI].attributes.elements;
-//            if (_dL.length == 0) {
-//                u.RaiseError("eRecord Null or Undefined", 0, "eRecord34", e);
-//                return null;
-//            }
-//            else {
-//                //eRecord.02////////////////////////////////////////////
-//                try {
-//                    eRecord["eRecord.02"] = u.setBusinessObject(_dL, NemsisList, "eRecord.02")
-//                }
-//                catch (e) {
-//                    u.RaiseError("eRecord.02", 1, "eRecord34", e);
-//                };
+    //    else {
+    //        var _dL = [];  //section element array.  Item[0]==-1 indicates empty set
+    //        var _dL = pRecord.attributes.sections[_sI].attributes.elements;
+    //        if (_dL.length == 0) {
+    //            u.RaiseError("eRecord Null or Undefined", 0, "eRecord34", e);
+    //            return null;
+    //        }
+    //        else {
+    //            //eRecord.02////////////////////////////////////////////
+    //            try {
+    //                eRecord["eRecord.02"] = u.setBusinessObject(_dL, NemsisList, "eRecord.02")
+    //            }
+    //            catch (e) {
+    //                u.RaiseError("eRecord.02", 1, "eRecord34", e);
+    //            };
 
-//                //eRecord.03////////////////////////////////////////////
-//                try {
-//                    eRecord["eRecord.03"] = u.setBusinessObject(_dL, NemsisList, "eRecord.03")
-//                }
+    //            //eRecord.03////////////////////////////////////////////
+    //            try {
+    //                eRecord["eRecord.03"] = u.setBusinessObject(_dL, NemsisList, "eRecord.03")
+    //            }
 
-//                catch (e) {
-//                    u.RaiseError("eRecord.03", 1, "eRecord34", e);
-//                };
-//                //eRecord.04////////////////////////////////////////////
+    //            catch (e) {
+    //                u.RaiseError("eRecord.03", 1, "eRecord34", e);
+    //            };
+    //            //eRecord.04////////////////////////////////////////////
 
-//                try {
-//                    eRecord["eRecord.04"] = u.setBusinessObject(_dL, NemsisList, "eRecord.04")
-//                }
-//                catch (e) {
-//                    u.RaiseError("eRecord.04", 1, "eRecord34", e);
-//                };
-//            }
-//        }
-//    };
+    //            try {
+    //                eRecord["eRecord.04"] = u.setBusinessObject(_dL, NemsisList, "eRecord.04")
+    //            }
+    //            catch (e) {
+    //                u.RaiseError("eRecord.04", 1, "eRecord34", e);
+    //            };
+    //        }
+    //    }
+    //};
 
     if (typeof eRecord !== 'undefined') {
         return eRecord;
@@ -387,16 +382,13 @@ exports.seteDispatch = function (pcrObj, NemsisList) {
     };
 
     var eDispatch = new Object();
-
-    //eDispatch.01//////////////////////////////////////////    
     try {
         eDispatch["eDispatch.01"] = u.setBusinessObject(_elementList, NemsisList, "eDispatch.01")
     }
     catch (e) {
         u.RaiseError("eDispatch.01", 1, "eDispatch34", e);
     };
-
-    //eDispatch.02//////////////////////////////////////////
+    
     try {
         eDispatch["eDispatch.02"] = u.setBusinessObject(_elementList, NemsisList, "eDispatch.02")                
     }
@@ -405,8 +397,6 @@ exports.seteDispatch = function (pcrObj, NemsisList) {
         u.RaiseError("eDispatch.02", 1, "eDispatch34", e);
     };
 
-    /////eDispatch.03////////////////////
-    
     try {
         eDispatch["eDispatch.03"] = u.setBusinessObject(_elementList, NemsisList, "eDispatch.03")
     }
@@ -415,26 +405,19 @@ exports.seteDispatch = function (pcrObj, NemsisList) {
         u.RaiseError("eDispatch.03", 1, "eDispatch34", e);
     };
 
-    /////eDispatch.04////////////////////
     try {
         eDispatch["eDispatch.04"] = u.setBusinessObject(_elementList, NemsisList, "eDispatch.04")
     }
     catch (e) {
         u.RaiseError("eDispatch.04", 1, "eDispatch34", e);
     };
-
-    /////eDispatch.05////////////////////
     try {
-
         eDispatch["eDispatch.05"] = u.setBusinessObject(_elementList, NemsisList, "eDispatch.05")
     }
-
     catch (e) {
         u.RaiseError("eDispatch.05", 1, "eDispatch34", e);
     };
 
-
-    /////eDispatch.06////////////////////
     try {
         eDispatch["eDispatch.06"] = u.setBusinessObject(_elementList, NemsisList, "eDispatch.06")
     }
@@ -469,8 +452,7 @@ exports.seteDisposition = function (pcrObj, NemsisList) {
         return null;
     };
 
-    //eDisposition.12
-    var eDisposition = new Object();
+    var eDisposition = {};
     try {
         
         eDisposition["eDisposition.12"] = u.setBusinessObject(_eL, NemsisList, "eDisposition.12")
@@ -496,94 +478,82 @@ exports.seteDisposition = function (pcrObj, NemsisList) {
         if (_sI[0] !== -1) {
 
 
-            var _dEl = new Array();
+            var _dEl = [];
             _dEl = pDisposition.attributes.sections[_sI[0]].attributes.elements;
-            if (_dEl.length !== 0) {
-                var DestinationGroup = new Object();
-                //eDisposition.01///////////////////////////////////////////////////////////
+            if (_dEl.length !== 0) 
+            {
+                var DestinationGroup = {};
                 try {
                     DestinationGroup["eDisposition.01"] = u.setBusinessObject(_dEl, NemsisList, "eDisposition.01")
                 }
                 catch (e) {
                     u.RaiseError("eDisposition.01", 1, "eDisposition34", e);
                 };
-
-
-                //eDisposition.02///////////////////////////////////////////////////////////
                 try {
                     DestinationGroup["eDisposition.02"] = u.setBusinessObject(_dEl, NemsisList, "eDisposition.02")
                 }
                 catch (e) {
                     u.RaiseError("eDisposition.02", 1, "eDisposition34", e);
                 };
-                //eDisposition.03/////////////////////////////////////////////////////////////
                 try {
                     DestinationGroup["eDisposition.03"] = u.setBusinessObject(_dEl, NemsisList, "eDisposition.03")
                 }
                 catch (e) {
                     u.RaiseError("eDisposition.03", 1, "eDisposition34", e);
                 };
-
-                //eDisposition.04///////////////////////////////////////////////////////
                 try {
                     DestinationGroup["eDisposition.04"] = u.setBusinessObject(_dEl, NemsisList, "eDisposition.04")
                 }
                 catch (e) {
                     u.RaiseError("eDisposition.04", 1, "eDisposition34", e);
                 };
-
-                //eDisposition.05/////////////////////////////////////////////
                 try {
                     DestinationGroup["eDisposition.05"] = u.setBusinessObject(_dEl, NemsisList, "eDisposition.05")
                 }
                 catch (e) {
                     u.RaiseError("eDisposition.05", 1, "eDisposition34", e);
                 };
-
-                //eDisposition.06//////////////////////////////////////////////////////
                 try {
 
                     DestinationGroup["eDisposition.06"] = u.setBusinessObject(_dEl, NemsisList, "eDisposition.06");
-                    // Pad it out.  
-                    if (DestinationGroup["eDisposition.06"].vSet[0].val.length == 2) {
-                        DestinationGroup["eDisposition.06"].vSet[0].val = "0" + DestinationGroup["eDisposition.06"].vSet[0].val
-                    };
+                    if (DestinationGroup["eDisposition.06"].IsNull == false) {
+                        if (DestinationGroup["eDisposition.06"].vSet[0].val.length == 2) {
+                            DestinationGroup["eDisposition.06"].vSet[0].val = "0" + DestinationGroup["eDisposition.06"].vSet[0].val
+                        };
 
-                    if (DestinationGroup["eDisposition.06"].vSet[0].val.length == 1) {
-                        DestinationGroup["eDisposition.06"].vSet[0].val = "00" + DestinationGroup["eDisposition.06"].vSet[0].val
-                    };
-
+                        if (DestinationGroup["eDisposition.06"].vSet[0].val.length == 1) {
+                            DestinationGroup["eDisposition.06"].vSet[0].val = "00" + DestinationGroup["eDisposition.06"].vSet[0].val
+                        };
+                    }
                     if (typeof DestinationGroup["eDisposition.05"] !== 'undefined') {
-                        DestinationGroup["eDisposition.06"].vSet[0].val = DestinationGroup["eDisposition.05"].vSet[0].val + DestinationGroup["eDisposition.06"].vSet[0].val;
+                        if (DestinationGroup["eDisposition.05"].IsNull == false) {
+                            if (DestinationGroup["eDisposition.06"].IsNull == false) {
+                                DestinationGroup["eDisposition.06"].vSet[0].val = DestinationGroup["eDisposition.05"].vSet[0].val + DestinationGroup["eDisposition.06"].vSet[0].val;
+                            }
+                        }
                     };
                 }
                 catch (e) {
                     u.RaiseError("eDisposition.06", 1, "eDisposition34", e);
                 };
-                //eDisposition.07////////////////////////////////////////////////////
                 try {
                     DestinationGroup["eDisposition.07"] = u.setBusinessObject(_dEl, NemsisList, "eDisposition.07")
                 }
                 catch (e) {
                     u.RaiseError("eDisposition.07", 1, "eDisposition34", e);
                 };
-
-                //eDisposition.08///////////////////////////////////////////////////
                 try {
                     DestinationGroup["eDisposition.08"] = u.setBusinessObject(_dEl, NemsisList, "eDisposition.08")
                 }
                 catch (e) {
                     u.RaiseError("eDisposition.08", 1, "eDisposition34", e);
                 };
-
-                //eDisposition.09/////////////////////////////////////////
                 try {
                     DestinationGroup["eDisposition.09"] = u.setBusinessObject(_dEl, NemsisList, "eDisposition.09")
                 }
                 catch (e) {
                     u.RaiseError("eDisposition.09", 1, "eDisposition34", e);
                 };
-                //eDisposition.10//////////////////////////////////////////
                 try {
                     DestinationGroup["eDisposition.10"] = u.setBusinessObject(_dEl, NemsisList, "eDisposition.10")
                 }
@@ -594,99 +564,78 @@ exports.seteDisposition = function (pcrObj, NemsisList) {
         }
     };
 
-
-    //eDisposition.11/////////////////////////////////////////////////
     try {
         eDisposition["eDisposition.11"] = u.setBusinessObject(_eL, NemsisList, "eDisposition.11")
     }
     catch (e) {
         u.RaiseError("eDisposition.11", 1, "eDisposition34", e);
     };
-
-    //eDisposition.13/////////////////////////////////////////////////////    
     try {
         eDisposition["eDisposition.13"] = u.setBusinessObject(_eL, NemsisList, "eDisposition.13")
     }
     catch (e) {
         u.RaiseError("eDisposition.13", 1, "eDisposition34", e);
     };
-
-    //eDisposition.14/////////////////////////////////////////////////////
     try {
         eDisposition["eDisposition.14"] = u.setBusinessObject(_eL, NemsisList, "eDisposition.14")
     }
     catch (e) {
         u.RaiseError("eDisposition.14", 1, "eDisposition34", e);
     };
-
-    //eDisposition.15////
     try {
         eDisposition["eDisposition.15"] = u.setBusinessObject(_eL, NemsisList, "eDisposition.15")
     }
     catch (e) {
         u.RaiseError("eDisposition.15", 1, "eDisposition34", e);
     };
-
-    //eDisposition.16////
     try {
         eDisposition["eDisposition.16"] = u.setBusinessObject(_eL, NemsisList, "eDisposition.16")
     }
     catch (e) {
         u.RaiseError("eDisposition.16", 1, "eDisposition34", e);
     };
-
-    //eDisposition.17////
     try {
         eDisposition["eDisposition.17"] = u.setBusinessObject(_eL, NemsisList, "eDisposition.17")
     }
     catch (e) {
         u.RaiseError("eDisposition.17", 1, "eDisposition34", e);
     };
-    //eDisposition.18////
     try {
         eDisposition["eDisposition.18"] = u.setBusinessObject(_eL, NemsisList, "eDisposition.18")
     }
     catch (e) {
         u.RaiseError("eDisposition.18", 1, "eDisposition34", e);
     };
-    //eDisposition.19////
     try {
         eDisposition["eDisposition.19"] = u.setBusinessObject(_eL, NemsisList, "eDisposition.19")
     }
     catch (e) {
         u.RaiseError("eDisposition.19", 1, "eDisposition34", e);
     };
-
-    //eDisposition.20////
     try {
         eDisposition["eDisposition.20"] = u.setBusinessObject(_eL, NemsisList, "eDisposition.20")
     }
     catch (e) {
         u.RaiseError("eDisposition.20", 1, "eDisposition34", e);
     };
-    //eDisposition.21////
     try {
         eDisposition["eDisposition.21"] = u.setBusinessObject(_eL, NemsisList, "eDisposition.21")
     }
     catch (e) {
         u.RaiseError("eDisposition.21", 1, "eDisposition34", e);
     };
-
-    //eDisposition.22////
     try {
         eDisposition["eDisposition.22"] = u.setBusinessObject(_eL, NemsisList, "eDisposition.22")
     }
     catch (e) {
         u.RaiseError("eDisposition.22", 1, "eDisposition34", e);
     };
-    //eDisposition.23////
     try {
         eDisposition["eDisposition.23"] = u.setBusinessObject(_eL, NemsisList, "eDisposition.23")
     }
     catch (e) {
         u.RaiseError("eDisposition.23", 1, "eDisposition34", e);
     };
-    //eDisposition.26////
     try {
         eDisposition["eDisposition.24"] = u.setBusinessObject(_eL, NemsisList, "eDisposition.24")
     }
@@ -694,7 +643,6 @@ exports.seteDisposition = function (pcrObj, NemsisList) {
         u.RaiseError("eDisposition.24", 1, "eDisposition34", e);
     };
 
-    var HTActivationArray = new Array();;
     if (typeof pDisposition.attributes.sections !== 'undefined') {
         var _hTAG = new Array();
         try {
@@ -705,35 +653,37 @@ exports.seteDisposition = function (pcrObj, NemsisList) {
         };
         if (_hTAG[0] !== -1) {
             for (var i = 0; i < _hTAG.length; i++) {
-                var hTG = new Object();
+                var hTG = {};
                 var _dataList = pDisposition.attributes.sections[_hTAG[i]].attributes.elements;
-
-                //eDisposition.24////                
                 try {
                     hTG["eDisposition.24"] = u.setBusinessObject(_dataList, NemsisList, "eDisposition.24")
                 }
                 catch (e) {
                     u.RaiseError("eDisposition.24", 1, "eDisposition34", e);
                 };
-                //eDisposition.25////
                 try {
                     hTG["eDisposition.25"] = u.setBusinessObject(_dataList, NemsisList, "eDisposition.25")
                 }
                 catch (e) {
                     u.RaiseError("eDisposition.25", 1, "eDisposition34", e);
                 };
-                HTActivationArray.push(hTG)
-                hTG = undefined;
+                if (typeof HTActivationArray == 'undefined') {
+                    var HTActivationArray = [];;
+                };                    
+                HTActivationArray.push(hTG)                
             }
         }
     };
+
     if (typeof eDisposition !== 'undefined') {
         if (typeof DestinationGroup !== 'undefined') {
             eDisposition.DestinationGroup = DestinationGroup;
         };
-        if (HTActivationArray.length > 0) {
-            var HospitalTeamActivationGroup = new Object();
-            eDisposition.HospitalTeamActivationGroup = HTActivationArray.slice(0);
+        if (typeof HTActivationArray !== 'undefined') {
+            if (HTActivationArray.length > 0) {
+                var HospitalTeamActivationGroup = new Object();
+                eDisposition.HospitalTeamActivationGroup = HTActivationArray.slice(0);
+            }
         };
         return eDisposition;
     }
@@ -752,119 +702,97 @@ exports.seteTimes = function (pcrObj, NemsisList) {
     if (typeof pTimes.attributes.elements !== 'undefined') {
         var _el = pTimes.attributes.elements;
         if (_el.length > 0) {
-            var eTimes = new Object();
-            //eTimes.01//////////////////      
+            var eTimes = {};
             try {
                 eTimes["eTimes.01"] = u.setBusinessObject(_el, NemsisList, "eTimes.01")
             }
             catch (e) {
                 u.RaiseError("eTimes.01", 1, "eTimes34", e);
             };
-
-            //eTimes.02/////////////////////////////////////////////////////////
             try {
                 eTimes["eTimes.02"] = u.setBusinessObject(_el, NemsisList, "eTimes.02")
             }
             catch (e) {
                 u.RaiseError("eTimes.02", 1, "eTimes34", e);
             };
-
-            //eTimes.03//////////////////////////////////////////////////////
             try {
                 eTimes["eTimes.03"] = u.setBusinessObject(_el, NemsisList, "eTimes.03")
             }
             catch (e) {
                 u.RaiseError("eTimes.03", 1, "eTimes34", e);
             };
-            //eTimes.04//////////////////////////////////////////////////
             try {
                 eTimes["eTimes.04"] = u.setBusinessObject(_el, NemsisList, "eTimes.04")
             }
             catch (e) {
                 u.RaiseError("eTimes.04", 1, "eTimes34", e);
             };
-            //eTimes.05//////////////////////////////////////////////////
             try {
                 eTimes["eTimes.05"] = u.setBusinessObject(_el, NemsisList, "eTimes.05")
             }
             catch (e) {
                 u.RaiseError("eTimes.05", 1, "eTimes34", e);
             };
-            //eTimes.06/////////////////////////////////////////////////        
             try {
                 eTimes["eTimes.06"] = u.setBusinessObject(_el, NemsisList, "eTimes.06")
             }
             catch (e) {
                 u.RaiseError("eTimes.06", 1, "eTimes34", e);
             };
-
-            //eTimes.07//////////////////
             try {
                 eTimes["eTimes.07"] = u.setBusinessObject(_el, NemsisList, "eTimes.07")
             }
             catch (e) {
                 u.RaiseError("eTimes.07", 1, "eTimes34", e);
             };
-
-            //eTimes.08//////////////////
             try {
                 eTimes["eTimes.08"] = u.setBusinessObject(_el, NemsisList, "eTimes.08")
             }
             catch (e) {
                 u.RaiseError("eTimes.08", 1, "eTimes34", e);
             };
-            //eTimes.09//////////////////
             try {
                 eTimes["eTimes.09"] = u.setBusinessObject(_el, NemsisList, "eTimes.09")
             }
             catch (e) {
                 u.RaiseError("eTimes.09", 1, "eTimes34", e);
             };
-
-            //eTimes.10//////////////////////////////////////////////////////////////////////
             try {
                 eTimes["eTimes.10"] = u.setBusinessObject(_el, NemsisList, "eTimes.10")
             }
             catch (e) {
                 u.RaiseError("eTimes.10", 1, "eTimes34", e);
             };
-
-            //eTimes.11////////////////////////////////////////////////////////////////
             try {
                 eTimes["eTimes.11"] = u.setBusinessObject(_el, NemsisList, "eTimes.11")
             }
             catch (e) {
                 u.RaiseError("eTimes.11", 1, "eTimes34", e);
             };
-            //eTimes.12///////////////////////////////////////////////////////////////////////        
             try {
                 eTimes["eTimes.12"] = u.setBusinessObject(_el, NemsisList, "eTimes.12")
             }
             catch (e) {
                 u.RaiseError("eTimes.12", 1, "eTimes34", e);
             };
-            //eTimes.13//////////////////////////////////////////////////////////////////////
             try {
                 eTimes["eTimes.13"] = u.setBusinessObject(_el, NemsisList, "eTimes.13")
             }
             catch (e) {
                 u.RaiseError("eTimes.13", 1, "eTimes34", e);
             };
-            //eTimes.14//////////////////
             try {
                 eTimes["eTimes.14"] = u.setBusinessObject(_el, NemsisList, "eTimes.14")
             }
             catch (e) {
                 u.RaiseError("eTimes.14", 1, "eTimes34", e);
             };
-            //eTimes.15//////////////////
             try {
                 eTimes["eTimes.15"] = u.setBusinessObject(_el, NemsisList, "eTimes.15")
             }
             catch (e) {
                 u.RaiseError("eTimes.15", 1, "eTimes34", e);
             };
-            //eTimes.16/////////////////
             try {
                 eTimes["eTimes.16"] = u.setBusinessObject(_el, NemsisList, "eTimes.16")
             }

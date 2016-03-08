@@ -50,9 +50,12 @@ Parse.Cloud.define("getPCR", function (request, response) {
     };
 
     u.setBuild("FetchBusinessObject")
+    /////////////////////////////////////////////////////////////
     var pcr = getPCRObject(_pcrID);
     pcr.then(function (P) {
-        if (P.length == 0) {
+        ///////////////////////////////////////////////////////////
+        if (P.length == 0) 
+        {
             errObj.PCRID = _Call.PCRID
             errObj.Agency = _Call.agencyID
 
@@ -67,7 +70,6 @@ Parse.Cloud.define("getPCR", function (request, response) {
 
             _Call.Summary = [];
             _Call.HasFatal = false
-            _Call.Errors = []
             _Call.Warnings = []
             _Call.PDF = {};
             _Call.HTML = {};
@@ -115,6 +117,9 @@ Parse.Cloud.define("getPCR", function (request, response) {
                         if (typeof P[0].attributes.vehicle.attributes.name !== 'undefined') {
                             _Call.VehicleName = P[0].attributes.vehicle.attributes.name;
                         };
+                        if (typeof P[0].attributes.vehicle.attributes.number !== 'undefined') {
+                            _Call.VehicleNumber = P[0].attributes.vehicle.attributes.number;
+                        };
                         if (typeof P[0].attributes.vehicle.attributes.location !== 'undefined') {
                             _Call.Location = P[0].attributes.vehicle.attributes.location;
                         };
@@ -124,344 +129,374 @@ Parse.Cloud.define("getPCR", function (request, response) {
                     }
                 }
             }
+            else
+            {
+                response.success("Failed Fetch: ELements")
+            }
         };
-
+        /////////////////////////////////////////////////////////////
         var eList = getAll();
         eList.then(function (elements) {
-            x.Genv34.getObj(_pcrID).then(function (rawParse) {
+            console.log("ELEMENTS")
+        ///////////////////////////////////////////////////////////////                
+
+            ///////////////////////////////////////////////////////////////            
+            x.Genv34.getObj(_pcrID).then(function (rawParse)
+            {
+            ///////////////////////////////////////////////////////////////
+
                 if (typeof rawParse.attributes === 'undefined') {
                     response.success("Failed Fetch: rawParse")
                 };
-
+            
                 _Call.PCRID
                 var Summary = [];
                 var Warnings = [];
-                var Errors = [];
                 _Call.Summary = Summary;
                 _Call.HasFatal = false
-                _Call.Errors = Errors;
                 _Call.Warnings = Warnings; //   - stuff like "Response/Enroute interval:  15 minutes.  One day we'll config this stuff.
                 _Call.PDF = {}
                 _Call.HTML = {};
                 _Call.XML = {};
                 _Call.BillFile = {};
-
-
                 u.setBuild("GetAgency");
-                var p = getAgency(_Call.agencyID);
-                p.then(function (results) {
 
-                    if (typeof rawParse.attributes.emsDataSet === 'undefined') {
-                        response.success("Fetch Failure:  emsDataSet")
+
+                if (typeof rawParse.attributes.emsDataSet === 'undefined') {
+                    response.success("Fetch Failure:  emsDataSet")
+                };
+                _Call.PCRObject = rawParse.attributes.emsDataSet;   //Set the Business Entity
+                var ElementList = [];                               //Config List
+                for (var i = 0; i < elements.length ; i++) {
+                    var Element = new Object();
+                    Element.Number = elements[i].attributes.ElementNumber;
+                    Element.ElementName = elements[i].attributes.ElementName;
+                    Element.Usage = elements[i].attributes.Usage;
+                    if (elements[i].attributes.NVList.length > 0) {
+                        Element.NVList = elements[i].attributes.NVList
                     };
-                    _Call.PCRObject = rawParse.attributes.emsDataSet;   //Set the Business Entity
-                    var ElementList = [];                               //Config Lis
-                    for (var i = 0; i < elements.length ; i++) {
-                        var Element = new Object();
-                        Element.Number = elements[i].attributes.ElementNumber;
-                        Element.ElementName = elements[i].attributes.ElementName;
-                        Element.Usage = elements[i].attributes.Usage;
-                        if (elements[i].attributes.NVList.length > 0) {
-                            Element.NVList = elements[i].attributes.NVList
-                        };
-
-                        if (elements[i].attributes.PNList.length > 0) {
-                            Element.PNList = elements[i].attributes.PNList
-                        };
-
-                        if (elements[i].attributes.IsNillable.length > 0) {
-                            Element.IsNillable = elements[i].attributes.IsNillable
-                        };
-                        ElementList.push(Element)//Populate Configurations
+                    if (elements[i].attributes.PNList.length > 0) {
+                        Element.PNList = elements[i].attributes.PNList
                     };
-                    _Call.NEMSISElements = ElementList;                 //Bind Configurations to Business Entity
-                    try {
-                        u.setBuild("BeginGenPCRObject");
-                        var _v3 = v.setTheCall(_Call)                    //Get Attribute List
-                        _Call.Version3 = _v3;                            //Assign Attributes to Business Entity       
-                        //if(_Call._v3.ePatient["ePatient.01"] doesnt exist')                           //Set Patient Object
-                        //if(_Call._v3.eDisposition.DestinationGroup["eDisposition.02"] doesnt exist')  //Set Disposition Object
-                        _Call.ObjectList = _v3.RawPCRObjects;
-                    }
-                    catch (e) {
-                        u.RaiseError("Failed generating PCR Object", 0, _Call.agencyID + "||" + _Call.PCRID, e);
+                    if (elements[i].attributes.IsNillable.length > 0) {
+                        Element.IsNillable = elements[i].attributes.IsNillable
                     };
+                    ElementList.push(Element)//Populate Configurations
+                };
+                _Call.NEMSISElements = ElementList;
+                try {
+                    u.setBuild("BeginGenPCRObject");
 
-                    //try {
-                    u.setBuild("SetCallProperties");
-                    var props = v3CT.setV3English(_Call);             //Reporting Payload
-                    _Call.Props = props;
-                    _Call.PCRID = _pcrID;
-                    rules.setCallRules(_Call);
+                    var _v3 = v.setTheCall(_Call)                    //Get Attribute List
+                    _Call.Version3 = _v3;                            //Assign Attributes to Business Entity       
+                    //if(_Call._v3.ePatient["ePatient.01"] doesnt exist')                           //Set Patient Object
+                    //if(_Call._v3.eDisposition.DestinationGroup["eDisposition.02"] doesnt exist')  //Set Disposition Object
+                    _Call.ObjectList = _v3.RawPCRObjects;
+                }
+                catch (e) {
+                    u.RaiseError("Failed generating PCR Object", 0, _Call.agencyID + "||" + _Call.PCRID, e);
+                };
 
-                    var CallE = u.getCallErrors();
-                    var TimeE = u.getTimeErrors();
-                    var WarningsE = u.getWarnings();
-                    
-                    if (TimeE.length > 0) {
-                        _Call.TimeErrors = TimeE;
-                    };
-                    if (WarningsE.length > 0) {
-                        _Call.Warnings = WarningsE;
-                    };
+                u.setBuild("SetCallProperties");
+                var props = v3CT.setV3English(_Call);             //Reporting Payload
 
-
-                    _Call.Errors = CallE
-
-
-                    var o1 = new Array();
-                    o1 = u.getFatalErrors();        //If the call is well-formed, build it.
-
-                    if (o1.length === 0) {
-                        var HasFatal = false;
-                    }
-                    else {
-                        var HasFatal = true;
-                        _Call.FATALERRORS = o1;
-                    };
-
-                    //try {
-                        var _Summary = summary.setCallSummary(_Call)
-                        _Call.Summary = _Summary;
-                    //}
-                    //catch (e) {
-                    //    u.RaiseError("Failed generating Summary Object", 0, _Call.agencyID + "||" + _Call.PCRID, e);
-                    //};
-
-                    try {
-                        var htmltext = ht.setHTML(_Call)                //AsIs HTML Document
-                        _Call.htmltext = htmltext;
-                        var htmlBytes = htmltext.getBytes();
-                        _Call.HTML = htmlBytes;
-                    }
-                    catch (e) {
-                        u.RaiseError("Failed generating HTML Reporting Object", 0, _Call.agencyID + "||" + _Call.PCRID, e);
-                    };
-
-                    var p = getAgencyRigs(_Call.agencyID)  //Stamp Agency Rig Geo at time of call
-                    p.then(function (allRigs) {
-
-                        _Call.AllVehicles = allRigs;
-                        //if TheCall.PatientID is null or not exist, check and set
-                        //var patId = setPatient.setCallMetrix(_Call)  // Keep track of the Call throughout workflow
-                        //callM.then(function (ddr) {
-
-                        var callM = callMetrix.setCallMetrix(_Call)  // Keep track of the Call throughout workflow                                                                                     
-
-                        //////////////////////////////////////////////
-                        ////////////////////////////////////////////                                    
-                        var p1 = saveHTMLClass(_Call);
-                        p1.then(function () {
-                            var status = _Call.status
-                            status = "INCOMPLETE"
-                            if (status !== "COMPLETE") {
-                                try {
-                                    var dc = pdf.NewPDF(_Call);
-                                    _Call.PDF = dc;
-                                }
-                                catch (e) {
-                                    u.RaiseError("Failed generating PDF ", 0, _Call.agencyID + "||" + _Call.PCRID, e);
-                                };
-
-                                try {
-                                    _Call.Version2 = v2Object;
-                                    var v2Object = v2.setV2Call(_Call);
-                                    var v2XML = ver2XML.setV2XML(v2Object);
-                                    _Call.v2XML = v2XML;
-                                    var version2XMLByteArray = v2XML.getBytes();
-                                    _Call.XML = version2XMLByteArray;
-                                }
-                                catch (e) {
-                                    u.RaiseError("Failed generating Verson 2 Object", 0, _Call.agencyID + "||" + _Call.PCRID, e);
-                                }
+                _Call.Props = props;
+                _Call.PCRID = _pcrID;
+                rules.setCallRules(_Call);
+                _Call.Errors = u.getCallErrors();
 
 
-                                /////////////////////////////////////////////////////////////////////
-                                /////////////////////////////////////////////////////////////////////
-                                //From here, we only process Good Calls
+                status = "INCOMPLETE";
+                // var o1 = new Array();
+                // o1 = u.getFatalErrors();        //If the call is well-formed, build it.
+                // var status = "INCOMPLETE"
+                //if (o1.length === 0) {
+                //    var HasFatal = false;
+                //    status = "COMPLETE"
+                //}
+                //else
+                //{
+                //    var HasFatal = true;
+                //    _Call.FATALERRORS = o1;
+                //};
 
-                                var p = SaveThePDF(_Call);
-                                p.then(function () {
+                try {
+                    var _Summary = summary.setCallSummary(_Call)
+                    _Call.Summary = _Summary;
+                }
+                catch (e) {
+                    u.RaiseError("Failed generating Summary Object", 0, _Call.agencyID + "||" + _Call.PCRID, e);
+                };
 
-                                    if (typeof _Call.XML !== 'undefined') {
-                                        var cXML = SaveTheXML(_Call);
-                                        cXML.then(function (Txml) {
-                                            u.setBuild("EndTime");
-
-                                            var y = sendIt(_Call)
-                                            y.then(function (theMail) {
-                                                var tom = sendToTom(_Call)
-                                                tom.then(function (theTom) {
-                                                    _Call.Sent = "True";
-                                                    var cMet = crewMetrix.setCrewMetrix(_Call);
-                                                    var yy = getCrewName(_Call.CrewIDS)
-                                                    yy.then(function (cn) {
-
-                                                        if (typeof cGroup === 'undefined') {
-                                                            var cGroup = [];
-                                                        };
-                                                        for (var i = 0; i < cn.length ; i++) {
-                                                            var name = ""
-                                                            name = cn[i].attributes.firstName + " " + cn[i].attributes.lastName
-                                                            cGroup.push(name)
-                                                        };
-                                                        _Call.CrewNames = cGroup.slice(0);
-                                                        var rt = getRoute(_Call)
-                                                        rt.then(function (rout) {
-                                                            var PCRRoute = []
-                                                            var dis = 0;
-                                                            var a = Parse.GeoPoint;
-                                                            var b = Parse.GeoPoint;
-                                                            if (rout && rout.length > 0) {
-                                                                for (var i = 0; i < rout.length ; i++) {
-                                                                    var routeDetail = {};
-                                                                    routeDetail.name = i.toString()
-                                                                    routeDetail.location = rout[i].attributes.geoPoint
-                                                                    PCRRoute.push(routeDetail)
-                                                                    if (i == 0) {
-                                                                        a = rout[0].attributes.geoPoint
-                                                                    }
-                                                                    else {
-                                                                        b = rout[i].attributes.geoPoint
-                                                                        var s = a.milesTo(b)
-                                                                        dis = dis + s;
-                                                                        a = rout[i].attributes.geoPoint
-                                                                    }
-                                                                    var ts = ""
-                                                                    if (typeof rout[i].attributes.timestamp != 'undefined') {
-                                                                        ts = rout[i].attributes.timestamp;
-                                                                    }
-                                                                    var lat = ""
-                                                                    if (typeof rout[i].attributes.geoPoint.latitude != 'undefined') {
-                                                                        lat = rout[i].attributes.geoPoint.latitude;
-                                                                    };
-                                                                    var lon = ""
-                                                                    if (typeof rout[i].attributes.geoPoint.longitude != 'undefined') {
-                                                                        lon = rout[i].attributes.geoPoint.longitude;
-                                                                    };
-                                                                    var speed = "";
-                                                                    if (typeof rout[i].attributes.speed != 'undefined') {
-                                                                        speed = rout[i].attributes.speed;
-                                                                    }
-                                                                    var bat = "";
-                                                                    if (typeof rout[i].attributes.batteryLevel != 'undefined') {
-                                                                        bat = rout[i].attributes.batteryLevel;
-                                                                    };
-                                                                    var alt = "";
-                                                                    if (typeof rout[i].attributes.altitude != 'undefined') {
-                                                                        alt = rout[i].attributes.altitude;
-                                                                    }
-                                                                    var rig = "";
-                                                                    if (typeof rout[i].attributes.vehicle.id != 'undefined');
-                                                                    {
-                                                                        rig = rout[i].attributes.vehicle.id;
-                                                                    }
-
-                                                                    var st = ts + "|" + lat + ":" + lon + "|" + speed + "|" + bat + "|" + alt + " " + dis + " " + rig;
-                                                                    if (typeof EncR === 'undefined') {
-                                                                        var EncR = [];
-                                                                    };
-                                                                    EncR.push(st)
-                                                                }
-                                                            };
-                                                            _Call["Route"] = EncR.slice(0);
-                                                            _Call.EncouterRoute = PCRRoute;
-                                                            _Call["AMiles"] = dis;
-                                                            try {
-
-                                                                _Call.XMLHtml = "<![CDATA[" + htmltext + "]]>";
-                                                                var billFile = Bill.setBillFile(_Call);
-                                                                _Call.BillFile = billFile;
-                                                            }
-                                                            catch (e) {
-                                                                u.RaiseError("Failed generating BillFile", 0, _Call.agencyID + "||" + _Call.PCRID, e);
-                                                            };
-
-                                                            _Call.WellFormed = true;
-
-
-                                                            response.success(_Call);
-
-
-
-
-
-                                                        }, function (error) {
-
-                                                        });
-
-                                                        //_Call.WellFormed = true;
-                                                        //response.success(_Call)
-                                                    }, function (error) {
-                                                        _Call.WellFormed = true;
-                                                        response.success(_Call)
-                                                    });
-
-                                                }, function (error) {
-                                                    response.success(_Call)
-                                                });
-
-                                            }, function (error) {
-                                            });
-                                        });
-                                    };
-
-                                }, function (error) {
-                                    var e = mailError("SaveHTML", errObj)
-                                    e.then(function (er) {
-                                        response.success(er)
-                                    });
-                                    response.success(_Call)
-                                });
-
-                            }
-                            else {
-                                response.success(_Call)
-                            }
-                        });
-
-                    }, function (error) {
-                        var e = mailError("GetAgencyRigs", errObj)
-                        e.then(function (er) {
-                            response.success(er)
-                        });
-                        response.success("Error: Agency Rigs " + _Call.agencyID + "||" + _Call.PCRID)
-                    });
-                }, function (error) {
-                    var e = mailError("GetElements", errObj)
+                var htmltext = ht.setHTML(_Call)                //AsIs HTML Document
+                if (htmltext == null)
+                {
+                    var e = mailError("ht.setHtml Failure", errObj)
                     e.then(function (er) {
-                        response.success(er)
-                    });
-                    response.success("Elements Errors")
-                });
-            }, function (error) {
-                var e = mailError("getAgency", errObj)
-                e.then(function (er) {
-                    response.success(er)
-                });
-                response.success("getAgency Errors")
-            });
+                        response.success(_Call)
+                    });                    
+                }
+                else
+                {
+                    _Call.htmltext = htmltext;
+                    var htmlBytes = htmltext.getBytes();
+                    _Call.HTML = htmlBytes;
 
+                    try {
+                        _Call.XMLHtml = "<![CDATA[" + htmltext + "]]>";
+                        var billFile = Bill.setBillFile(_Call);
+                        _Call.BillFile = billFile;
+                    }
+                    catch (e) {
+                        u.RaiseError("Failed generating BillFile", 0, _Call.agencyID + "||" + _Call.PCRID, e);
+                    };
+
+                    var shift = getShift(_Call.vehicleId);
+                    shift.then(function (CrewShift) 
+                    {
+                        _Call.CrewShift = CrewShift;
+                        if (typeof CrewShift[0] !== 'undefined')
+                        {
+                            if (typeof CrewShift[0].attributes !== 'undefined')
+                            {
+                                if (typeof CrewShift[0].attributes.crew !== 'undefined')
+                                {
+
+                                }
+                            }
+                        }
+
+                        var p = getAgencyRigs(_Call.agencyID)  //Stamp Agency Rig Geo at time of call
+                        p.then(function (allRigs) {
+
+                            _Call.AllVehicles = allRigs;
+                                            //        //if TheCall.PatientID is null or not exist, check and set
+                                            //        //var patId = setPatient.setCallMetrix(_Call)  // Keep track of the Call throughout workflow
+                                            //        //callM.then(function (ddr) {
+                                                                       var callM = callMetrix.setCallMetrix(_Call)  // Keep track of the Call throughout workflow                                                                                     
+
+                                            //////////////////////////////////////////////
+                                            ////////////////////////////////////////////                                    
+                                            var p1 = saveHTMLClass(_Call);
+                                            p1.then(function () {
+                    //                            ////            var status = _Call.status
+
+                    //                            //////////////////////////////////////////////////////////////////////////////////////////
+                    //                            //////////////////////////////////////////////////////////////////////////////////////////
+                    //                            //////////////////////////////////////////////////////////////////////////////////////////
+                    //                            //////////////////////////////////////////////////////////////////////////////////////////
+                    //                            status == "INCOMPLETE";
+                    //                            //////////////////////////////////////////////////////////////////////////////////////////
+                    //                            //////////////////////////////////////////////////////////////////////////////////////////
+                    //                        //////////////////////////////////////////////////////////////////////////////////////////
+                    //                            //////////////////////////////////////////////////////////////////////////////////////////
+                    //                            if (status === "COMPLETE") {
+                    //                                try {
+                    //                                    var dc = pdf.NewPDF(_Call);
+                    //                                    _Call.PDF = dc;
+                    //                                }
+                    //                                catch (e) {
+                    //                                    u.RaiseError("Failed generating PDF ", 0, _Call.agencyID + "||" + _Call.PCRID, e);
+                    //                                };
+
+                    //                                try {
+                    //                                    _Call.Version2 = v2Object;
+                    //                                    var v2Object = v2.setV2Call(_Call);
+                    //                                    var v2XML = ver2XML.setV2XML(v2Object);
+                    //                                    _Call.v2XML = v2XML;
+                    //                                    var version2XMLByteArray = v2XML.getBytes();
+                    //                                    _Call.XML = version2XMLByteArray;
+                    //                                }
+                    //                                catch (e) {
+                    //                                    u.RaiseError("Failed generating Verson 2 Object", 0, _Call.agencyID + "||" + _Call.PCRID, e);
+                    //                                }
+
+
+                    //                                /////////////////////////////////////////////////////////////////////
+                    //                                /////////////////////////////////////////////////////////////////////
+                    //                                //From here, we only process Good Calls
+
+                    //                                var p = SaveThePDF(_Call);
+                    //                                p.then(function () {
+
+                    //                                    if (typeof _Call.XML !== 'undefined') {
+                    //                                        var cXML = SaveTheXML(_Call);
+                    //                                        cXML.then(function (Txml) {
+                    //                                            u.setBuild("EndTime");
+
+                    //                                            var y = sendIt(_Call)
+                    //                                            y.then(function (theMail) {
+                    //                                                var tom = sendToTom(_Call)
+                    //                                                tom.then(function (theTom) {
+                    //                                                    _Call.Sent = "True";
+                    //                                                    var cMet = crewMetrix.setCrewMetrix(_Call);
+                    //                                                    var yy = getCrewName(_Call.CrewIDS)
+                    //                                                    yy.then(function (cn) {
+
+                    //                                                        if (typeof cGroup === 'undefined') {
+                    //                                                            var cGroup = [];
+                    //                                                        };
+                    //                                                        for (var i = 0; i < cn.length ; i++) {
+                    //                                                            var name = ""
+                    //                                                            name = cn[i].attributes.firstName + " " + cn[i].attributes.lastName
+                    //                                                            cGroup.push(name)
+                    //                                                        };
+                    //                                                        _Call.CrewNames = cGroup.slice(0);
+                    //                                                        var rt = getRoute(_Call)
+                    //                                                        rt.then(function (rout) {
+                    //                                                            var PCRRoute = []
+                    //                                                            var dis = 0;
+                    //                                                            var a = Parse.GeoPoint;
+                    //                                                            var b = Parse.GeoPoint;
+                    //                                                            if (rout && rout.length > 0) {
+                    //                                                                for (var i = 0; i < rout.length ; i++) {
+                    //                                                                    var routeDetail = {};
+                    //                                                                    routeDetail.name = i.toString()
+                    //                                                                    routeDetail.location = rout[i].attributes.geoPoint
+                    //                                                                    PCRRoute.push(routeDetail)
+                    //                                                                    if (i == 0) {
+                    //                                                                        a = rout[0].attributes.geoPoint
+                    //                                                                    }
+                    //                                                                    else {
+                    //                                                                        b = rout[i].attributes.geoPoint
+                    //                                                                        var s = a.milesTo(b)
+                    //                                                                        dis = dis + s;
+                    //                                                                        a = rout[i].attributes.geoPoint
+                    //                                                                    }
+                    //                                                                    var ts = ""
+                    //                                                                    if (typeof rout[i].attributes.timestamp != 'undefined') {
+                    //                                                                        ts = rout[i].attributes.timestamp;
+                    //                                                                    }
+                    //                                                                    var lat = ""
+                    //                                                                    if (typeof rout[i].attributes.geoPoint.latitude != 'undefined') {
+                    //                                                                        lat = rout[i].attributes.geoPoint.latitude;
+                    //                                                                    };
+                    //                                                                    var lon = ""
+                    //                                                                    if (typeof rout[i].attributes.geoPoint.longitude != 'undefined') {
+                    //                                                                        lon = rout[i].attributes.geoPoint.longitude;
+                    //                                                                    };
+                    //                                                                    var speed = "";
+                    //                                                                    if (typeof rout[i].attributes.speed != 'undefined') {
+                    //                                                                        speed = rout[i].attributes.speed;
+                    //                                                                    }
+                    //                                                                    var bat = "";
+                    //                                                                    if (typeof rout[i].attributes.batteryLevel != 'undefined') {
+                    //                                                                        bat = rout[i].attributes.batteryLevel;
+                    //                                                                    };
+                    //                                                                    var alt = "";
+                    //                                                                    if (typeof rout[i].attributes.altitude != 'undefined') {
+                    //                                                                        alt = rout[i].attributes.altitude;
+                    //                                                                    }
+                    //                                                                    var rig = "";
+                    //                                                                    if (typeof rout[i].attributes.vehicle.id != 'undefined');
+                    //                                                                    {
+                    //                                                                        rig = rout[i].attributes.vehicle.id;
+                    //                                                                    }
+
+                    //                                                                    var st = ts + "|" + lat + ":" + lon + "|" + speed + "|" + bat + "|" + alt + " " + dis + " " + rig;
+                    //                                                                    if (typeof EncR === 'undefined') {
+                    //                                                                        var EncR = [];
+                    //                                                                    };
+                    //                                                                    EncR.push(st)
+                    //                                                                }
+                    //                                                            };
+                    //                                                            _Call["Route"] = EncR.slice(0);
+                    //                                                            _Call.EncouterRoute = PCRRoute;
+                    //                                                            _Call["AMiles"] = dis;
+
+
+                    //                                                            _Call.WellFormed = true;
+                    //                                                            _Call.HasFatal = false;
+                    //                                                            //////////////////////////////////////////
+                    response.success(_Call);
+                    //                                                            //////////////////////////////////////////
+
+                    //                                                        }, function (error) {
+                    //                                                        });
+                    //                                                        //                        //_Call.WellFormed = true;
+                    //                                                        //                        //response.success(_Call)
+                    //                                                    }, function (error) {
+                    //                                                        _Call.WellFormed = true;
+                    //                                                        response.success(_Call)
+                    //                                                    });
+
+                    //                                                }, function (error) {  //Set to tom
+                    //                                                    response.success(_Call)
+                    //                                                });
+
+                    //                                            }, function (error) {
+                    //                                            });
+                    //                                        });
+                    //                                    };
+
+                    //                                    //}, function (error) {
+                    //                                    var e = mailError("SaveHTML", errObj)
+                    //                                    e.then(function (er) {
+                    //                                        response.success(er)
+                    //                                    });
+                    //                                    response.success(_Call)
+                    //                                });
+
+                    //                            }
+                    //                            else {
+                    //                                response.success(_Call)
+                    //                            }
+                    //                        });
+
+                    //                    }, function (error) {
+                    //                        var e = mailError("GetAgencyRigs", errObj)
+                    //                        e.then(function (er) {
+                    //                            response.success(er)
+                    //                        });
+                    //                        response.success("Error: Agency Rigs " + _Call.agencyID + "||" + _Call.PCRID)
+                    //                    });
+
+                    //                    var e = mailError("Get Rigs", errObj)
+                    //                    e.then(function (er) {
+
+                    //                    });
+                    //                }
+                    //                else {
+                    //                    var e = mailError("Form Property", errObj)
+                    //                    e.then(function (er) {
+                    //                        response.success("Error: Property Formation Error " + _Call.agencyID + "||" + _Call.PCRID)
+                                        }); //
+                    //                };// no HTML
+                    //            }, function (error) {
+                    //                var e = mailError("GetNEMSISElements", errObj)
+                    //                e.then(function (er) {
+                    //                        response.success("Error: NEMSIS Element List " + er)
+                                    });  //Get Agency Rigs
+
+                            });//Get Crew
+                
+                }// If HTMLText is Not Null
+                /////////////////////////////////////////////////////
+            });//GetPCR
         }, function (error) {
+            
             var e = mailError("getElements", errObj)
             e.then(function (er) {
-                response.success(er)
+                response.success(_Call)
             });
-            response.success("getElements Errors")
-        });
-    }, function (error) {
+            /////////////////////////////////////////////////////
+        });//getAll();
+        }, function (error) {
         var e = mailError("getPCR", errObj)
         e.then(function (er) {
             response.success(er)
         });
-        response.success("getPCR Errors")
+    ///////////////////////////////////////////////////////////////////////////////
+    })///getPCR
+}, function (error) {
+    var e = mailError("getPCR", errObj)
+    e.then(function (er) {
+        response.success(er)
     });
-
 });
 
 
-var SaveTheXML = function (tc)
-    {
+var SaveTheXML = function (tc) {
     var file = new Parse.File(tc.PCRID + ".XML", tc.XML);
     return file.save().then(function () {
         var TheXML = Parse.Object.extend("XMLClass");
@@ -471,8 +506,7 @@ var SaveTheXML = function (tc)
         txml.save()
     })
 };
-var SaveThePDF = function (TheCall)
-    {
+var SaveThePDF = function (TheCall) {
     var file = new Parse.File(TheCall.PCRID + ".PDF", TheCall.PDF);
     return file.save().then(function () {
         var ThePCR = Parse.Object.extend("PDFClass");
@@ -512,16 +546,6 @@ var getHTMLObject = function (pcrId) {
         error: function (error) { }
     });
 };
-var getAgency = function () {
-    var Agency = Parse.Object.extend("Agency");
-    var query = new Parse.Query(Agency);
-    query.equalTo("DatasetName", "EMSDataSet");
-    query.limit(1000)
-    return query.find({
-        success: function (results) { },
-        error: function (error) { }
-    });
-};
 String.prototype.getBytes = function () {
     var bytes = [];
     for (var i = 0; i < this.length; ++i) {
@@ -548,36 +572,35 @@ var sendIt = function (tc) {
     });
 };
 var mailError = function (from, err) {
-    console.log(from)
-    console.log("err")
-    console.log(err)
-    var pcr = ""
-    var status = "";
-    var agency = "";
-    var username = "";
-    var vehicle = "";
-
-    if (typeof err.pcrID != 'undefined') {
-        pcr = err.pcrID
-    };
-    if (typeof err.status != 'undefined') {
-        status = err.status
-    }
-    if (typeof err.agencyID != 'undefined') {
-        agency = err.agency
-    }
-    if (typeof err.userName != 'undefined') {
-        username = err.username
-    }
-    if (typeof err.vehicleId != 'undefined') {
-        vehicle = err.vehicle
-    }
-    client.initialize('mg.datainmotionllc.com', 'key-dd6c965d8a32b0a4db474a678e02de87');
     
+    //var pcr = ""
+    //var status = "";
+    //var agency = "";
+    //var username = "";
+    //var vehicle = "";
 
-    var etext = "PCR: " + pcr + " Call Status: " + status + " Agency: " + agency +  " User: " + username + " Vehicle: " + vehicle
+    //if (typeof err.pcrID != 'undefined') {
+    //    pcr = err.pcrID
+    //};
+    //if (typeof err.status != 'undefined') {
+    //    status = err.status
+    //}
+    //if (typeof err.agencyID != 'undefined') {
+    //    agency = err.agencyID
+    //}
+    //if (typeof err.userName != 'undefined') {
+    //    username = err.username
+    //}
+    //if (typeof err.vehicleId != 'undefined') {
+    //    vehicle = err.vehicleId
+    //}
+    //client.initialize('mg.datainmotionllc.com', 'key-dd6c965d8a32b0a4db474a678e02de87');
+
+
+    //var etext = "PCR: " + pcr + " Call Status: " + status + " Agency: " + agency + " User: " + username + " Vehicle: " + vehicle
+    var etext = "Test"
     return client.sendEmail({
-        to: 'bouvierneil@hotmail.com',        
+        to: 'bouvierneil@hotmail.com',
         from: "ErrorMail@DataInMotion.com",
         subject: from,
         text: etext
@@ -612,8 +635,7 @@ var sendToTom = function (tc) {
     })
 };
 var saveHTMLClass = function (TheCall) {
-    console.log("IN HTML")
-    console.log(TheCall.HTML)
+
     var _htmlID = null;
     var htm = Parse.Object.extend("HTMLClass");
     var query = new Parse.Query(htm)
@@ -630,7 +652,7 @@ var saveHTMLClass = function (TheCall) {
                 }
             },
             error: function (user, error) {
-                console.warn('Error '  + error.message);
+                console.warn('Error ' + error.message);
             }
         }).then(
     function (object) {
@@ -640,9 +662,8 @@ var saveHTMLClass = function (TheCall) {
             ht.set("objectId", _htmlID);
         };
 
-        console.log(TheCall.HTML)
         var file = new Parse.File(TheCall.PCRID + ".HTML", TheCall.HTML);
-        return file.save().then(function () {                        
+        return file.save().then(function () {
             ht.set("PCRID", TheCall.PCRID);
             ht.set("Complaint", TheCall.Props["DispatchComplaint"]);
             ht.set("HTML", file);
@@ -650,7 +671,7 @@ var saveHTMLClass = function (TheCall) {
         });
         return null
     }
-    
+
     ,
     function (error) {
         console.log('Error ' + error.code + ': ' + error.message);
@@ -725,7 +746,7 @@ var getAgencyRigs = function (agencyId) {
         error: function (error) { }
     });
 };
-var setPatient= function (theParam) {
+var setPatient = function (theParam) {
     var cmID = null;
     var pat = Parse.Object.extend("Patient");
     var query = new Parse.Query(pat)
@@ -777,42 +798,33 @@ var setPatient= function (theParam) {
             }
         });
 };
-Parse.Cloud.define("getPatient", function (request, response)
-{
-    if (typeof request.params.SearchKey !== 'undefined')
-    {
-        if (request.params.SearchKey !== '')
-        {
-            if ((typeof theParam.SSN != 'undefined') && (theParam.SSN != ''))
-            {
+Parse.Cloud.define("getPatient", function (request, response) {
+    if (typeof request.params.SearchKey !== 'undefined') {
+        if (request.params.SearchKey !== '') {
+            if ((typeof theParam.SSN != 'undefined') && (theParam.SSN != '')) {
                 var SSN = theParam.SSN
             };
-            if ((typeof theParam.lName != 'undefined') && (theParam.lName != ''))
-            {
+            if ((typeof theParam.lName != 'undefined') && (theParam.lName != '')) {
                 var lName = theParam.LastName
             };
-            if ((typeof theParam.fName != 'undefined') && (theParam.fName != ''))
-            {
+            if ((typeof theParam.fName != 'undefined') && (theParam.fName != '')) {
                 var fName = theParam.FirstName
             };
-            if ((typeof theParam.DOB != 'undefined') && (theParam.DOB != ''))
-            {
+            if ((typeof theParam.DOB != 'undefined') && (theParam.DOB != '')) {
                 var DOB = theParam.DOB
             }
-            if ((typeof theParam.Phone != 'undefined') && (theParam.Phone != ''))
-            {
+            if ((typeof theParam.Phone != 'undefined') && (theParam.Phone != '')) {
                 var Phone = theParam.Phone
             }
         }
     }
     var cm = Parse.Object.extend("Patient");
     var query = new Parse.Query(cm);
-    query.equalTo("ssn", SSN); 
+    query.equalTo("ssn", SSN);
     query.equalTo("active", true);
     query.descending()
     return query.find({
-        success: function (results)
-        {
+        success: function (results) {
             response.success(results)
         },
         error: function (error) { }
@@ -831,7 +843,6 @@ var getCrewName = function (id) {
             aa.push(id[i].objectId)
         }
     };
-    console.log("GetGrewNames")
     var _user = Parse.Object.extend("User");
     var query = new Parse.Query(_user);
     //var sa = ["h6Skan9mV0", "rFf2SWLm60"]
@@ -847,7 +858,7 @@ var getCrewName = function (id) {
     });
 };
 var getRoute = function (call) {
-
+    console.log("IN GET ROUTE     WER")
     var from = new Date(call.Props["EncounterBeginTime"]);
     var to = new Date(call.Props["EncounterEndTime"]);
     var rig = call.vehicleId
@@ -867,7 +878,106 @@ var getRoute = function (call) {
         success: function (results) {
         },
         error: function (error) {
-            console.log("ERRRRRRRR")
+         
         }
     });
 };
+
+var getShift = function (vehicleID)
+{
+    var shift = Parse.Object.extend("Shift");
+    var query = new Parse.Query(shift);
+    var Shift = {};
+    var cr = [];
+    query.doesNotExist("endDate");
+    query.descending("startDate");
+    query.equalTo("vehicle",
+    {
+        __type: "Pointer",
+        className: "Vehicle",
+        objectId: vehicleID
+    });
+
+    query.include("crew")
+    query.include("vehicle")
+    query.find({
+        success: function (results) {
+            if (results && results.length > 0) {
+                console.log(results)
+                if (typeof results[0].attributes !== 'undefined') {
+                    if (typeof results[0].attributes.vehicle !== 'undefined') {
+                        if (typeof results[0].attributes.vehicle !== 'undefined') {
+                            if (typeof results[0].attributes.vehicle.attributes !== 'undefined') {
+                                if (typeof results[0].attributes.vehicle.attributes.name !== 'undefined') {
+                                    Shift.VehicleName = results[0].attributes.vehicle.attributes.name
+                                };
+                                if (typeof results[0].attributes.vehicle.attributes.number !== 'undefined') {
+                                    Shift.VehicleNumber = results[0].attributes.vehicle.attributes.number
+                                };
+                                if (typeof results[0].attributes.vehicle.attributes.installation !== 'undefined') {
+                                    Shift.Installation = results[0].attributes.vehicle.attributes.installation.id
+                                }
+                            }
+                        };
+                        if (typeof results[0].attributes.crew !== 'undefined') {
+                            if (results[0].attributes.crew.length !== 0) {
+                                var c = {}
+
+                                for (var ii = 0; ii < results[0].attributes.crew.length ; ii++) {
+                                    if (typeof results[0].attributes.crew[ii].attributes !== 'undefined') {
+                                        if (typeof results[0].attributes.crew[ii].attributes.levelDescription !== 'undefined') {
+                                            c.level = results[0].attributes.crew[ii].attributes.levelDescription
+                                        };
+
+                                        if (typeof results[0].attributes.crew[ii].attributes.roleDescriptions !== 'undefined') {
+                                            c.Roles = results[0].attributes.crew[ii].attributes.roleDescriptions
+                                        };
+                                    }
+                                    var _user = Parse.Object.extend("User");
+                                    var query = new Parse.Query(_user);
+                                    console.log("Results0")
+                                    console.log(results[0].attributes.crew[ii].attributes.userId)
+                                    query.equalTo("objectId", results[0].attributes.crew[ii].attributes.userId)
+                                    query.include("dPersonnel")
+                                    query.find({
+                                        success: function (r) {
+                                            console.log(r)
+                                            if (r && r.length !== 0) {
+
+                                                c.lastName = "";
+                                                c.firstName = "";
+                                                c.activeStatus = "";
+                                                if (typeof r[0].attributes.lastName != 'undefined') {
+                                                    c.lastName = r[0].attributes.lastName;
+                                                }
+                                                if (typeof r[0].attributes.firstName != 'undefined') {
+                                                    c.firstName = r[0].attributes.firstName;
+                                                }
+                                                if (typeof r[0].attributes.active != 'undefined') {
+                                                    c.activeStatus = r[0].attributes.active;
+                                                }
+                                                cr.push(c)
+                                                Shift.Crew = cr;
+                                                 //Shift
+                                                console.log(Shift)
+                                            }
+                                        },
+                                        error: function (error) {
+                                            console.log("ERRRRRRRR")
+                                        }
+                                    });
+                                }
+                            }
+                        }
+                    }
+
+                }
+            }
+
+        },
+
+        error: function (error) {
+        }
+
+    });
+}

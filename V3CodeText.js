@@ -31,13 +31,13 @@ exports.setV3English = function (TheCall) {
     };
 
 
-    if (typeof BO.eRecord !== 'undefined') {
-        var obj = {};
-        var obj = BO.eRecord;
-        if (typeof obj["eRecord.01"] !== 'undefined') {
-            Props["PCRID"] = setPropsect(obj["eRecord.01"]);
-        }
-    };
+    //if (typeof BO.eRecord !== 'undefined') {
+    //    var obj = {};
+    //    var obj = BO.eRecord;
+    //    if (typeof obj["eRecord.01"] !== 'undefined') {
+    //        Props["PCRID"] = setPropsect(obj["eRecord.01"]);
+    //    }
+    //};
 
     if (typeof BO.eDispatch !== 'undefined') {
         var obj = {};
@@ -76,6 +76,7 @@ exports.setV3English = function (TheCall) {
             Props["DispatchPriority"] = setPropsect(obj["eDispatch.05"]);
         }
     };
+
     if (typeof BO.eDisposition !== 'undefined') {
         var obj = {};
         var obj1 = BO.eDisposition;
@@ -98,9 +99,9 @@ exports.setV3English = function (TheCall) {
                 Props["DispoToAddress"] = Props["DispoToAddress"] + setPropsect(obj["eDisposition.05"]);
             };
 
-            if (typeof obj["eDisposition.06"] !== 'undefined') {
-                Props["DispoCounty"] = setPropsect(obj["eDisposition.06"]);
-            };
+            //if (typeof obj["eDisposition.06"] !== 'undefined') {
+            //    Props["DispoCounty"] = setPropsect(obj["eDisposition.06"]);
+            //};
             if (typeof obj["eDisposition.07"] !== 'undefined') {
                 Props["DispoZip"] = setPropsect(obj["eDisposition.07"]);
                 Props["DispoToAddress"] = Props["DispoToAddress"] + setPValue(obj["eDisposition.07"]);
@@ -428,20 +429,22 @@ exports.setV3English = function (TheCall) {
                 Events.push(Event);
             }
         };
-        if (obj["eTimes.05"].IsNull == false) {
-            var o = setPValue(obj["eTimes.05"]);
-            if (o !== "") {
-                var iii = new Date(o);
-                var tt = mom(iii)
-                Props["TimeEnRoute"] = mom(tt).subtract({ 'hours': timeZoneOffset }).format("HH:mm:ss")
-                var Event = new Object()
-                Event.Time = Props["TimeEnRoute"];
-                Event.Name = "En Route";
-                var v = [];
-                v.push("En Route")
-                Event.Value = v;
-                EventLen = EventLen + v.length;
-                Events.push(Event);
+        if (typeof obj["eTimes.05"] !== 'undefined') {
+            if (obj["eTimes.05"].IsNull == false) {
+                var o = setPValue(obj["eTimes.05"]);
+                if (o !== "") {
+                    var iii = new Date(o);
+                    var tt = mom(iii)
+                    Props["TimeEnRoute"] = mom(tt).subtract({ 'hours': timeZoneOffset }).format("HH:mm:ss")
+                    var Event = new Object()
+                    Event.Time = Props["TimeEnRoute"];
+                    Event.Name = "En Route";
+                    var v = [];
+                    v.push("En Route")
+                    Event.Value = v;
+                    EventLen = EventLen + v.length;
+                    Events.push(Event);
+                }
             }
         };
         if (typeof obj["eTimes.06"] !== 'undefined') {
@@ -631,8 +634,10 @@ exports.setV3English = function (TheCall) {
                 Events.push(Event);
             }
         }
-    };
-    if (typeof BO.eResponse !== 'undefined') {
+    }
+    ;
+    if (typeof BO.eResponse !== 'undefined')
+    {
         var obj = {};
         obj = BO.eResponse;
         if (typeof obj.AgencyGroup !== 'undefined') {
@@ -2373,101 +2378,14 @@ exports.setV3English = function (TheCall) {
 
     var b = r.match(/(.{1,120})/g);
 
-    Props["Narrative"] = b
+    Props["Narrative"] = b;
 
+    var d = sortBy(Events, { prop: "Time" });
+    d.Count = EventLen;
+    Props.Events = d;
 
-
-    //var EncR = [];
-    //Props["Route"] = EncR;
-    //if (typeof TheCall.CrewIDS !== 'undefined') {
-        
-    //    var yy = getCrewName(TheCall.CrewIDS)
-    //    yy.then(function (cn) {
-        
-    //        if (typeof cGroup === 'undefined') {
-    //            var cGroup = [];
-    //        };
-    //        for (var i = 0; i < cn.length ; i++) {
-    //            var name = ""
-    //            name = cn[i].attributes.firstName + " " + cn[i].attributes.lastName
-    //            console.log("asd;lfkjasd;lfkjasd;lfkj")
-    //            console.log(name)
-    //            cGroup.push(name)
-    //        };
-
-        
-    //        Props.CrewNames = cGroup.slice(0);
-    //        var rt = getRoute(Props)
-    //        rt.then(function (rout) {
-    //            console.log("In Route")
-    //            var dis = 0;
-    //            var a = Parse.GeoPoint;
-    //            var b = Parse.GeoPoint;
-    //            if (rout && rout.length > 0) {
-    //                for (var i = 0; i < rout.length ; i++) {
-
-    //                    if (i == 0) {
-    //                        a = rout[0].attributes.geoPoint
-    //                    }
-    //                    else {
-    //                        b = rout[i].attributes.geoPoint
-    //                        var s = a.milesTo(b)
-    //                        dis = dis + s;
-    //                        a = rout[i].attributes.geoPoint
-    //                    }
-    //                    var ts = ""
-    //                    if (typeof rout[i].attributes.timestamp != 'undefined') {
-    //                        ts = rout[i].attributes.timestamp;
-    //                    }
-    //                    var lat = ""
-    //                    if (typeof rout[i].attributes.geoPoint.latitude != 'undefined') {
-    //                        lat = rout[i].attributes.geoPoint.latitude;
-    //                    };
-    //                    var lon = ""
-    //                    if (typeof rout[i].attributes.geoPoint.longitude != 'undefined') {
-    //                        lon = rout[i].attributes.geoPoint.longitude;
-    //                    };
-    //                    var speed = "";
-    //                    if (typeof rout[i].attributes.speed != 'undefined') {
-    //                        speed = rout[i].attributes.speed;
-    //                    }
-    //                    var bat = "";
-    //                    if (typeof rout[i].attributes.batteryLevel != 'undefined') {
-    //                        bat = rout[i].attributes.batteryLevel;
-    //                    };
-    //                    var alt = "";
-    //                    if (typeof rout[i].attributes.altitude != 'undefined') {
-    //                        alt = rout[i].attributes.altitude;
-    //                    }
-    //                    var rig = "";
-    //                    if (typeof rout[i].attributes.vehicle.id != 'undefined');
-    //                    {
-    //                        rig = rout[i].attributes.vehicle.id;
-    //                    }
-
-    //                    var st = ts + "|" + lat + ":" + lon + "|" + speed + "|" + bat + "|" + alt + " " + dis + " " + rig;
-
-    //                    EncR.push(st)
-    //                };
-    //                Props["Route"] = EncR.slice(0)
-    //                Props["AMiles"] = dis
-
-    //                var d = sortBy(Events, { prop: "Time" });
-    //                d.Count = EventLen
-    //                Props.Events = d;
-    //                return Props;
-    //            };
-    //        });
-    //        var d = sortBy(Events, { prop: "Time" });
-    //        d.Count = EventLen
-    //        Props.Events = d;
-    //        return Props;
-    //    });
-        var d = sortBy(Events, { prop: "Time" });
-        d.Count = EventLen
-        Props.Events = d;
-        return Props;
-    //}
+    return Props;
+   
 };
 var setPropsect = function (pcrObject) {
     s = "";

@@ -84,7 +84,8 @@ var getValue = function (elementList, valueElement) {
     valueObject.IsNull = true;
     returnObject.val = null;
     if (elementList === 'undefined') {
-        //console.log("undefined")
+        this.RaiseError("ElementList Undefined", 100, valueElement, "");
+        return null;
     }
     if (elementList !== 'undefined') {
 
@@ -98,7 +99,6 @@ var getValue = function (elementList, valueElement) {
                 valueObject.IsNull = true;
                 returnObject.val = null;
                 returnObject.text = null;
-                //if ((typeof elementList[i].attributes.value === 'undefined')||(elementList[i].attributes.value ==null ))   //Determine if valueObject exists
                 if (elementList[i].attributes.value == "")   //Determine if valueObject exists
                 {
                     //If Not, retrun NullObject assertion
@@ -124,8 +124,6 @@ var getValue = function (elementList, valueElement) {
                 }
                 else if (elementList[i].attributes.value === null)   //Determine if valueObject exists
                 {
-
-
                     //If Not, retrun NullObject assertion
                     valueObject.Count = 0;
                     returnObject.HasValue = false;
@@ -142,7 +140,6 @@ var getValue = function (elementList, valueElement) {
                             valueObject.pn = elementList[i].attributes.pn;
                             valueObject.HasPN = true;
                         }
-
                     };
                     return valueObject;
                 }
@@ -181,7 +178,7 @@ var getValue = function (elementList, valueElement) {
                                     returnObject.PhoneNumberType = elementList[i].attributes.params.PhoneNumberType.value;
                                     returnObject.PhoneNumberTypeText = elementList[i].attributes.params.PhoneNumberType.description;
                                 } else if (typeof elementList[i].attributes.params.EmailAddressType !== 'undefined') {
-                                    returnObject.EmailType = elementList[i].attributes.params.EmailAddressType.value;
+                                    returnObject.EmailType = elementList[i].attributes.params.EmailAddressType.valvalueObject.ValueArrayue;
                                     returnObject.EmailTypeText = elementList[i].attributes.params.EmailAddressType.description;
                                 }
                                 else {
@@ -224,7 +221,7 @@ exports.IsGo = function (valObject) {
     return true;
 };
 function findById(source, id) {
-    if (source !== 'undefined') {
+    if (typeof source !== 'undefined') {
         if (source !== null) {
             for (var i = 0; i < source.length; i++) {
                 if (source[i].Number !== 'undefined') {
@@ -236,7 +233,6 @@ function findById(source, id) {
         }
     };
     return null;
-    //throw "Couldn't find object with id: " + id;
 }
 var setPN = function (iVal) {
     //  console.log(iVal)
@@ -390,6 +386,7 @@ exports.RaiseError = function (theError, theSeverity, theOrigin, error) {
         };
         Error.Severity = theSeverity;
         if (theSeverity === 0) {
+
             CallErrors.Fatal = true;
         }
     };
@@ -398,7 +395,7 @@ exports.RaiseError = function (theError, theSeverity, theOrigin, error) {
         if (typeof Error == 'undefined') {
             var Error = new Object();
         };
-        Error.SMethod = theError;
+        Error.SMethod = theError + " " + theSeverity;
         Error.Time = mom().format("HH:mm:ss:SS");
         Error.Seq = seq++
     };
@@ -436,15 +433,23 @@ exports.RaiseError = function (theError, theSeverity, theOrigin, error) {
             ErrorList.push(Error);
         }
         else if (theSeverity === 10) {
-            Rules.push(Error)
-            ErrorList.push(Error);
+            Rules.push(Error)            
         }         
         
     }
     
 };
-exports.getCallErrors = function () {
-    return ErrorList;
+exports.getCallErrors = function ()
+{
+    if (typeof ErrorList === 'undefined')
+    {
+        return null;
+    }
+    else
+    {
+        return ErrorList;
+    }
+    
 };
 exports.getCallLog = function () {
     return CallLog;
@@ -470,30 +475,30 @@ function formatPhoneNumber(s) {
     var m = s2.match(/^(\d{3})(\d{3})(\d{4})$/);
     return (!m) ? null : "(" + m[1] + ") " + m[2] + "-" + m[3];
 };
-exports.setBusinessObject = function (elementList, NemsisList, NemsisElement) {    
-    
+exports.setBusinessObject = function (elementList, NemsisList, NemsisElement) {
     var _v = new Array();
-    _v = getValue(elementList, NemsisElement);
     var Props = findById(NemsisList, NemsisElement);
-    if (Props !== null) {
+    if (Props !== null)
+    {
+        _v = getValue(elementList, NemsisElement);
         _v.props = Props;
-    }
-    else {
-        //RaiseError("Element not defined in NEMSIS Config", 10,  NemsisElement, 0);
-    }
-    _v.Name = NemsisElement;
+        _v.Name = NemsisElement;
 
-    var BO = new Object();
-    BO = SetItUp(_v);
-    return BO;
-
+        var BO = new Object();
+        BO = SetItUp(_v);
+        return BO;
+    }
+    else
+    {
+        this.RaiseError("Element not defined in NEMSIS Config", 100, NemsisElement, "");
+    }
 };
 var SetItUp = function (inputVal) {
     var valObj = {};
     var CustomResults = [];
     if (typeof inputVal.fileURL != 'undefined') {
         valObj.fileURL = inputVal.fileURL;
-    }
+    };
     valObj.IsNull = inputVal.IsNull;
     valObj.ElementName = inputVal.props.ElementName;
     valObj.Usage = inputVal.props.Usage;
